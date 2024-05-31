@@ -1,17 +1,18 @@
 <template>
   <v-app id="app">
       <div class="banner">
-        <img src="@/assets/logo.webp"/>
+        <img src="@/assets/images/logo.webp"/>
       </div>
-     
-          <v-list class="navbar">
 
+      <!-- <pre>{{user}}</pre> -->
+      
+          <v-list class="navbar">
               <div class="box-left">
               
               <router-link 
                 class="d-flex align-center menu-link"
                 active-class="activemenu"
-                :to="{ name: 'main'}"
+                to="/"
               >
                 <v-list-item link>
                     <v-list-item-title class="menu-text">หน้าหลัก</v-list-item-title>
@@ -27,18 +28,28 @@
                     <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
                 </v-list-item>
               </router-link>
-
+             
               <router-link 
                 class="d-flex align-center menu-link"
                 active-class="activemenu"
-                :to="{ name: 'registration-list'}"
+                to="/registration-list"
               >
                 <v-list-item link>
-                    <v-list-item-title class="menu-text">ตรวจสอบการลงทเบียน</v-list-item-title>
+                    <v-list-item-title class="menu-text">ตรวจสอบการลงทะเบียน</v-list-item-title>
+                </v-list-item>
+              </router-link>
+
+              <router-link
+                class="d-flex align-center menu-link"
+                active-class="activemenu"
+                to="/manage-employee"
+              >
+                <v-list-item link>
+                    <v-list-item-title class="menu-text">จัดการผู้ใช้งาน</v-list-item-title>
                 </v-list-item>
               </router-link>
             
-              <router-link 
+              <!-- <router-link 
                 class="d-flex align-center menu-link"
                 active-class="activemenu"
                 :to="{ name: 'document'}"
@@ -46,16 +57,38 @@
                 <v-list-item link>
                     <v-list-item-title class="menu-text">เอกสารที่เกี่ยวข้องกับโครงการ</v-list-item-title>
                 </v-list-item>
-              </router-link>
+              </router-link> -->
 
               </div>
 
               <div class="box-right">
-              
-                <v-menu v-if="user" offset-y v-model="menuOpen">
+
+
+                <v-menu v-if="user"
+                  v-model="menu"
+                  offset-y
+                  :close-on-content-click="false"
+                  :active-class="menuActiveClass"
+                  class="header-menu"
+                >
                   <template v-slot:activator="{ on }">
-                    <v-btn class="btn-profile" v-on="on" @click="toggleMenu">
-                      {{user.username}}
+                    <v-btn v-on="on" class="btn-profile h-48">
+                      {{user.employee_id}}
+                      <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
+                    </v-btn>
+                  </template>
+              
+                  <v-list>
+                    <v-list-item v-for="(item, index) in items" :key="index" :to="item.route" :active-class="activeItemClass">
+                      <v-list-item-title >{{ item.text }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+               
+                <!-- <v-menu v-if="user" offset-y v-model="menuOpen">
+                  <template v-slot:activator="{ on }">
+                    <v-btn class="btn-profile h-48" v-on="on" @click="toggleMenu">
+                      {{user.employee_id}}
                       <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
                     </v-btn>
                   </template>
@@ -64,20 +97,18 @@
                       <v-list-item-title @click="selectItem(item)">{{ item }}</v-list-item-title>
                     </v-list-item>
                   </v-list>
-                </v-menu>
+                </v-menu> -->
 
-                <router-link 
+                <router-link v-else
                   class="align-center menu-link"
                   active-class="activemenu"
-                  :to="{ name: 'login'}"
+                  to="/login"
                 >
                   <v-list-item link class="text-right">
                       <v-list-item-title class="menu-text">สำหรับเจ้าหน้าที่</v-list-item-title>
                   </v-list-item>
                 </router-link>
 
-
-               
               </div>
               
 
@@ -91,6 +122,7 @@
             <br>
 
             <router-view></router-view>
+            <br>
           </v-col>
         </v-row>
        
@@ -105,15 +137,33 @@
 <script>
 
 import store from '../store/index.js';
+import { mapGetters } from 'vuex';
 
 export default {
   data() {
     return {
+      menu: false,
+      items: [
+        { text: 'อัพโหลดข้อมูลการชำระเงิน', route: '/receipt-import' },
+        { text: 'สำหรับเจ้าหน้าที่การเงิน', route: '/receipt-list' },
+        { text: 'ออกจากระบบ', route: '/login' }
+      ],
+      menuActiveClass: 'my-dropdown-active', // Custom class for dropdown when active
+      activeItemClass: 'my-list-item-active', // Custom class for active list item
       collapsed: true,
       user: store.getters.user,
       menuOpen: false,
-      items: ['อัพโหลดข้อมูลการชำระเงิน', 'สำหรับเจ้าหน้าที่การเงิน', 'ออกจากระบบ']
+      // items: ['อัพโหลดข้อมูลการชำระเงิน', 'สำหรับเจ้าหน้าที่การเงิน', 'ออกจากระบบ']
     };
+  },
+  computed: {
+    ...mapGetters(['isAuthenticated'])
+  },
+  created(){
+  
+  },
+  mounted(){
+   
   },
   methods: {
     toggleCollapse() {
@@ -125,15 +175,22 @@ export default {
     selectItem(item) {
       switch (item) {
         case "อัพโหลดข้อมูลการชำระเงิน":
-        this.$router.push({name:"receipt-import"});
-        console.log('Selected item:', item);
-            break;
+        if (this.$route.path !== '/receipt-import') {
+          this.$router.push('/receipt-import');
+        }
+          break;
         case "สำหรับเจ้าหน้าที่การเงิน":
-        this.$router.push({name:"receipt-list"});
-            console.log('Selected item:', item);
-            break;
+        if (this.$route.path !== '/receipt-list') {
+          this.$router.push('/receipt-list');
+        }
+          break;
         case "ออกจากระบบ":
-            this.logout()
+            store.dispatch("logout")
+            if (this.$route.path !== '/login') {
+              this.$router.push('/login');
+            }
+            location.reload();
+          
             break;
         default:
             // Default action
@@ -145,14 +202,13 @@ export default {
     },
     async logout() {
 
-      console.log('==========');
-      await store.dispatch("logout");
+      console.log(this.user);
+            await store.dispatch("logout");
+         
+            // await this.$router.push("/login");
 
-      await this.$router.push({name:"main"});
-    
-      // await this.$router.push("/home");
+        }
 
-    }
   }
 };
 </script>
@@ -206,18 +262,18 @@ export default {
       display: flex;
       padding: 8px;
     }
-  .box-left{
-    place-content: flex-start;
-    display: flex;
-  }
-  .box-right{
-    flex: auto;
-    text-align: right;
-  }
-  .box-left a,
-  .box-right a{
-    text-decoration: none;
-  }
+    .box-left{
+      place-content: flex-start;
+      display: flex;
+    }
+    .box-right{
+      flex: auto;
+      text-align: right;
+    }
+    .box-left a,
+    .box-right a{
+      text-decoration: none;
+    }
   .menu-text{
     color: white;
   }
@@ -229,10 +285,16 @@ export default {
     background-color: #f4742b;
     border-radius: 5px;
   }
+
+  /* .activemenu{
+    background-color: #f4742b;
+    border-radius: 5px;
+  } */
   .activemenu:hover,
   .router-link-exact-active:hover{
     background-color: #f4742b;
   }
+
   .btn-profile{
     background-color: transparent!important;
     box-shadow: none;
@@ -245,8 +307,8 @@ export default {
 
   .btn-blue{
     background-color: #243C7F!important;
-    color: white;
-    width: 100%;
+    /* color: white;
+    width: 100%; */
   }
   .btn-blue span{
     color: white;
@@ -281,6 +343,91 @@ export default {
   }
   .text-white{
     color:white;
+  }
+  .text-danger{
+    color: #dc3545;
+  }
+  .text-dark{
+    color: #000;
+  }
+
+  .bg-blue{
+    background: #243C7F;
+  }
+
+  
+  .v-messages__message{
+    line-height: 18px!important;
+  }
+
+  .btn-gray{
+    background-color: #545b62;
+    border-color: #4e555b;
+  }
+  .btn-success{
+    background-color: #69F0AE !important;
+    border: 1px solid #4cae4c !important;
+  }
+
+  .btn-gray span{
+    color: white;
+  }
+  .bg-green{
+    background-color: #69F0AE !important;
+    border: 1px solid #4cae4c !important;
+  } 
+  .bg-green span{
+    color: #000000;
+  }
+
+  .bg-gray{
+    background: #545b62;
+  }
+
+
+  .menu-text{
+    font-size: 18px;
+    line-height: 1.5!important;
+    font-weight: 400;
+  }
+
+  .font-weight-bold{
+    font-weight: 700px;
+  }
+
+  .h-48{
+    height: 48px!important;  
+  }
+
+  .v-radio label{
+    color: #333!important;
+    font-size: 18px;
+  }
+
+  .checkbox-option label{
+    color: #333!important;
+    font-size: 18px;
+  }
+  .checkbox-option .v-messages{
+    display: none;
+  }
+  .f-18{
+    font-size: 18px;
+    
+  }
+  .f-22{
+    font-size: 22px;
+  }
+
+  .text-success{
+    color: #28a745 !important;
+  }
+  .text-gray{
+    color: #6c757d !important;
+  }
+  .my-list-item-active{
+    background-color: #f4742b;
+    font-weight: 700;
   }
 
 </style>

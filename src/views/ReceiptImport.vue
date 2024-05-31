@@ -1,34 +1,215 @@
 <template>
-    <div class="receiptImport">
-        <h2 class="mb-3">อัพโหลดข้อมูลการชำระเงิน</h2> 
-        <v-row justify="center">
-            <v-col cols="10">
-                <p class="style-label">อัพโหลด</p>
+    <div>
+      
+        <div class="receiptImport" id="uploaddiv" :class="{ import: isImport }">
 
-                <v-file-input
-                    v-model="file"
-                    label="เลือกไฟล์"
-                    :prepend-icon="null"
-                    @change="onFileChange"
-                    class="style-input-file"
-                    clearable 
-                    dense
-                    solo
-                >
-                    <template v-slot:append>
-                    <div class="custom">
-                        Browse
-                    </div>
-                    </template>
-                </v-file-input>
-                
-            </v-col>
-        </v-row>
-        <v-row justify="center">
-            <v-btn>ยืนยัน</v-btn>
-        </v-row>
+            <h2 class="mb-3">อัพโหลดข้อมูลการชำระเงิน</h2> 
+            <v-row justify="center">
+                <v-col cols="10">
+                    <p class="style-label">อัพโหลด</p>
+
+                    <v-file-input
+                        v-model="file"
+                        label="เลือกไฟล์"
+                        :prepend-icon="null"
+                    
+                        class="style-input-file"
+                        clearable 
+                        dense
+                        solo
+                    >
+                        <template v-slot:append>
+                        <div class="custom">
+                            Browse
+                        </div>
+                        </template>
+                    </v-file-input>
+                    
+                </v-col>
+            </v-row>
+            <v-row justify="center" class="box-submit">
+                <v-btn class="btn-success" @click="uplaodFile">ยืนยัน</v-btn>
+            </v-row>
+        </div>
+        <div id="showresult" :class="{ modified: isModified }" style="display: none;">
+            <h4 class="mb-3">สำเร็จ</h4> 
+            <div class="box-success">
+                <p>สำเร็จ {{ success }} รายการ</p>
+            </div>
+            <br>
+            <h4 class="mb-3">ไม่สำเร็จ</h4> 
+            <div class="box-unsuccess">
+                <p>ไม่สำเร็จ {{ unsuccess }} รายการ</p>
+            </div>
+
+            <div class="btn-import text-center">
+                <div @click="clearClass" class="f-22 bg-gray box-import">import อีกครั้ง</div>
+                <!-- <router-link to="/receipt-import" class="f-22 bg-gray">import อีกครั้ง</router-link> -->
+            </div>
+        </div>
     </div>
 </template>
+
+
+<script>
+    import axios from "axios";
+    import store from "@/store";
+    import moment from "moment";
+    import Swal from 'sweetalert2';
+    export default{
+        data:() => ({
+            file: null,
+            user: store.getters.user,
+            success: null,
+            unsuccess: null,
+            isModified: false,
+            isImport: false
+        }) ,
+        methods: {
+
+            async uplaodFile() {
+
+                    const file = this.file
+
+                    const reader = new FileReader();
+
+                    reader.onload = async() => {
+                        const content = reader.result;
+
+                        // อ่านไฟล์และแปลงรหัสอักขระของสตริงให้เป็น UTF-8
+                
+                        const utf8Content = this.decodeUnicode(content);
+
+                        try {
+
+                            const digitPath = `/CRAServices/payment/get_format_256`
+
+                            const response = await axios.post(`${digitPath}`, utf8Content, {
+                                headers: {
+                                        "Accept": "text/html",
+                                        "Content-Type": "text/html"
+                                        
+                                    }
+                            })
+
+                            let success = [];
+                            let unsuccess = [];
+                            const dataFormat256 = response.data[0].detail
+
+                            for(let i = 0; i<dataFormat256.length; i++){
+
+                                this.mapStatusRegister(dataFormat256[i])
+                                
+
+                                //DATA สุทธิ
+                                let data = {
+                                    "reference_no_1" : dataFormat256[i].reference_1,
+                                    "reference_no_2":dataFormat256[i].reference_2,
+                                    "course_price":dataFormat256[i].amount
+                                }
+                                
+
+                                const MapRefAndAmount = `/api_gcp/Register/MapRefAndAmount`
+
+                                const response = await axios.post(`${MapRefAndAmount}`, data)
+
+
+                             
+
+                                if(parseInt(response.data[0].SUCCESS) >= 1)
+                                {
+                                    success.push(dataFormat256[i]);
+                                }
+                                else {
+                                    unsuccess.push(dataFormat256[i]);
+                                }
+                            }
+                  
+                            this.success = success.length
+                            this.unsuccess = unsuccess.length
+                            console.log("SUCCESS ====> " + this.success);
+                            console.log("UNSUCCESS ====> " + unsuccess.length);
+
+                            } catch (error) {
+                                // หากเกิดข้อผิดพลาดในการส่งข้อมูล
+                                console.error('Error:', error);
+                            }
+                    };
+
+                    await reader.readAsText(file);
+
+                    // await this.$router.push({name:'ImportListView'})
+
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ',
+                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                    }).then( function(){
+                    });
+
+                    this.isModified = true;
+                    this.isImport = true;
+
+                //  document.getElementById("uploaddiv").style.display = "none";
+                //  document.getElementById("showresult").style.display = "block";
+                
+
+
+
+                },
+
+            async mapStatusRegister(value){
+
+                
+
+                const reference_1 = value.reference_1;
+                const reference_2 = value.reference_2;
+                const amount = value.amount;
+
+                // const replaceReference_1 = reference_1.replace(/\D/g, "")
+                // const replaceReference_2 = reference_2.replace(/\D/g, "")
+                // const replaceAmount      = amount.replace(/\D/g, "")
+
+                const data = {
+                    "reference_no_1"    : reference_1,
+                    "reference_no_2"    : reference_2,
+                    "course_price"      : amount,
+                    "status_register"   : 12003,
+                    "modified_by"       :  this.user.username,
+                    "modified_date"     :  moment().format('YYYY-MM-DD HH:mm:ss'),
+                }
+
+                try {
+                    const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
+                    await axios.post(`${mapStatusReceiptPath}`, data)
+
+                    // console.log(response);
+                    
+                } catch (error) {
+                    console.log('mapStatusReceipt', error);
+                }
+
+
+            },
+
+            decodeUnicode(content) {
+
+                return content.replace(/\\u[\dA-F]{4}/gi, (match) => {
+                    return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
+                });
+            },
+
+            clearClass() {
+                // Set isModified to false when the clear button is clicked
+                this.isImport = false;
+                this.isModified = false;
+                this.file = null;
+            }
+     
+    
+        }
+    }
+</script>
 <style>
 
     .style-input-file .v-input__slot {
@@ -49,4 +230,46 @@
         /* border: 1px solid #ced4da; */
         padding: 10px;
     }
+    .box-submit button{
+  
+        height: 45px!important;
+        width: 270px!important;
+    }
+    .box-submit span {
+        font-size: 18px;
+    }
+    .modified{
+        display: block!important;
+    }
+    .import{
+        display: none;
+    }
+    .box-import{
+        padding: 0.5rem 4rem;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-top: 2rem;
+        display: inline-block;
+
+    }
+    .box-success{
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 1rem;
+        min-height: 300px;
+    }
+    .box-success p{
+       color: green;
+    }
+    .box-unsuccess{
+        border: 1px solid gray;
+        border-radius: 5px;
+        padding: 1rem;
+        min-height: 300px;
+    }
+    .box-unsuccess p{
+        color: red;
+    }
+
 </style>

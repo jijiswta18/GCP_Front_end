@@ -1,65 +1,65 @@
 <template>
-        <div class="login-form">
-           
-            <v-container>
-                <v-form
-                    ref="form"
-                    class="form-login mt-2"
-                    v-model="valid"
-                    lazy-validation
-                    @submit.prevent="login"    
-                >
-                <v-row justify="center">
-                    <h1>เข้าสู่ระบบ / Sign in</h1>
-                </v-row>
+    <div class="login-form">
+        <v-container>
+            <v-form
+                ref="form"
+                class="form-login mt-2"
+                v-model="valid"
+                lazy-validation
+                @submit.prevent="login"    
+            >
+            <v-row justify="center" class="mb-6">
+                <h1>เข้าสู่ระบบ / Sign in</h1>
+            </v-row>
 
-                <v-row justify="center">
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="username"
-                            :rules="usernameRules"
-                            label="Username รหัสพนักงาน"
-                            required
-                            solo
-                            prepend-inner-icon="fa-solid fa-user"
-                            class="style-input-login"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
+            <v-row  no-gutters justify="center">
+                <v-col cols="6">
+                    <v-text-field
+                        v-model="username"
+                        label="Username รหัสพนักงาน"
+                        required
+                        solo
+                        single-line
+                        clearable 
+                        prepend-inner-icon="fa-solid fa-user"
+                        class="style-input-login"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
 
-                <v-row justify="center">
-                    <v-col cols="6">
-                        <v-text-field
-                            v-model="password"
-                            :rules="passwordRules"
-                            label="Password wifi"
-                            required
-                            solo
-                            prepend-inner-icon="fa-solid fa-lock"
-                            class="style-input-login"
-                            :type="showPassword ? 'text' : 'password'"
-                            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                            @click:append="showPassword = !showPassword"
-                            autocomplete="on"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-                    
-                <v-row justify="center">
-                    <v-col cols="6">
-                        <v-btn 
-                            class="btn-blue"
-                            type="submit"
+            <v-row no-gutters justify="center">
+                <v-col cols="6">
+                    <v-text-field
+                        v-model="password"
+                        label="Password wifi"
+                        required
+                        solo
 
-                            :disabled="disabled == true"
-                        >เข้าสู่ระบบ</v-btn>
-                    </v-col>
-                </v-row>
+                        prepend-inner-icon="fa-solid fa-lock"
+                        class="style-input-login"
+                        :type="showPassword ? 'text' : 'password'"
+                        :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                        @click:append="showPassword = !showPassword"
+                        autocomplete="on"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+                
+            <v-row justify="center">
+                <v-col cols="6">
+                    <v-btn 
+                        class="btn-blue h-48"
+                        type="submit"
 
-                </v-form>
-            </v-container>
-          
-        </div>
+                        :disabled="disabled == true"
+                    >เข้าสู่ระบบ / Login</v-btn>
+                </v-col>
+            </v-row>
+
+            </v-form>
+        </v-container>
+        
+    </div>
 
 
     
@@ -70,6 +70,7 @@
 // import axios from "axios";
 import Swal from 'sweetalert2';
 import store  from '../store/index.js';
+
 
 
 export default {
@@ -91,42 +92,26 @@ export default {
         passwordRules: [
             v => !!v || 'กรุณากรอกข้อมูล',
         ],
-        }),
+        check_roles: store.getters.user,
+    }),
         computed: {},
+        
+        
     methods: {
         encodeBase64(str) {
            return btoa(str);
         },
 
         async login(){
-
             if( this.$refs.form.validate()){
                 try {
-
-                // const encodedPassword = this.encodeBase64(this.password);
-                // console.log('Encoded Password:', encodedPassword);
-        
-
                 await store.dispatch('login',{
                         username: this.username,
                         password: this.password,
                     })
-               
-                // let ldapPath = `/ldap/RestfulWS/username/${this.username}/password/${encodedPassword}`
-                
-                // let response = await axios.get(ldapPath);
-                // await axios.get(ldapPath);
 
-                // if(response.data){
-                //     let userPath = `/api_phonebook/phonebook/employee_info/${this.username}`
-                
-                //     let responseUser = await axios.get(userPath);
-
-                //     console.log(responseUser);
-                // }
-                
-           
-                await this.$router.push({name:"registration-list"});
+                await this.$router.push({ path: '/registration-list' });
+                location.reload();
                 await Swal.fire({
                     position: 'center',
                     icon: 'success',
@@ -181,6 +166,7 @@ export default {
         background: #e7e7e7;
         text-align: center;
     }
+
 
     
 </style>

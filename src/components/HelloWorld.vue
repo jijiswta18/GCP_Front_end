@@ -135,7 +135,7 @@
       whatsNext: [
         {
           text: 'Explore components',
-          href: 'https://vuetifyjs.com/components/api-explorer',
+          href: 'https://vuetifyjs.com/components/api_gcp-explorer',
         },
         {
           text: 'Select a layout',
