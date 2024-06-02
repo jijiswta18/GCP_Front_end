@@ -1,8 +1,9 @@
 <template>
     <div class="registrationlist">
         <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
+
         <!-- สิทธิ์ Admin -->
-        <v-row no-gutters>
+        <v-row no-gutters v-if="user">
             <v-col cols="6" class="px-2">
                 <p>สถานะการลงทะเบียน</p>
                 <SelectOption :options="filteredRegiterStatus" @selected="updateRegisterStatus" item-value="select_code"/>
@@ -13,7 +14,8 @@
             </v-col>
         </v-row>
 
-        <v-row no-gutters>
+ 
+        <v-row no-gutters v-if="user">
             <v-col cols="6" class="px-2">
                 <p>ประเภทผู้สมัคร</p>
                 <SelectOption :options="filteredRegiterType" @selected="updateRegiterType" item-value="select_code"/>
@@ -25,7 +27,7 @@
         </v-row>
 
         <div v-if="user">
-            <v-text-field
+            <!-- <v-text-field
                 v-model="search"
                 label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
                 solo
@@ -36,7 +38,7 @@
                 dense
             >
                 <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-            </v-text-field>
+            </v-text-field> -->
 
             <br>
 
@@ -64,11 +66,13 @@
                     </div>
                 </v-col>
             </v-row>
+            <div v-if="dataProfile.length  > 0">
+                <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+            </div>
 
-
-            <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+          
         </div>
-       
+ 
     </div>
 
 </template>
@@ -113,9 +117,6 @@ export default {
         valueCourseType: null,
         valueFood: null,
     }),
-    create(){
-       console.log('=>>>>>>>>>>',this.$route.path);
-    },
     mounted(){
         this.fetchSelectList();
         this.fetchCoursetList();
@@ -137,14 +138,12 @@ export default {
         
         customFilter() {
 
-           
-
             return this.datas.filter(item => {
                 return (
-                    (this.valueRegisterStatus === null || item.status_register.toLowerCase() === this.valueRegisterStatus.toLowerCase())  &&
-                    (this.valueRegiterType === null || item.register_type.toLowerCase() === this.valueRegiterType.toLowerCase()) &&
-                    (this.valueCencelOrder === null || item.cancel_order.toLowerCase() === this.valueCencelOrder.toLowerCase())
-                    // (this.valueCourseType === null || item.course_id.toLowerCase() === this.valueCourseType.toLowerCase())
+                    (this.valueRegisterStatus === null || item.status_register.toLowerCase().ToString() === this.valueRegisterStatus.toLowerCase().ToString())  &&
+                    (this.valueRegiterType === null || item.register_type.toLowerCase().ToString() === this.valueRegiterType.toLowerCase().ToString()) &&
+                    (this.valueCencelOrder === null || item.cancel_order.toLowerCase().ToString() === this.valueCencelOrder.toLowerCase().ToString())
+                    // (this.valueCourseType === null || item.course_id.toLowerCase().ToString() === this.valueCourseType.toLowerCase().ToString())
 
                 );
             });
@@ -218,6 +217,7 @@ export default {
             this.valueRegisterStatus = value;
         },
         updateCencelOrder(value) {
+            console.log(value);
             this.valueCencelOrder = value;
         },
         updateRegiterType(value) {

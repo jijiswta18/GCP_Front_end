@@ -1,6 +1,7 @@
 <template>
     <div class="login-form">
         <v-container>
+          
             <v-form
                 ref="form"
                 class="form-login mt-2"
@@ -48,7 +49,7 @@
             <v-row justify="center">
                 <v-col cols="6">
                     <v-btn 
-                        class="btn-blue h-48"
+                        class="btn-blue h-48 w-100"
                         type="submit"
 
                         :disabled="disabled == true"
@@ -92,7 +93,7 @@ export default {
         passwordRules: [
             v => !!v || 'กรุณากรอกข้อมูล',
         ],
-        check_roles: store.getters.user,
+        user: store.getters,
     }),
         computed: {},
         
@@ -110,16 +111,28 @@ export default {
                         password: this.password,
                     })
 
-                await this.$router.push({ path: '/registration-list' });
-                location.reload();
-                await Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'เข้าสู่ระบบสำเร็จ',
-                    showConfirmButton: false,
-                    timer: 1000
+                    console.log(this.user);
+                if(this.user.checkUser === "204")
+                {
+                    await Swal.fire({
+                    title: 'Error!',
+                    text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
                 })
-
+                }
+                else{
+                    await this.$router.push({ path: '/registration-list' });
+                    location.reload();
+                    await Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'เข้าสู่ระบบสำเร็จ',
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
+                }
+             
             } catch (error) {
                 console.error('Error fetching data:', error);
                 await Swal.fire({
@@ -165,6 +178,9 @@ export default {
     .not-match{
         background: #e7e7e7;
         text-align: center;
+    }
+    .w-100{
+        width: 100%;
     }
 
 

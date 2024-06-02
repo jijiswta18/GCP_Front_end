@@ -2,13 +2,14 @@
     <div class="registerview">
         <h2 class="mb-3">{{ formTitle  }}</h2> 
         <p class="text-required">* จำเป็นต้องระบุ / Required Fields</p>
-        <v-form  ref="form"  v-model="valid" lazy-validation>
+        <v-form  ref="form" lazy-validation>
+        <!-- <v-form  ref="form"  v-model="valid" lazy-validation> -->
             <div class="box-seminar">
                 <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ลงทะเบียนเข้ารับการอบรม</div> 
                 <v-row no-gutters>
                     <v-col cols="12">
                         <p class="style-label"><span>*</span> ประเภทผู้สมัคร</p>
-                        <v-radio-group v-model="dataFrom.register_type"  :disabled="isEdit">
+                        <v-radio-group v-model="dataFrom.register_type"  ref="RegisterTypeField" :disabled="isEdit">
                             <v-radio v-for="option in filteredRegiterStatus" :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
                         </v-radio-group>
@@ -18,9 +19,10 @@
                 <v-row  justify="center" class="mt-3" v-if="dataFrom.register_type">
                   
                     <v-col cols="10">
-
+                        
                         <v-data-table
                             v-model="valueCheckboxCourse"
+                            ref="ValueCourseField" 
                             :headers="headerCourses"
                             :items="filteredOptionCourses"
                             item-value="name"
@@ -47,7 +49,7 @@
                      
                         <template v-slot:[`item.price`]="{ item }">
                             <span v-if="dataFrom.register_type === '40001'">ไม่มีค่าลงทะเบียน</span>
-                            <span v-else>{{ item.price }} บาท</span>
+                            <span v-else>{{ item.price | formatNumber }} บาท</span>
                         
                         </template>
                                    
@@ -55,12 +57,12 @@
                     </v-data-table>
                     </v-col>
                 </v-row>
-                
-                <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 2) " class="mt-7">
+                {{ valueCheckboxCourse }}
+                <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 4)" class="mt-7">
                     <v-col cols="12" class="px-2">
                         <v-card class="px-5 py-5">
                             <p class="style-label">ท่านสนใจเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming " วันที่ 26 กรกฏาคม 2567 ณ ห้องพระอินทร์ 1-2 ชั้น 2  <br> โรงแรมอัศวิน แกรนด์ คอนเวนชั่น หรือไม่ ? * Onsite จำกัด 80 ท่าน เท่านั้น <span>*</span></p>
-                            <v-radio-group v-model="dataFrom.check_course_other" :disabled="isEdit">
+                            <v-radio-group v-model="dataFrom.check_course_other" ref="CheckCourseOtherField" :disabled="isEdit">
                                 <v-radio label="เข้าร่วม" :value="true"></v-radio>
                                 <v-radio label="ไม่เข้ารวม" :value="false"></v-radio>
                             </v-radio-group>
@@ -80,6 +82,7 @@
                             label="เลือก"
                             v-model="dataFrom.title_name"
                             :items="filteredTitleName"
+                            ref="titleNameField"
                             item-text="name"
                             item-value="select_code"
                             solo
@@ -91,6 +94,7 @@
                             <p  class="style-label"> คำนำหน้าอื่น ๆ (โปรดระบุ) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.title_name_other"
+                                ref="titleNameOtherField"
                                 label="คำนำหน้า"
                                 dense
                                 solo
@@ -108,6 +112,7 @@
                         <p class="style-label">ชื่อ (ภาษาไทย) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.name_th"
+                                ref="NameThField"
                                 label="ชื่อ (ภาษาไทย)"
                                 dense
                                 solo
@@ -122,6 +127,7 @@
                         <p class="style-label">นามสกุล (ภาษาไทย) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.lastname_th"
+                                ref="LastNameThField"
                                 label="นามสกุล (ภาษาไทย)"
                                 dense
                                 solo
@@ -138,6 +144,7 @@
                         <p class="style-label">ชื่อ (ภาษาอังกฤษ) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.name_en"
+                                ref="NameEnField"
                                 label="ชื่อ (ภาษาอังกฤษ)"
                                 dense
                                 solo
@@ -152,6 +159,7 @@
                         <p class="style-label">นามสกุล (ภาษาอังกฤษ) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.lastname_en"
+                                ref="LastNameEnField"
                                 label="นามสกุล (ภาษาอังกฤษ)"
                                 dense
                                 solo
@@ -169,6 +177,7 @@
                         <v-autocomplete
                             label="เลือก"
                             v-model="dataFrom.education"
+                            ref="EducationField"
                             :items="filteredEducation"
                             item-text="name"
                             item-value="select_code"
@@ -190,6 +199,7 @@
                         <p class="style-label">ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.receipt_name"
+                            ref="ReceiptNameField"
                             label="ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน"
                             dense
                             solo
@@ -213,7 +223,8 @@
                         <p class="style-label">เลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.id_card_number"
-                            label="ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน"
+                            ref="IdCardNumberField"
+                            label="เลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร"
                             dense
                             solo
                             single-line
@@ -236,6 +247,7 @@
                         <p class="style-label">ชื่อสถานที่ปฏิบัติงาน : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.company_name"
+                            ref="CompanyNameField"
                             label="ชื่อสถานที่ปฏิบัติงาน"
                             dense
                             solo
@@ -252,6 +264,7 @@
                         <p class="style-label">ที่อยู่สถานที่ทำงานเลขที่ : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.company_address"
+                            ref="CompanyAddressField"
                             label="ที่อยู่ (หมู่ / ซอย / ถนน)"
                             dense
                             solo
@@ -269,6 +282,7 @@
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedProvince"
+                            ref="ProvinceField"
                             :items="provinces"
                             item-text="name"
                             item-value="province_code"
@@ -287,6 +301,7 @@
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedDistrict"
+                            ref="DistrictField"
                             :items="districts"
                             item-text="name"
                             item-value="district_code"
@@ -305,6 +320,7 @@
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedSubdistrict"
+                             ref="SubdistrictField"
                             :items="subdistricts"
                             item-text="name"
                             item-value="sub_district_code"
@@ -322,6 +338,7 @@
                         <p class="style-label">รหัสไปรษณีย์ : <span>*</span></p>
                         <v-text-field
                             v-model="postcode"
+                            ref="PostcodeField"
                             label="รหัสไปรษณีย์"
                             dense
                             solo
@@ -339,6 +356,7 @@
                         <p class="style-label"> เบอร์โทรศัพท์มือถือ : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.phone"
+                            ref="PhoneField"
                             label="เบอร์โทรศัพท์มือถือ"
                             dense
                             solo
@@ -355,6 +373,7 @@
                         <p class="style-label">เบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้) : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.phone_other"
+                            ref="PhoneOtherField"
                             label="หมายเลขโทรศัพท์"
                             dense
                             solo
@@ -365,13 +384,14 @@
                         ></v-text-field>
                     </v-col>
                 </v-row>
-
+                <p v-if="errorMessage" class="error_message not-match">ข้อมูลไม่ตรงกัน</p>
                 <v-row no-gutters v-if="dataFrom.register_type === '40002'">
                     <v-col cols="12" class="px-2">
-                        <p class="style-label">อีเมลล์ : <span>*</span></p>
+                        <p class="style-label">อีเมล : <span>*</span></p>
                         <v-text-field
-                            v-model="dataFrom.email"
-                            label="อีเมลล์ "
+                            v-model="dataFrom.email1"
+                            ref="EmailField"
+                            label="อีเมล"
                             dense
                             solo
                             single-line
@@ -384,15 +404,16 @@
 
                 <v-row no-gutters v-if="dataFrom.register_type === '40002'">
                     <v-col cols="12" class="px-2">
-                        <p class="style-label"> ยืนยันอีเมลล์ : <span>*</span></p>
+                        <p class="style-label"> ยืนยันอีเมล : <span>*</span></p>
                         <v-text-field
-                            v-model="dataFrom.confirm_email"
-                            label="ยืนยันอีเมลล์"
+                            v-model="dataFrom.email2"
+                            ref="EmailConfirmField"
+                            label="ยืนยันอีเมล"
                             dense
                             solo
                             single-line
                             clearable 
-                            class="style-input"
+                            :class="{ 'error-text': !handleEnter }"
                             :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
@@ -401,6 +422,7 @@
                 <div v-if="dataFrom.register_type === '40002'" class="d-flex align-center justify-center mb-4">
                     <v-checkbox
                         v-model="dataFrom.confirm_receipt"
+
                         color="primary"
                         hide-details
                         class="pt-0 mt-0"
@@ -418,6 +440,7 @@
                         <p class="style-label">รหัสพนักงาน : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.employee_id"
+                            ref="EmployeeIdField"
                             label="รหัสพนักงาน"
                             dense
                             solo
@@ -438,6 +461,7 @@
                         <v-autocomplete
                             label="เลือก"
                             v-model="dataFrom.job_position"
+                            ref="JobPositionField"
                             :items="filteredPotionJob"
                             item-text="name"
                             item-value="select_code"
@@ -451,7 +475,8 @@
                             <p class="style-label">ตำแหน่งงานอื่น ๆ (โปรดระบุ) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.job_position_other"
-                                label="รหัสพนักงาน"
+                                ref="JobPositionOtherField"
+                                label="ตำแหน่งงานอื่น ๆ (โปรดระบุ)"
                                 dense
                                 solo
                                 single-line
@@ -470,6 +495,7 @@
                         <p class="style-label">ชื่อหน่วยงาน : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.company_name"
+                            ref="CompanyNameField"
                             label="ชื่อหน่วยงาน"
                             dense
                             solo
@@ -487,6 +513,7 @@
                         <p class="style-label">ประสบการณ์ทำงาน (ปี) : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.work_experience"
+                            ref="WorkExperienceField"
                             label="ประสบการณ์ทำงาน"
                             dense
                             solo
@@ -515,6 +542,7 @@
                             <p class="style-label"> ระบุรายละเอียดอาหารที่มีอาการแพ้ : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.food_allergy_detail"
+                                ref="FoodAllergyDetailField"
                                 label="ระบุอาหารที่แพ้"
                                 dense
                                 solo
@@ -537,7 +565,8 @@
                             <p class="style-label"> ระบุรายละเอียดประเภทอาหาร : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.food_other"
-                                label="ระบุอาหารที่แพ้"
+                                ref="FoodOtherField"
+                                label="ระบุรายละเอียดประเภทอาหาร"
                                 dense
                                 solo
                                 single-line
@@ -564,7 +593,7 @@
                 <v-row no-gutters>
                     <v-col cols="12">
                         <p class="style-label"> เลือกประเภทข้อมูลใบเสร็จรับเงิน : <span>*</span></p>
-                        <v-radio-group v-model="dataFrom.select_receipt" >
+                        <v-radio-group v-model="dataFrom.select_receipt"  ref="SelectReceiptField">
                             <v-radio v-for="option in filteredOptionReceipt" :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
                         </v-radio-group>
@@ -618,6 +647,11 @@
 
     </div>
 </template>
+<style>
+.error-text {
+  color: red;
+}
+</style>
 <script>
     import axios from 'axios';
     import moment from "moment";
@@ -639,6 +673,7 @@
             selectedDistrict: null,
             selectedSubdistrict: null,
             selectedPostcode: null,
+            errorMessage:'',
             headerCourses: [
                 { text: 'name', align: 'left', value: 'name' },
                 { text: 'type_register', align: 'left', value: 'type_seminar' },
@@ -646,7 +681,15 @@
 
             ],
         }),
+        filters: {
+            formatNumber(value) {
+            return new Intl.NumberFormat().format(value)
+            }
+        },
         computed: {
+            handleEnter: function() {
+                return this.dataFrom.email1 === this.dataFrom.email2;
+            },
             formTitle () {
                 return this.$route.params.id  ? 'แก้ไขข้อมูลลงทะเบียน' : 'ลงทะเบียน'
             },
@@ -654,8 +697,8 @@
                 return this.options.filter(option => option.select_catagory === 1);
             },
             filteredEducation() {
-            return this.options.filter(option => option.select_catagory === 3);
-        },
+                return this.options.filter(option => option.select_catagory === 3);
+            },
             filteredRegiterStatus() {
                 return this.options.filter(option => option.select_catagory === 4);
             },
@@ -672,22 +715,19 @@
                 return this.options.filter(option => option.select_catagory === 9);
             },
             filteredOptionCourses() {
-            
-            let optionsCourses = []
-            if(this.dataFrom.register_type === '40001'){
-                optionsCourses = this.optionsCourses.filter(option => option.name === 'Onsite');
-            }else{
-                optionsCourses = this.optionsCourses.filter(option => option.name === 'Onsite' || option.name === 'Online');
+                
+                let optionsCourses = []
+                if(this.dataFrom.register_type === '40001'){
+                    optionsCourses = this.optionsCourses.filter(option => option.type_register === '40001' );
+                }else{
+                    optionsCourses = this.optionsCourses.filter(option =>  option.type_register != '40001' );
 
-            }
+                }
 
-            return optionsCourses;
-        },
+                return optionsCourses;
+            },
 
 
-        },
-        watch: {
-          
         },
         mounted(){
             this.fetchProvinces();
@@ -701,92 +741,155 @@
             }
         },
         methods: {
+     
+            textMatch() {
+                return this.dataFrom.email1 === this.dataFrom.email2
+            },
+
+            showError(message, fieldRef) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: message
+                }).then(() => {
+                    const tableContainer = fieldRef.$el.querySelector('.v-data-table');
+                    const input = fieldRef.$el.querySelector('input');
+                    const firstRadioButton = fieldRef.$el.querySelector('input[type="radio"]');
+                    if(input){
+                        input.focus();
+                    }
+            
+                    if (tableContainer) {
+                        tableContainer.focus();
+                    }
+                    if (firstRadioButton) {
+                    firstRadioButton.focus();
+                    }
+                });
+            },
+
             async saveRegister(){
-                if(this.$refs.form.validate()){
-                    if(this.isEdit === false){
-                        console.log('=======');
-                        try {
-                            // รับวันที่ปัจจุบัน
-                            let currentDate = moment();
+                const { 
+                    register_type, 
+                    title_name, title_name_other,
+                    name_th, lastname_th, name_en, lastname_en, education,
+                    receipt_name, id_card_number, company_name, company_address, 
+                    phone, phone_other, email, email2,
+                    employee_id, job_position, job_position_other, work_experience,
+                    food_allergy, food_allergy_detail, food, food_other, select_receipt
+                 } = this.dataFrom;
 
-                            // เพิ่ม 3 วัน
-                            currentDate.add(3, 'days');
+                 if (!register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
+                //  if (this.valueCheckboxCourse) return this.showError('กรุณาระบุอัตราค่าสมัครเข้าอบรม', this.$refs.ValueCourseField);
+                //  if (this.valueCheckboxCourse.find(it => it.id === 1 || it.id === 2) && !check_course_other) return this.showError('กรุณาระบุการเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming"', this.$refs.CheckCourseOtherField);
+                 if (!title_name) return this.showError('กรุณาระบุคำนำหน้า', this.$refs.titleNameField);
+                 if (title_name === '10013' && !title_name_other) return this.showError('กรุณาระบุคำนำหน้าอื่น ๆ', this.$refs.titleNameOtherField);
+                 if (!name_th) return this.showError('กรุณาระบุชื่อ', this.$refs.NameThField);
+                 if (!lastname_th) return this.showError('กรุณาระบุนามสกุล', this.$refs.LastNameThField);
+                 if (!name_en) return this.showError('กรุณาระบุชื่อภาษาอังกฤษ', this.$refs.NameEnField);
+                 if (!lastname_en) return this.showError('กรุณาระบุนามสกุลภาษาอังกฤษ', this.$refs.LastNameEnField);
+                 if (register_type === '40002' && !education) return this.showError('กรุณาระบุคุณวุฒิการศึกษาสูงสุด', this.$refs.EducationField);
+                 if (register_type === '40002' && !receipt_name) return this.showError('กรุณาระบุชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน', this.$refs.ReceiptNameField);
+                 if (register_type === '40002' && !id_card_number) return this.showError('กรุณาระบุเลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร ', this.$refs.IdCardNumberField);
+                 if (!company_name) return this.showError('กรุณาระบุชื่อสถานที่ปฏิบัติงาน', this.$refs.CompanyNameField);
+                 if (register_type === '40002' && !company_address) return this.showError('กรุณาระบุที่อยู่สถานที่ทำงานเลขที่', this.$refs.CompanyAddressField);
+                 if (register_type === '40002' && !this.selectedProvince) return this.showError('กรุณาเลือกจังหวัด', this.$refs.ProvinceField);
+                 if (register_type === '40002' && !this.selectedDistrict) return this.showError('กรุณาเลือกเขต/อำเภอ', this.$refs.DistrictField);
+                 if (register_type === '40002' && !this.selectedSubdistrict) return this.showError('กรุณาเลือกแขวง/ตำบล', this.$refs.SubdistrictField);
+                 if (register_type === '40002' && !this.PostcodeField) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.postcode);
+                 if (!phone) return this.showError('กรุณาระบุเบอร์โทรศัพท์มือถือ', this.$refs.PhoneField);
+                 if (!phone_other) return this.showError('กรุณาระบุเบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้)', this.$refs.PhoneOtherField);
+                 if (register_type === '40002' && !email) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
+                 if (register_type === '40002' && !email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
+                 if (register_type === '40001' &&!employee_id) return this.showError('กรุณาระบุรหัสพนักงาน', this.$refs.EmployeeIdField);
+                 if (!job_position) return this.showError('กรุณาระบุตำแหน่งงาน', this.$refs.JobPositionField);
+                 if (job_position === '20008' && !job_position_other) return this.showError('กรุณาระบุตำแหน่งงานอื่น ๆ', this.$refs.JobPositionOtherField);
+                 if (!work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
+                 if (food_allergy === '50001' && !food_allergy_detail) return this.showError('กรุณาระบุรายละเอียดอาหารที่มีอาการแพ้', this.$refs.FoodAllergyDetailField);
+                 if (food === '70004' && !food_other) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodOtherField);
+                 if (select_receipt) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
 
-                            // รูปแบบใหม่ (YYYY-MM-DD HH:mm:ss)
-                            let start_date = moment.format('YYYY-MM-DD HH:mm:ss');
-                            let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
+                if(this.isEdit === false){
+                    try {
+                        // รับวันที่ปัจจุบัน
+                        let currentDate = moment();
 
-                            const fd = {
+                        // เพิ่ม 3 วัน
+                        currentDate.add(3, 'days');
+
+                        // รูปแบบใหม่ (YYYY-MM-DD HH:mm:ss)
+                        let start_date = moment.format('YYYY-MM-DD HH:mm:ss');
+                        let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
+
+                        const fd = {
+                
+                        "register_type"             : this.dataFrom.register_type,
+                        "course_id"                 : this.valueCheckboxCourse[0].id,
+                        "course_name"               : this.valueCheckboxCourse[0].name,
+                        "course_price"              : this.valueCheckboxCourse[0].price,
+                        "check_course_other_other"        : this.dataFrom.check_course_other,
+                        "title_name"                : this.dataFrom.title_name,
+                        "title_name_other"          : this.dataFrom.title_name_other,
+                        "name_th"                   : this.dataFrom.name_th,
+                        "lastname_th"               : this.dataFrom.lastname_th,
+                        "name_en"                   : this.dataFrom.name_en,
+                        "lastname_en"               : this.dataFrom.lastname_en,
+                        "education"                 : this.dataFrom.education,
+                        "receipt_name"              : this.dataFrom.receipt_name,
+                        "id_card_number"            : this.dataFrom.id_card_number,
+                        "confirm_receipt"           : this.dataFrom.confirm_receipt,
+                        "company_name"              : this.dataFrom.company_name,
+                        "company_address"           : this.dataFrom.company_address,
+                        "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
+                        "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
+                        "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
+                        "postcode"                  : this.postcode,
+                        "email"                     : this.dataFrom.email,
+                        "phone"                     : this.dataFrom.phone,
+                        "phone_other"               : this.dataFrom.phone_other,
+                        "employee_id"               : this.dataFrom.employee_id,
+                        "job_position"              : this.dataFrom.job_position,
+                        "job_position_other"        : this.dataFrom.job_position_other,
+                        "work_experience"           : this.dataFrom.work_experience,
+                        "food_allergy"              : this.dataFrom.food_allergy,
+                        "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
+                        "food"                      : this.dataFrom.food,
+                        "food_other"                : this.dataFrom.food_other,
+                        "receipt_order"             : this.dataFrom.select_receipt, 
+                        "confirm_register"          : this.dataFrom.confirm_register,
+                        "create_date"               : start_date,
+                        "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
+                        "end_date"                  : end_date,
+                        "cance_oreder"              : 11002,
+                    }
+
+
+                    const registerPath = `/api_gcp/Register/addRegister`
+
+                    let response =  await axios.post(`${registerPath}`, fd)
+
+
+                    if(response.data.data){
+                        this.getDigit(response.data.data) 
+                    }
+
                     
-                            "register_type"             : this.dataFrom.register_type,
-                            "course_id"                 : this.valueCheckboxCourse[0].id,
-                            "course_name"               : this.valueCheckboxCourse[0].name,
-                            "course_price"              : this.valueCheckboxCourse[0].price,
-                            "check_course_other_other"        : this.dataFrom.check_course_other,
-                            "title_name"                : this.dataFrom.title_name,
-                            "title_name_other"          : this.dataFrom.title_name_other,
-                            "name_th"                   : this.dataFrom.name_th,
-                            "lastname_th"               : this.dataFrom.lastname_th,
-                            "name_en"                   : this.dataFrom.name_en,
-                            "lastname_en"               : this.dataFrom.lastname_en,
-                            "education"                 : this.dataFrom.education,
-                            "receipt_name"              : this.dataFrom.receipt_name,
-                            "id_card_number"            : this.dataFrom.id_card_number,
-                            "confirm_receipt"           : this.dataFrom.confirm_receipt,
-                            "company_name"              : this.dataFrom.company_name,
-                            "company_address"           : this.dataFrom.company_address,
-                            "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
-                            "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
-                            "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
-                            "postcode"                  : this.postcode,
-                            "email"                     : this.dataFrom.email,
-                            "phone"                     : this.dataFrom.phone,
-                            "phone_other"               : this.dataFrom.phone_other,
-                            "employee_id"               : this.dataFrom.employee_id,
-                            "job_position"              : this.dataFrom.job_position,
-                            "job_position_other"        : this.dataFrom.job_position_other,
-                            "work_experience"           : this.dataFrom.work_experience,
-                            "food_allergy"              : this.dataFrom.food_allergy,
-                            "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
-                            "food"                      : this.dataFrom.food,
-                            "food_other"                : this.dataFrom.food_other,
-                            "receipt_order"             : this.dataFrom.select_receipt, 
-                            "confirm_register"          : this.dataFrom.confirm_register,
-                            "create_date"               : start_date,
-                            "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
-                            "end_date"                  : end_date,
-                            "cance_oreder"              : 11002,
-                        }
-
-                        console.log(fd);
-                        console.log(this.dataFrom);
-                        console.log(this.valueCheckboxCourse);
-                        const registerPath = `/api_gcp/Register/addRegister`
-
-                        let response =  await axios.post(`${registerPath}`, fd)
-
-                        console.log(response);
-
-                        if(response.data.data){
-                            this.getDigit(response.data.data) 
-                        }
-
-                        
-                        await Swal.fire({
-                            icon: 'success',
-                            title: 'บันทึกสำเร็จ',
-                            text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-                        }).then( function(){
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ',
+                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                    }).then( function(){
 
 
-                        });
+                    });
 
-                        await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
+                    await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
 
-                        } catch (error) {
-                            console.error('Error Insert register:', error);
-                        }
-                    }else{
+                    } catch (error) {
+                        console.error('Error Insert register:', error);
+                    }
+                }else{
+                    try {
 
                         const date = moment();
                         const formattedDate = date.format('YYYY-MM-DD HH:mm:ss'); 
@@ -839,17 +942,165 @@
 
 
                         });
-
-
+                    } catch (error) {
+                        console.log('editRegister',error);
                     }
-                 
-                }else{
-                    await Swal.fire({
-                        icon: 'warning',
-                        title: 'Oops...',
-                    });
+
                 }
+               
+             
             },
+            // async saveRegister(){
+            //     if(this.$refs.form.validate()){
+            //         if(this.isEdit === false){
+            //             console.log('=======');
+            //             try {
+            //                 // รับวันที่ปัจจุบัน
+            //                 let currentDate = moment();
+
+            //                 // เพิ่ม 3 วัน
+            //                 currentDate.add(3, 'days');
+
+            //                 // รูปแบบใหม่ (YYYY-MM-DD HH:mm:ss)
+            //                 let start_date = moment.format('YYYY-MM-DD HH:mm:ss');
+            //                 let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
+
+            //                 const fd = {
+                    
+            //                 "register_type"             : this.dataFrom.register_type,
+            //                 "course_id"                 : this.valueCheckboxCourse[0].id,
+            //                 "course_name"               : this.valueCheckboxCourse[0].name,
+            //                 "course_price"              : this.valueCheckboxCourse[0].price,
+            //                 "check_course_other_other"        : this.dataFrom.check_course_other,
+            //                 "title_name"                : this.dataFrom.title_name,
+            //                 "title_name_other"          : this.dataFrom.title_name_other,
+            //                 "name_th"                   : this.dataFrom.name_th,
+            //                 "lastname_th"               : this.dataFrom.lastname_th,
+            //                 "name_en"                   : this.dataFrom.name_en,
+            //                 "lastname_en"               : this.dataFrom.lastname_en,
+            //                 "education"                 : this.dataFrom.education,
+            //                 "receipt_name"              : this.dataFrom.receipt_name,
+            //                 "id_card_number"            : this.dataFrom.id_card_number,
+            //                 "confirm_receipt"           : this.dataFrom.confirm_receipt,
+            //                 "company_name"              : this.dataFrom.company_name,
+            //                 "company_address"           : this.dataFrom.company_address,
+            //                 "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
+            //                 "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
+            //                 "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
+            //                 "postcode"                  : this.postcode,
+            //                 "email"                     : this.dataFrom.email,
+            //                 "phone"                     : this.dataFrom.phone,
+            //                 "phone_other"               : this.dataFrom.phone_other,
+            //                 "employee_id"               : this.dataFrom.employee_id,
+            //                 "job_position"              : this.dataFrom.job_position,
+            //                 "job_position_other"        : this.dataFrom.job_position_other,
+            //                 "work_experience"           : this.dataFrom.work_experience,
+            //                 "food_allergy"              : this.dataFrom.food_allergy,
+            //                 "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
+            //                 "food"                      : this.dataFrom.food,
+            //                 "food_other"                : this.dataFrom.food_other,
+            //                 "receipt_order"             : this.dataFrom.select_receipt, 
+            //                 "confirm_register"          : this.dataFrom.confirm_register,
+            //                 "create_date"               : start_date,
+            //                 "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
+            //                 "end_date"                  : end_date,
+            //                 "cance_oreder"              : 11002,
+            //             }
+
+            //             console.log(fd);
+            //             console.log(this.dataFrom);
+            //             console.log(this.valueCheckboxCourse);
+            //             const registerPath = `/api_gcp/Register/addRegister`
+
+            //             let response =  await axios.post(`${registerPath}`, fd)
+
+            //             console.log(response);
+
+            //             if(response.data.data){
+            //                 this.getDigit(response.data.data) 
+            //             }
+
+                        
+            //             await Swal.fire({
+            //                 icon: 'success',
+            //                 title: 'บันทึกสำเร็จ',
+            //                 text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+            //             }).then( function(){
+
+
+            //             });
+
+            //             await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
+
+            //             } catch (error) {
+            //                 console.error('Error Insert register:', error);
+            //             }
+            //         }else{
+
+            //             const date = moment();
+            //             const formattedDate = date.format('YYYY-MM-DD HH:mm:ss'); 
+
+            //             const fdEdit = {
+            //                 "register_id"               : this.dataFrom.id,
+            //                 "title_name"                : this.dataFrom.title_name,
+            //                 "title_name_other"          : this.dataFrom.title_name_other,
+            //                 "name_th"                   : this.dataFrom.name_th,
+            //                 "lastname_th"               : this.dataFrom.lastname_th,
+            //                 "name_en"                   : this.dataFrom.name_en,
+            //                 "lastname_en"               : this.dataFrom.lastname_en,
+            //                 "education"                 : this.dataFrom.education,
+            //                 "receipt_name"              : this.dataFrom.receipt_name,
+            //                 "id_card_number"            : this.dataFrom.id_card_number,
+            //                 "confirm_receipt"           : this.dataFrom.confirm_receipt,
+            //                 "company_name"              : this.dataFrom.company_name,
+            //                 "company_address"           : this.dataFrom.company_address,
+            //                 "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
+            //                 "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
+            //                 "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
+            //                 "postcode"                  : this.postcode,
+            //                 "email"                     : this.dataFrom.email,
+            //                 "phone"                     : this.dataFrom.phone,
+            //                 "phone_other"               : this.dataFrom.phone_other,
+            //                 "employee_id"               : this.dataFrom.employee_id,
+            //                 "job_position"              : this.dataFrom.job_position,
+            //                 "job_position_other"        : this.dataFrom.job_position_other,
+            //                 "work_experience"           : this.dataFrom.work_experience,
+            //                 "food_allergy"              : this.dataFrom.food_allergy,
+            //                 "food_allergy_detail"       : this.dataFrom.food_allergy !== "50001" ?  null : this.dataFrom.food_allergy_detail,
+            //                 "food"                      : this.dataFrom.food,
+            //                 "food_other"                : this.dataFrom.food !== "70004" ? null : this.dataFrom.food_other,
+            //                 "receipt_order"           : this.dataFrom.select_receipt, 
+            //                 "confirm_register"          : this.dataFrom.confirm_register,
+            //                 "modified_by"               : this.dataFrom.id,
+            //                 "modified_date"             : formattedDate
+            //             }
+
+            //             console.log(fdEdit);
+
+            //             const registerEditPath = `/api_gcp/Register/editRegister`
+            //             await axios.post(`${registerEditPath}`, fdEdit)
+
+            //             await Swal.fire({
+            //                 icon: 'success',
+            //                 title: 'บันทึกสำเร็จ',
+            //                 text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+            //             }).then( function(){
+
+
+            //             });
+
+
+            //         }
+                 
+            //     }else{
+            //         await Swal.fire({
+            //             icon: 'warning',
+            //             title: 'Oops...',
+            //         });
+            //     }
+            // },
+
+
             async getDigit(id){
 
                 let idProject           = '0041'
@@ -903,10 +1154,12 @@
 
                 this.dataFrom                   = datas
                 
-                this.valueCheckboxCourse.id  = datas.course_id
+                // this.valueCheckboxCourse        = datas.course_id
+                let test = {"id": datas.course_id };
+                
+                this.valueCheckboxCourse.push(test);
 
-                console.log(this.valueCheckboxCourse.value);
-
+                console.log(this.valueCheckboxCourse);
 
                 console.log(datas);
                 // setTimeout(async ()  => {
@@ -1060,5 +1313,8 @@
         padding: 16px!important;
         font-size: 18px!important;
         color: #000!important;
+    }
+    .error-text input{
+        color: red!important;
     }
 </style>

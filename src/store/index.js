@@ -6,8 +6,11 @@ import VuexPersistence from 'vuex-persist'
 Vue.use(Vuex)
 
 const getDefaultState = () => {
+
+  
   return {
     user: null,
+    checkUser: null,
   }
 }
 
@@ -21,15 +24,24 @@ export default new Vuex.Store({
       // console.log('state', state);
       return state.user
     },
+    checkUser (state) {
+      // console.log('state', state);
+      return state.checkUser
+    },
+
   },
   mutations: {
     authUser (state, data) {
       state.user = data
     },
+    checkUser (state, data) {
+      state.checkUser = data
+    },
     
     clearAuthUser (state){
 
       state.user = null
+      state.checkUser = null
       localStorage.removeItem('expirationDate')
 
     }
@@ -39,6 +51,7 @@ export default new Vuex.Store({
   
     async login ( {commit}, authData){
   
+      commit('checkUser', null);
       // let ldapPath = `/ldap/RestfulWS/username/${authData.username}/password/${authData.password}`
               
       // let response = await axios.get(ldapPath);
@@ -47,6 +60,9 @@ export default new Vuex.Store({
               
       let response = await axios.post(adPath, authData);
 
+
+      console.log(response);
+   
       // commit('authUser', response.data.result)
 
 
@@ -69,7 +85,9 @@ export default new Vuex.Store({
         localStorage.setItem("expirationDate", now + expirationTime);
 
       }
-
+      else if(response.data.code === "204"){
+        commit('checkUser', "204");
+      }
     },
 
     async logout({commit}){

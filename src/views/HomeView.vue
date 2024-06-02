@@ -4,139 +4,130 @@
         <img src="@/assets/images/logo.webp"/>
       </div>
 
-      <!-- <pre>{{user}}</pre> -->
-      
-          <v-list class="navbar">
-              <div class="box-left">
-              
-              <router-link 
-                class="d-flex align-center menu-link"
-                active-class="activemenu"
-                to="/"
-              >
-                <v-list-item link>
-                    <v-list-item-title class="menu-text">หน้าหลัก</v-list-item-title>
-                </v-list-item>
-              </router-link>
-
-              <router-link 
-                class="d-flex align-center menu-link"
-                active-class="activemenu"
-                :to="{ name: 'registration'}"
-              >
-                <v-list-item link>
-                    <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
-                </v-list-item>
-              </router-link>
-             
-              <router-link 
-                class="d-flex align-center menu-link"
-                active-class="activemenu"
-                to="/registration-list"
-              >
-                <v-list-item link>
-                    <v-list-item-title class="menu-text">ตรวจสอบการลงทะเบียน</v-list-item-title>
-                </v-list-item>
-              </router-link>
-
-              <router-link
-                class="d-flex align-center menu-link"
-                active-class="activemenu"
-                to="/manage-employee"
-              >
-                <v-list-item link>
-                    <v-list-item-title class="menu-text">จัดการผู้ใช้งาน</v-list-item-title>
-                </v-list-item>
-              </router-link>
+        <v-list class="navbar">
+            <div class="box-left">
             
-              <!-- <router-link 
-                class="d-flex align-center menu-link"
-                active-class="activemenu"
-                :to="{ name: 'document'}"
+            <router-link 
+              class="d-flex align-center menu-link"
+              active-class="activemenu"
+              to="/"
+            >
+              <v-list-item link>
+                  <v-list-item-title class="menu-text">หน้าหลัก</v-list-item-title>
+              </v-list-item>
+            </router-link>
+
+            <router-link 
+              class="d-flex align-center menu-link"
+              active-class="activemenu"
+              :to="{ name: 'registration'}"              >
+            
+              <v-list-item link v-if="user?.menu_register || checkDate">
+                  <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
+              </v-list-item>
+            </router-link>
+            
+            <router-link 
+              class="d-flex align-center menu-link"
+              active-class="activemenu"
+              to="/registration-list"
+            >
+              <v-list-item link>
+                  <v-list-item-title class="menu-text">ตรวจสอบการลงทะเบียน</v-list-item-title>
+              </v-list-item>
+            </router-link>
+
+            <router-link
+              class="d-flex align-center menu-link"
+              active-class="activemenu"
+              to="/manage-employee"
+            >
+              <v-list-item link>
+                  <v-list-item-title class="menu-text">จัดการผู้ใช้งาน</v-list-item-title>
+              </v-list-item>
+            </router-link>
+          
+            <!-- <router-link 
+              class="d-flex align-center menu-link"
+              active-class="activemenu"
+              :to="{ name: 'document'}"
+            >
+              <v-list-item link>
+                  <v-list-item-title class="menu-text">เอกสารที่เกี่ยวข้องกับโครงการ</v-list-item-title>
+              </v-list-item>
+            </router-link> -->
+
+            </div>
+
+            <div class="box-right">
+
+
+              <v-menu v-if="user != null"
+                v-model="menu"
+                offset-y
+                :close-on-content-click="false"
+                :active-class="menuActiveClass"
+                class="header-menu"
               >
-                <v-list-item link>
-                    <v-list-item-title class="menu-text">เอกสารที่เกี่ยวข้องกับโครงการ</v-list-item-title>
-                </v-list-item>
-              </router-link> -->
-
-              </div>
-
-              <div class="box-right">
-
-
-                <v-menu v-if="user"
-                  v-model="menu"
-                  offset-y
-                  :close-on-content-click="false"
-                  :active-class="menuActiveClass"
-                  class="header-menu"
-                >
-                  <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" class="btn-profile h-48">
-                      {{user.employee_id}}
-                      <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
-                    </v-btn>
-                  </template>
-              
-                  <v-list>
-                    <v-list-item v-for="(item, index) in items" :key="index" :to="item.route" :active-class="activeItemClass">
-                      <v-list-item-title >{{ item.text }}</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-               
-                <!-- <v-menu v-if="user" offset-y v-model="menuOpen">
-                  <template v-slot:activator="{ on }">
-                    <v-btn class="btn-profile h-48" v-on="on" @click="toggleMenu">
-                      {{user.employee_id}}
-                      <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list>
-                    <v-list-item v-for="(item, index) in items" :key="index">
-                      <v-list-item-title @click="selectItem(item)">{{ item }}</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu> -->
-
-                <router-link v-else
-                  class="align-center menu-link"
-                  active-class="activemenu"
-                  to="/login"
-                >
-                  <v-list-item link class="text-right">
-                      <v-list-item-title class="menu-text">สำหรับเจ้าหน้าที่</v-list-item-title>
+                <template v-slot:activator="{ on }">
+                  <v-btn v-on="on" class="btn-profile h-48">
+                    {{user.employee_id}}
+                    <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
+                  </v-btn>
+                </template>
+            
+                <v-list>
+                  <v-list-item to="/receipt-import">
+                    <v-list-item-title>อัพโหลดข้อมูลการชำระเงิน</v-list-item-title>
                   </v-list-item>
-                </router-link>
+                  <v-list-item to="/receipt-list">
+                    <v-list-item-title>สำหรับเจ้าหน้าที่การเงิน</v-list-item-title>
+                  </v-list-item>
+                <v-list-item class="cursor-pointer">
+                  <v-list-item-title @click="logout">ออกจากระบบ</v-list-item-title>
+                </v-list-item>
+                </v-list>
+              </v-menu>
 
-              </div>
-              
+              <router-link v-else
+                class="align-center menu-link"
+                active-class="activemenu"
+                to="/login"
+              >
+                <v-list-item link class="text-right">
+                    <v-list-item-title class="menu-text">สำหรับเจ้าหน้าที่</v-list-item-title>
+                </v-list-item>
+              </router-link>
 
-           
-          </v-list>
+            </div>
+            
+
+          
+        </v-list>
        
-    <v-main class="main">
-      <v-container fluid>
-        <v-row  justify="center">
-          <v-col cols="11">
-            <br>
+      <v-main class="main">
+        <v-container fluid>
+          <v-row  justify="center">
+            <v-col cols="11">
+              <br>
 
-            <router-view></router-view>
-            <br>
-          </v-col>
-        </v-row>
-       
+              <router-view></router-view>
+              <br>
+            </v-col>
+          </v-row>
+        
+        
+        </v-container>
       
-      </v-container>
-    
 
-    </v-main>
+      </v-main>
   </v-app>
 </template>
 
 <script>
 
 import store from '../store/index.js';
+import axios from 'axios';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -153,6 +144,7 @@ export default {
       collapsed: true,
       user: store.getters.user,
       menuOpen: false,
+      checkDate: false,
       // items: ['อัพโหลดข้อมูลการชำระเงิน', 'สำหรับเจ้าหน้าที่การเงิน', 'ออกจากระบบ']
     };
   },
@@ -160,52 +152,37 @@ export default {
     ...mapGetters(['isAuthenticated'])
   },
   created(){
-  
-  },
-  mounted(){
    
   },
+  mounted(){
+    this.getMenuRegisterOpening()
+  },
   methods: {
+    async getMenuRegisterOpening(){
+      const path = '/api_gcp/Register/getMenuRegisterOpening'
+      const response = await axios.get(path);
+
+      this.checkDate = response.data
+
+      console.log(this.checkDate);
+
+      
+
+    },
     toggleCollapse() {
       this.collapsed = !this.collapsed;
     },
     toggleMenu() {
       this.menuOpen = !this.menuOpen;
     },
-    selectItem(item) {
-      switch (item) {
-        case "อัพโหลดข้อมูลการชำระเงิน":
-        if (this.$route.path !== '/receipt-import') {
-          this.$router.push('/receipt-import');
-        }
-          break;
-        case "สำหรับเจ้าหน้าที่การเงิน":
-        if (this.$route.path !== '/receipt-list') {
-          this.$router.push('/receipt-list');
-        }
-          break;
-        case "ออกจากระบบ":
-            store.dispatch("logout")
-            if (this.$route.path !== '/login') {
-              this.$router.push('/login');
-            }
-            location.reload();
-          
-            break;
-        default:
-            // Default action
-            break;
-      }
-     
-
-      // Do something with the selected item
-    },
+  
     async logout() {
 
       console.log(this.user);
             await store.dispatch("logout");
          
-            // await this.$router.push("/login");
+            await this.$router.push("/login");
+            location.reload();
 
         }
 
@@ -285,7 +262,13 @@ export default {
     background-color: #f4742b;
     border-radius: 5px;
   }
-
+  .v-list-item--active{
+    background-color: #f4742b;
+  
+  }
+  .v-list-item--active .v-list-item__title{
+    color: white!important;
+  }
   /* .activemenu{
     background-color: #f4742b;
     border-radius: 5px;

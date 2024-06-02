@@ -349,8 +349,9 @@
                     console.log(reference_no_2);
                     console.log( id);
 
+                  
                     window.print();
-
+                    
                     this.$router.push({ path: '/' }); 
 
                 } catch (error) {

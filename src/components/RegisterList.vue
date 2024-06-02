@@ -1,6 +1,18 @@
 <template>
     <div>
 
+        <v-text-field
+            v-model="search"
+            :label="formTitle"
+            solo
+            class="style-input-search mb-7"
+            single-line
+            hide-details="auto"
+            clearable 
+            dense
+        >
+            <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+        </v-text-field>
 
         <v-data-table
             :headers="headers"
@@ -31,30 +43,16 @@
     data: () => ({
         search: '',
         selectedItems: [],
-        selectAll: false,
     }),
     create(){
     
     },
-    watch: {
-    selectAll(value) {
-     
-      if (value) {
-        this.selectedItems = [...this.datas];
-        console.log(this.selectedItems );
-      } else {
-        this.selectedItems = [];
-      }
+    computed:{
+        formTitle () {
+            return this.type === 'employee' ? 'อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2' : 'อีเมล (ไม่ต้องเว้นวรรค)'
+        },
     },
-    selectedItems() {
-      if (this.selectedItems.length === this.datas.length) {
-        console.log(this.selectedItems);
-        this.selectAll = true;
-      } else {
-        this.selectAll = false;
-      }
-    },
-  },
+    watch: {},
     methods: {
         async checkRegister(value, type){
             if(type === 'employee'){

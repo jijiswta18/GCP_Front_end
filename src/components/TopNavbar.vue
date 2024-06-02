@@ -89,9 +89,15 @@
                 </template>
 
                 <v-list>
-                  <v-list-item v-for="(item, index) in items" :key="index" :to="item.route"  active-class="activemenu">
-                  <!-- <v-list-item v-for="(item, index) in items" :key="index" @click="selectItem(item)"> -->
+                  <!-- <v-list-item v-for="(item, index) in items" :key="index" :to="item.route"  active-class="activemenu">
+        
                     <v-list-item-title>{{ item }}</v-list-item-title>
+                  </v-list-item> -->
+                  <v-list-item  active-class="activemenu">
+                    <v-list-item-title>a</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item  active-class="activemenu">
+                    <v-list-item-title @click="logout">ออกจากระบบ</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -143,12 +149,15 @@ import store from '../store/index.js';
           items: [
             { text: 'อัพโหลดข้อมูลการชำระเงิน', route: '/receipt-import' },
             { text: 'สำหรับเจ้าหน้าที่การเงิน', route: '/receipt-list' },
-            { text: 'ออกจากระบบ', route: '/login' }
+            { text: 'ออกจากระบบ', route: '/login', }
           ],
           activeItemClass: 'my-list-item-active', // Your custom class for active state
           user: store.getters.user,
       }),
       methods: {
+        logout(){
+          console.log('=============');
+        },
     toggleCollapse() {
       this.collapsed = !this.collapsed;
     },

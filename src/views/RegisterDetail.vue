@@ -70,8 +70,8 @@
                     <div class="box-receipt">
                         <div class="d-flex" v-if="data.register_type !== '40001'"><h1>พิมพ์ใบชำระเงิน : <img class="w-60" src="@/assets/images/pdf.png" @click="printPayment"/></h1></div>
                         <p><span>สถานะ : </span><span :class="getColorClass(data.status_register)">{{ data.statusRegisterName }}</span></p>   
-                        <p  v-if="data.register_type === '40002'"><span class="text-warning">ค่าลงทะเบียน : </span>{{  data.course_price }} บาท</p> 
-                        <p  else><span class="text-warning">ค่าลงทะเบียน : </span>{{  data.course_price }}</p>   
+                        <p  v-if="data.register_type === '40002'"><span class="text-warning">ค่าลงทะเบียน : </span> {{  data.course_price | formatNumber}} บาท</p> 
+                        <p  v-else><span class="text-warning">ค่าลงทะเบียน : </span>{{  data.course_price }}</p>   
                         <p><span class="text-warning">ประเภทผู้สมัคร : </span>{{ data.registerTypeName }}</p>   
                         <p><span class="text-warning">รายการที่ต้องการสมัคร : </span>
                             <ul>
@@ -297,6 +297,8 @@ import moment from 'moment';
 import Swal from 'sweetalert2';
 import CryptoJS from 'crypto-js';
 import store from '../store/index.js';
+
+
 export default{
     data: () =>({
         data: {},
@@ -307,6 +309,11 @@ export default{
         dialogCancelOrder: false,
         dialogCancelReceipt: false,
     }),
+    filters: {
+        formatNumber(value) {
+        return new Intl.NumberFormat().format(value)
+        }
+    },
     mounted(){
         this.fechRegisterById();
     },
@@ -427,7 +434,8 @@ export default{
 
 
         editRegister(){
-            this.$router.push({name: 'receipt'})
+            console.log(this.data.id);
+            this.$router.push({name: 'registration-edit', params: { id: this.data.id}})
         },  
         printPayment(){
 
