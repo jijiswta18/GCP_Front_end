@@ -16,6 +16,11 @@
         >
             <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
         </v-text-field>
+
+        <div class="box-excel d-flex mt-3">
+          <h3>ทั้งหมด {{ datas.length }} รายการ | </h3>
+          <div class="ml-2"  @click="exportToExcel"><img src="@/assets/images/excel.webp"/></div>
+        </div>
         <br>
   
         <v-data-table
@@ -28,7 +33,7 @@
           :footer-props="{itemsPerPageOptions: [5, 10, 20]}"
           class="table-regislist"
         >
-       
+     
         <template v-slot:[`item.select`]="{ item }">
             <v-checkbox
                 v-model="selectedItems"
@@ -44,11 +49,9 @@
                 <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
             </template>
         </v-data-table>
-        
         </div>
-        <!-- <RegisterList :headers="headers" :datas="datas" type="receipt"/> -->
         <v-row justify="center">
-            <v-btn class="bg-green" @click="dialog = true">ออกใบเสร็จรับเงิน</v-btn>
+            <v-btn class="bg-green" @click="checkDailog">ออกใบเสร็จรับเงิน</v-btn>
         </v-row>
 
         <v-dialog
@@ -81,16 +84,7 @@
                   <v-spacer></v-spacer>
 
                   <div @click="dialog = false" class="btn-gray border-gray btn-receipt f-22 text-white mr-2">ปิด</div>
-                  <!-- <v-btn
-                 
-                    variant="plain"
-                    @click="dialog = false"
-                    class="btn-gray"
-                  >ปิด</v-btn> -->
-
-                  <div  class="btn-success btn-receipt f-22 text-gray mr-2">ออกใบเสร็จรับเงิน</div>
-                  <!-- <v-btn class="btn-success pt-2 pb-2"><span class="f-22 text-white">ออกใบเสร็จรับเงิน</span></v-btn>
-                  <v-btn class="btn-success pt-2 pb-2"><span class="f-22 text-white">ออกใบเสร็จรับเงิน</span></v-btn> -->
+                  <div @click="createReceipt" class="btn-success btn-receipt f-22 text-gray mr-2">ออกใบเสร็จรับเงิน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -99,21 +93,22 @@
     
 </template>
 <script>
-// import RegisterList from '@/components/RegisterList.vue';
+
 import axios from 'axios';
 import moment from 'moment';
-
+import Swal from 'sweetalert2';
+import store from '@/store';
+import CryptoJS from 'crypto-js';
+import * as XLSX from 'xlsx';
 
 export default {
-    // components: {RegisterList},
-    data: () => ({
 
+    data: () => ({
+      user: store.getters.user,
       search: '',
       selectedItems: [],
       selectAll: false,
       headers: [
-
-          // { text: '', align: 'center', value: 'select' },
           { text: 'สถานะออกใบเสร็จรับเงิน', align: 'center', value: 'statusReceipt' },
           { text: '', align: 'center', value: 'detail' },
           { text: 'ID', align: 'center', value: 'id' },
@@ -131,14 +126,12 @@ export default {
      
       if (value) {
         this.selectedItems = [...this.datas];
-        console.log(this.selectedItems );
       } else {
         this.selectedItems = [];
       }
     },
     selectedItems() {
       if (this.selectedItems.length === this.datas.length) {
-        console.log(this.selectedItems);
         this.selectAll = true;
       } else {
         this.selectAll = false;
@@ -149,7 +142,82 @@ export default {
       this.fechstatusRegisterReceipt()
     },
     methods: {
+      exportToExcel() {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(this.datas);
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+        /* generate XLSX file and send to client */
+        XLSX.writeFile(wb, 'รายงานข้อมูลผู้ลงทะเบียน.xlsx');
+      },
+      checkDailog(){
+
+        if(this.selectedItems.length){
+          this.dialog = true
+        }else{
+          console.log('=========');
+            Swal.fire({
+              icon: 'warning',
+              title: "กรุณาเลือกข้อมูล",
+              // text: message
+          }).then(() => {
+            
+          });
+        }
+     
+
+      },
+      async createReceipt(){
+
+            try {
+
+              for(let i = 0; i < this.selectedItems.length; i++){
+                
+                const fdCreateReceipt = {
+
+                  "master_id"     : this.selectedItems[i].id,
+                  "project_code"  : "0041",
+                  "price"         : this.selectedItems[i].course_price,
+                  "reference_1"   : this.selectedItems[i].reference_no_1,
+                  "reference_2"   : this.selectedItems[i].reference_no_2,
+                  "name"          : this.selectedItems[i].receipt_name,    
+                  "id_card_number": this.selectedItems[i].id_card_number,
+                  "address"       : this.selectedItems[i].company_address,  
+                  "province"      : this.selectedItems[i].province_id,
+                  "district"      : this.selectedItems[i].district_id,
+                  "sub_district"  : this.selectedItems[i].subdistrict_id,
+                  "zip_code"      : this.postcode,
+                  "admin_id"      : this.user.employee_id
+
+                }
+
+ 
+                const createReceiptPath          = `/api/create_receipt`
+                
+                await axios.post(`${createReceiptPath}`, `${fdCreateReceipt}`)
+
+
+              }
+              
+
+              await Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ',
+                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                    }).then( function(){
+              });
+          
+              this.dialog = false
+
+              this.selectedItems = []
+
+
+            } catch (error) {
+                console.log('createReceipt', error);   
+            }
       
+        },
+
       async fechstatusRegisterReceipt(){
 
         try {
@@ -157,7 +225,6 @@ export default {
 
           const response = await axios.get(`${statusRegisterReceiptPath}`)
 
-          console.log(response.data.data);
 
           this.datas = response.data.data
         
@@ -169,7 +236,17 @@ export default {
 
       },
       detailRegister(value){
-            this.$router.push({ name: 'registration-detail', params: { id: value.id }})
+
+        const registerId = { id: value.id};
+
+        const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+        // Encrypt the receipt data
+        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+
+        this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
+
+            // this.$router.push({ name: 'registration-detail', params: { id: value.id }})
         },
         formatDate(value) {
             return moment(value).format("YYYY-MM-DD HH:mm:ss")
@@ -258,4 +335,9 @@ font-size: 18px;
     padding: 0.25rem 1rem;
     cursor: pointer;
 }
+.box-excel img{
+    display: inline-block;
+    width: 40px;
+}
+
 </style>

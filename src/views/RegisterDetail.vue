@@ -1,17 +1,10 @@
 <template>
     <div class="regisDetail">
         <v-card class="pd-125">
-            <!-- <pre>  {{ data }}</pre> -->
-          
+
             <h2 class="mb-3 d-flex">ข้อมูลผู้ลงทะเบียน | <div class="text-warning ml-2 cursor-pointer" @click="editRegister"> แก้ไขข้อมูล</div></h2>
             <v-row>
                 <v-col>
-                    <!-- <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ลงทะเบียนเข้าร่วมประชุม</div>
-                    <div class="box-meet">
-                        <p><span class="text-warning">ประเภทผู้สมัคร : </span>{{ data.registerTypeName }}</p>  
-                        <p><span class="text-warning">รายการที่ต้องการสมัคร : </span></p>  
-                     
-                    </div> -->
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลรายละเอียดผู้สมัคร </div>
                     <div class="box-profile">
                         <p><span class="text-warning">คำนำหน้า : </span> {{  data.titleName  }}</p>   
@@ -85,20 +78,20 @@
                     </div>
                     <v-card class="pd-125 mb-6">
                         <h2   class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
-                        <div v-if="data.register_type === '40001' && data.status_register === '12002'" class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
-                        <div v-if="data.register_type === '40002' && data.register_type === '12001' " class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
-                        <div v-if="data.register_type === '40002'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
-                        <div class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
+                        <div v-if="user.approve_employee && data.status_register === '12002'" class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
+                        <div v-if="user.approve_receipt && data.register_type === '12001' " class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
+                        <div v-if="user.refund_receipt" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
+                        <div v-if="user.cancel_register" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
                     </v-card>
                     <v-card class="pd-125"  v-if="data.register_type === '40002'" >
                         <h2   class="mb-3 text-center">เมนูข้อมูลใบเสร็จรับเงิน</h2>
-                        <div class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
-                        <div class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
-                        <div class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
-                        <div v-if="data.status_register === '12003'" class="btn-success text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogReceipt = true">ออกใบเสร็จรับเงิน</div>
+                        <div v-if="user.preview_receipt" class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
+                        <div v-if="user.edit_receipt" class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
+                        <div v-if="user.cancel_receipt" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
+                        <div v-if="user.receive_receipt && data.status_register === '12003' && data.status_receipt === '13001'" class="btn-success text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogReceipt = true">ออกใบเสร็จรับเงิน</div>
                     </v-card>
                 </v-col>
-
+                
             </v-row>
         </v-card>   
 
@@ -172,7 +165,7 @@
 
                   <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div  class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการยืนยันชำระเงิน</div>
+                  <div @click="updateStatusRegister('1')" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการยืนยันชำระเงิน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -308,6 +301,8 @@ export default{
         dialogReceipt: false,
         dialogCancelOrder: false,
         dialogCancelReceipt: false,
+        registerId: {},
+        loading: false
     }),
     filters: {
         formatNumber(value) {
@@ -315,6 +310,11 @@ export default{
         }
     },
     mounted(){
+        const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
+        const key               = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
+        const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
+        const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
+        this.registerId        = JSON.parse(decryptedData);
         this.fechRegisterById();
     },
     methods:{
@@ -322,14 +322,11 @@ export default{
 
             try {
 
-                // const formatter = new Intl.NumberFormat('en-US');
+                this.loading = true;
                 const formattedEndDate          = moment(this.data.end_date).format('DD-MM-YYYY');
                 const registerByIdPath          = `/api_gcp/Register/getRegisterById`
-                const response                  = await axios.get(`${registerByIdPath}/` + this.$route.params.id)
+                const response                  = await axios.get(`${registerByIdPath}/` + this.registerId.id)
                 const datas                     = response.data.data[0]
-
-                
-                // const formattedAmount           = formatter.format(datas.course_price);
 
                 this.data                       = datas
                 this.data.name_th               = `${datas.name_th} ` + `${datas.lastname_th}`  
@@ -338,12 +335,17 @@ export default{
                 this.data.jobPositionName       = datas.job_position_other !== null ? datas.job_position_other : datas.jobPositionName
                 this.data.foodName              = datas.food_other !== null ? datas.food_other : datas.foodName
                 this.data.end_date              = formattedEndDate
-                // this.data.course_price          = formattedAmount
+
+                console.log(this.data );
 
             } catch (error) {
                 console.log('fechRegisterById', error);
+            }finally {
+                this.loading = false;
             }
          },
+
+         
 
                 
         async updateStatusRegister(status){
@@ -357,8 +359,6 @@ export default{
                     "modified_by"       : this.user.employee_id,
                     "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
                 }
-
-                console.log(fd);
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusRegister`
 
@@ -379,19 +379,20 @@ export default{
 
             const fdCreateReceipt = {
 
-                "master_id"     : "5",
-                "project_code"  : "0041",
-                "price"         : this.data.course_price,
-                "reference_1"   : this.data.reference_no_1,
-                "reference_2"   : this.data.reference_no_2,
-                "name"          : this.data.receipt_name,    
-                "id_card_number": this.data.id_card_number,
-                "address"       : this.data.company_address,  
-                "province"      : this.data.province_id,
-                "district"      : this.data.district_id,
-                "sub_district"  : this.data.subdistrict_id,
-                "zip_code"      : this.postcode,
-                "admin_id"      : this.user.employee_id
+                "master_id"             : this.data.id,
+                "project_code"          : "0041",
+                "payment_type_code"     : "01",
+                "price"                 : this.data.course_price,
+                "reference_1"           : this.data.reference_no_1,
+                "reference_2"           : this.data.reference_no_2,
+                "name"                  : this.data.receipt_name,    
+                "id_card_number"        : this.data.id_card_number,
+                "address"               : this.data.company_address,  
+                "province"              : this.data.province_id,
+                "district"              : this.data.district_id,
+                "sub_district"          : this.data.subdistrict_id,
+                "zip_code"              : this.data.postcode,
+                "admin_id"              : this.user.employee_id
             
             }
 
@@ -399,8 +400,13 @@ export default{
             try {
 
             const createReceiptPath          = `/api/create_receipt`
-            await axios.post(`${createReceiptPath}`, `${fdCreateReceipt}`)
+            const response = await axios.post(`${createReceiptPath}`, `${fdCreateReceipt}`)
 
+            if(response.response){
+                this.updateStatusRegister('13002')
+            }
+
+       
 
             } catch (error) {
                 console.log('createReceipt', error);   
@@ -434,8 +440,15 @@ export default{
 
 
         editRegister(){
-            console.log(this.data.id);
-            this.$router.push({name: 'registration-edit', params: { id: this.data.id}})
+
+            const registerEditId = { id: this.registerId.id};
+
+            const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+            // Encrypt the receipt data
+            const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerEditId), key).toString();
+
+            this.$router.push({name: 'registration-edit', params: { id: encryptedData}})
         },  
         printPayment(){
 
@@ -463,17 +476,6 @@ export default{
   
         previewReceipt(){
 
-            // const receiptData = { 
-            //     id: this.data.id, 
-            //     reference_no_1: this.data.reference_no_1, 
-            //     reference_no_2: this.data.reference_no_1,   
-            // };
-
-            // const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
-
-            // // Encrypt the receipt data
-            // const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(receiptData), key).toString();
-
             const encryptedData = this.getreceiptData();
 
             // Pass the encrypted data as a route parameter
@@ -487,8 +489,11 @@ export default{
             
             const receiptData = { 
                 id: this.data.id, 
+                name: this.data.name_th, 
+                title_name: this.data.titleName, 
                 reference_no_1: this.data.reference_no_1, 
-                reference_no_2: this.data.reference_no_1,   
+                reference_no_2: this.data.reference_no_2,  
+                payment_type_code: "01",  
             };
 
             const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส

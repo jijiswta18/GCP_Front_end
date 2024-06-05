@@ -37,7 +37,7 @@
               </v-list-item>
             </router-link>
 
-            <router-link
+            <!-- <router-link
               class="d-flex align-center menu-link"
               active-class="activemenu"
               to="/manage-employee"
@@ -45,7 +45,7 @@
               <v-list-item link>
                   <v-list-item-title class="menu-text">จัดการผู้ใช้งาน</v-list-item-title>
               </v-list-item>
-            </router-link>
+            </router-link> -->
           
             <!-- <router-link 
               class="d-flex align-center menu-link"
@@ -128,6 +128,7 @@
 
 import store from '../store/index.js';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -178,13 +179,33 @@ export default {
   
     async logout() {
 
-      console.log(this.user);
-            await store.dispatch("logout");
+      Swal.fire({
+        icon: "warning",
+        title: "คุณต้องการออกจากระบบ",
+        showDenyButton: false,
+        showCancelButton: true,
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: `ยกเลิก`
+      }).then(async (result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          await store.dispatch("logout");
          
-            await this.$router.push("/login");
-            location.reload();
+          await this.$router.push("/login");
+          await location.reload();
 
+        } else if (result.isDenied) {
+          Swal.fire("Changes are not saved", "", "info");
         }
+      });
+
+      // console.log(this.user);
+      //       await store.dispatch("logout");
+         
+      //       await this.$router.push("/login");
+      //       location.reload();
+
+   }
 
   }
 };
@@ -412,5 +433,8 @@ export default {
     background-color: #f4742b;
     font-weight: 700;
   }
+  
+
+ 
 
 </style>

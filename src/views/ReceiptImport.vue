@@ -35,6 +35,19 @@
             <h4 class="mb-3">สำเร็จ</h4> 
             <div class="box-success">
                 <p>สำเร็จ {{ success }} รายการ</p>
+
+                <v-row>
+                    <v-col
+                        v-for="(item, index) in data_success" :key="index" cols="12">
+                    <div>
+                        <span>{{index+1}}.</span>
+                        <span> {{ item.customer_name }}</span>
+                       
+                        <span>ราคา {{  item.amount | formatNumber}} บาท</span>
+                    </div>
+                    </v-col>
+                </v-row>
+                
             </div>
             <br>
             <h4 class="mb-3">ไม่สำเร็จ</h4> 
@@ -63,10 +76,17 @@
             success: null,
             unsuccess: null,
             isModified: false,
-            isImport: false
-        }) ,
+            isImport: false,
+            data_success : []
+        }),
+        filters: {
+        formatNumber(value) {
+        return new Intl.NumberFormat().format(value)
+        }
+    },
         methods: {
 
+           
             async uplaodFile() {
 
                     const file = this.file
@@ -87,8 +107,7 @@
                             const response = await axios.post(`${digitPath}`, utf8Content, {
                                 headers: {
                                         "Accept": "text/html",
-                                        "Content-Type": "text/html"
-                                        
+                                        "Content-Type": "text/html"   
                                     }
                             })
 
@@ -98,33 +117,75 @@
 
                             for(let i = 0; i<dataFormat256.length; i++){
 
-                                this.mapStatusRegister(dataFormat256[i])
+
+                                const reference_1 = dataFormat256[i].reference_1;
+                                const reference_2 = dataFormat256[i].reference_2;
+                                const amount = dataFormat256[i].amount;
+
+                                // const replaceReference_1 = reference_1.replace(/\D/g, "")
+                                // const replaceReference_2 = reference_2.replace(/\D/g, "")
+                                // const replaceAmount      = amount.replace(/\D/g, "")
+
+                                const data = {
+                                    "reference_no_1"    : reference_1,
+                                    "reference_no_2"    : reference_2,
+                                    "course_price"      : amount,
+                                    "status_register"   : 12003,
+                                    "modified_by"       :  this.user.username,
+                                    "modified_date"     :  moment().format('YYYY-MM-DD HH:mm:ss'),
+                                }
+
+                                try {
+                                    const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
+
+                                    const response = await axios.post(`${mapStatusReceiptPath}`, data)
+
+                                    if(parseInt(response.data[0].SUCCESS) >= 1)
+                                    {
+                                        success.push(dataFormat256[i]);
+                                    }else {
+                                        unsuccess.push(dataFormat256[i]);
+                                    }
+
+                                    console.log(response);
+                                    
+                                } catch (error) {
+                                    console.log('mapStatusReceipt', error);
+                                }
+
                                 
+
+                                // const response = this.mapStatusRegister(dataFormat256[i])
+                                
+                                console.log(response);
 
                                 //DATA สุทธิ
-                                let data = {
-                                    "reference_no_1" : dataFormat256[i].reference_1,
-                                    "reference_no_2":dataFormat256[i].reference_2,
-                                    "course_price":dataFormat256[i].amount
-                                }
+                                // let data = {
+                                //     "reference_no_1" : dataFormat256[i].reference_1,
+                                //     "reference_no_2":dataFormat256[i].reference_2,
+                                //     "course_price":dataFormat256[i].amount
+                                // }
                                 
 
-                                const MapRefAndAmount = `/api_gcp/Register/MapRefAndAmount`
+                                // const MapRefAndAmount = `/api_gcp/Register/MapRefAndAmount`
 
-                                const response = await axios.post(`${MapRefAndAmount}`, data)
+                                // const response = await axios.post(`${MapRefAndAmount}`, data)
 
+                                // console.log(response);
 
                              
 
-                                if(parseInt(response.data[0].SUCCESS) >= 1)
-                                {
-                                    success.push(dataFormat256[i]);
-                                }
-                                else {
-                                    unsuccess.push(dataFormat256[i]);
-                                }
+                                // if(parseInt(response.data[0].SUCCESS) >= 1)
+                                // {
+                                //     success.push(dataFormat256[i]);
+                                // }
+                                // else {
+                                //     unsuccess.push(dataFormat256[i]);
+                                // }
                             }
-                  
+
+                        
+                            this.data_success = success
                             this.success = success.length
                             this.unsuccess = unsuccess.length
                             console.log("SUCCESS ====> " + this.success);
@@ -139,6 +200,7 @@
                     await reader.readAsText(file);
 
                     // await this.$router.push({name:'ImportListView'})
+                    
 
                     await Swal.fire({
                         icon: 'success',
@@ -149,11 +211,6 @@
 
                     this.isModified = true;
                     this.isImport = true;
-
-                //  document.getElementById("uploaddiv").style.display = "none";
-                //  document.getElementById("showresult").style.display = "block";
-                
-
 
 
                 },

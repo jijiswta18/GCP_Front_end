@@ -1,19 +1,12 @@
 <template>
     <div>
 
-        <v-text-field
-            v-model="search"
-            :label="formTitle"
-            solo
-            class="style-input-search mb-7"
-            single-line
-            hide-details="auto"
-            clearable 
-            dense
-        >
-            <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-        </v-text-field>
+        <div class="box-excel d-flex mt-3">
+          <h3>ทั้งหมด {{ datas.length }} รายการ | </h3>
+          <div class="ml-2"  @click="exportToExcel"><img src="@/assets/images/excel.webp"/></div>
+        </div>
 
+        <br>
         <v-data-table
             :headers="headers"
             :items="datas"
@@ -38,6 +31,8 @@
     import axios from 'axios';
     import Swal from 'sweetalert2';
     import moment from 'moment';
+    import CryptoJS from 'crypto-js';
+    import * as XLSX from 'xlsx';
     export default {
     props: ['headers', 'datas', 'type'],
     data: () => ({
@@ -54,9 +49,25 @@
     },
     watch: {},
     methods: {
+        exportToExcel() {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(this.datas);
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+            /* generate XLSX file and send to client */
+            XLSX.writeFile(wb, 'รายงานข้อมูลผู้ลงทะเบียน.xlsx');
+        },
         async checkRegister(value, type){
             if(type === 'employee'){
-                this.$router.push({ name: 'registration-detail', params: { id: value.id }})
+
+                    const registerId = { id: value.id};
+
+                    const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+                    // Encrypt the receipt data
+                    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+
+                this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
             }else{
                 try {
                     const { value: checkPhone } = await Swal.fire({
@@ -91,6 +102,7 @@
                     if (checkPhone) {
 
                         const id = checkPhone.data[0].id
+                        
 
                         this.$router.push({ name: 'registration-detail', params: { id: id}})
                 

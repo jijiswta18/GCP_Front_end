@@ -57,7 +57,6 @@
                     </v-data-table>
                     </v-col>
                 </v-row>
-                {{ valueCheckboxCourse }}
                 <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 4)" class="mt-7">
                     <v-col cols="12" class="px-2">
                         <v-card class="px-5 py-5">
@@ -102,7 +101,6 @@
                                 clearable 
                                 class="style-input"
                                 required
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             ></v-text-field>
                         </div>
                     </v-col>
@@ -120,7 +118,6 @@
                                 clearable 
                                 class="style-input"
                                 required
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" class="px-2">
@@ -135,7 +132,6 @@
                                 clearable 
                                 class="style-input"
                                 required
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             ></v-text-field>
                     </v-col>
                 </v-row>
@@ -152,7 +148,6 @@
                                 clearable 
                                 class="style-input"
                                 required
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" class="px-2">
@@ -167,7 +162,6 @@
                                 clearable 
                                 class="style-input"
                                 required
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             ></v-text-field>
                     </v-col>
                 </v-row>
@@ -206,7 +200,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                         <p class="style-label text-danger mb-0">หมายเหตุ :</p>
                         <div class="mb-4">
@@ -230,7 +223,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                         <p class="style-label text-danger mb-0">หมายเหตุ :</p>
                         <div class="mb-4">
@@ -254,7 +246,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -271,14 +262,13 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
 
                 <v-row no-gutters v-if="dataFrom.register_type === '40002'">
                     <v-col cols="3" class="px-2">
-                        <p class="style-label">จังหวัด : <span>*</span> </p>
+                        <p class="style-label">จังหวัด : <span>*</span> </p>{{ selectedProvince }}
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedProvince"
@@ -292,13 +282,12 @@
                             single-line
                             class="style-select"
                             @change="onProvinceChange"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-autocomplete>
                     </v-col>
                     
                     <v-col cols="3" class="px-2">
-                        <p class="style-label">เขต/อำเภอ : <span>*</span></p>
-                        <v-autocomplete
+                        <p class="style-label">เขต/อำเภอ : <span>*</span></p> {{ selectedDistrict }}
+                        <v-autocomplete 
                             label="เลือก"
                             v-model="selectedDistrict"
                             ref="DistrictField"
@@ -312,11 +301,10 @@
                             class="style-select"
                             :disabled="!selectedProvince"
                             @change="onDistrictChange"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-autocomplete>
                     </v-col>
                     <v-col cols="3" class="px-2">
-                        <p class="style-label">แขวง/ตำบล : <span>*</span></p>
+                        <p class="style-label">แขวง/ตำบล : <span>*</span></p> {{ selectedSubdistrict }}
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedSubdistrict"
@@ -330,7 +318,6 @@
                             single-line
                             :disabled="!selectedDistrict"
                             @change="onSubdistrictChange"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             class="style-select"
                         ></v-autocomplete>
                     </v-col>
@@ -346,7 +333,6 @@
                             clearable 
                             class="style-input"
                             :disabled="!selectedSubdistrict"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -363,7 +349,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -380,7 +365,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -397,7 +381,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -414,15 +397,15 @@
                             single-line
                             clearable 
                             :class="{ 'error-text': !handleEnter }"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
 
                 <div v-if="dataFrom.register_type === '40002'" class="d-flex align-center justify-center mb-4">
+                 
                     <v-checkbox
                         v-model="dataFrom.confirm_receipt"
-
+                        ref="ConfirmReceiptField"
                         color="primary"
                         hide-details
                         class="pt-0 mt-0"
@@ -448,7 +431,6 @@
                             clearable 
                             class="style-input"
                             required
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -483,7 +465,6 @@
                                 clearable 
                                 class="style-input"
                                 required
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             ></v-text-field>
                         </div>
                       
@@ -503,7 +484,6 @@
                             clearable 
                             class="style-input"
                             required
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -520,7 +500,6 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-text-field>
                     </v-col>
                 </v-row>  
@@ -549,7 +528,6 @@
                                 single-line
                                 clearable 
                                 class="style-input"
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             ></v-text-field>
                         </div>
                     </v-col>
@@ -572,7 +550,6 @@
                                 single-line
                                 clearable 
                                 class="style-input"
-                                :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                             ></v-text-field>
                         </div>
 
@@ -593,7 +570,7 @@
                 <v-row no-gutters>
                     <v-col cols="12">
                         <p class="style-label"> เลือกประเภทข้อมูลใบเสร็จรับเงิน : <span>*</span></p>
-                        <v-radio-group v-model="dataFrom.select_receipt"  ref="SelectReceiptField">
+                        <v-radio-group v-model="dataFrom.receipt_order"  ref="SelectReceiptField">
                             <v-radio v-for="option in filteredOptionReceipt" :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
                         </v-radio-group>
@@ -631,6 +608,7 @@
                 <div class="d-flex align-center justify-center mb-4">
                     <v-checkbox
                         v-model="dataFrom.confirm_register"
+                        ref="ConfirmRegisterField"
                         color="primary"
                         hide-details
                         class="pt-0 mt-0"
@@ -654,6 +632,7 @@
 </style>
 <script>
     import axios from 'axios';
+    import CryptoJS from 'crypto-js';
     import moment from "moment";
     import Swal from 'sweetalert2';
     export default {
@@ -733,14 +712,27 @@
             this.fetchProvinces();
             this.fetchSelectList();
             this.fetchCourses();
+            this.getCountRegister();
             if (this.$route.name === 'registration-edit') {
             this.isEdit = true;
             this.isHidden = !this.isHidden;
-            this.fechRegisterById(this.$route.params.id);
+            const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
+            const key               = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
+            const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
+            const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
+            const registerEditId    = JSON.parse(decryptedData);
+            this.fechRegisterById(registerEditId.id);
                 // Load data based on this.$route.params.id for editing
             }
         },
         methods: {
+
+            async getCountRegister(){
+                const countRegisterPath          = `/api_gcp/Register/CounterRegister`
+                const response                  = await axios.get(`${countRegisterPath}`)
+                
+                console.log(response);
+            },
      
             textMatch() {
                 return this.dataFrom.email1 === this.dataFrom.email2
@@ -748,22 +740,25 @@
 
             showError(message, fieldRef) {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: message
+                    icon: 'warning',
+                    title: message,
+                    // text: message
                 }).then(() => {
                     const tableContainer = fieldRef.$el.querySelector('.v-data-table');
                     const input = fieldRef.$el.querySelector('input');
                     const firstRadioButton = fieldRef.$el.querySelector('input[type="radio"]');
+                    const firstCheckboxButton = fieldRef.$el.querySelector('input[type="checkbox"]');
                     if(input){
                         input.focus();
                     }
-            
                     if (tableContainer) {
                         tableContainer.focus();
                     }
                     if (firstRadioButton) {
                     firstRadioButton.focus();
+                    }
+                    if (firstCheckboxButton) {
+                        firstCheckboxButton.focus();
                     }
                 });
             },
@@ -774,12 +769,13 @@
                     title_name, title_name_other,
                     name_th, lastname_th, name_en, lastname_en, education,
                     receipt_name, id_card_number, company_name, company_address, 
-                    phone, phone_other, email, email2,
+                    phone, phone_other, email1, email2, confirm_receipt,
                     employee_id, job_position, job_position_other, work_experience,
-                    food_allergy, food_allergy_detail, food, food_other, select_receipt
+                    food_allergy, food_allergy_detail, food, food_other, receipt_order,
+                    confirm_register
                  } = this.dataFrom;
 
-                 if (!register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
+                if (!register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
                 //  if (this.valueCheckboxCourse) return this.showError('กรุณาระบุอัตราค่าสมัครเข้าอบรม', this.$refs.ValueCourseField);
                 //  if (this.valueCheckboxCourse.find(it => it.id === 1 || it.id === 2) && !check_course_other) return this.showError('กรุณาระบุการเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming"', this.$refs.CheckCourseOtherField);
                  if (!title_name) return this.showError('กรุณาระบุคำนำหน้า', this.$refs.titleNameField);
@@ -796,18 +792,21 @@
                  if (register_type === '40002' && !this.selectedProvince) return this.showError('กรุณาเลือกจังหวัด', this.$refs.ProvinceField);
                  if (register_type === '40002' && !this.selectedDistrict) return this.showError('กรุณาเลือกเขต/อำเภอ', this.$refs.DistrictField);
                  if (register_type === '40002' && !this.selectedSubdistrict) return this.showError('กรุณาเลือกแขวง/ตำบล', this.$refs.SubdistrictField);
-                 if (register_type === '40002' && !this.PostcodeField) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.postcode);
+                 if (register_type === '40002' && !this.postcode) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.PostcodeField);
                  if (!phone) return this.showError('กรุณาระบุเบอร์โทรศัพท์มือถือ', this.$refs.PhoneField);
                  if (!phone_other) return this.showError('กรุณาระบุเบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้)', this.$refs.PhoneOtherField);
-                 if (register_type === '40002' && !email) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
+                 if (register_type === '40002' && !email1) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
                  if (register_type === '40002' && !email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
+                 if (register_type === '40002' && !confirm_receipt) return this.showError('กรุณายืนยันว่าข้อมูลในใบเสร็จรับเงินถูกต้อง', this.$refs.ConfirmReceiptField);
                  if (register_type === '40001' &&!employee_id) return this.showError('กรุณาระบุรหัสพนักงาน', this.$refs.EmployeeIdField);
                  if (!job_position) return this.showError('กรุณาระบุตำแหน่งงาน', this.$refs.JobPositionField);
                  if (job_position === '20008' && !job_position_other) return this.showError('กรุณาระบุตำแหน่งงานอื่น ๆ', this.$refs.JobPositionOtherField);
-                 if (!work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
+                 if (register_type === '40002' && !work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
                  if (food_allergy === '50001' && !food_allergy_detail) return this.showError('กรุณาระบุรายละเอียดอาหารที่มีอาการแพ้', this.$refs.FoodAllergyDetailField);
                  if (food === '70004' && !food_other) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodOtherField);
-                 if (select_receipt) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
+                 if (!receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
+                 if (!confirm_register) return this.showError('กรุณายืนยันว่าข้อมูลการลงทะเบียนถูกต้อง', this.$refs.ConfirmRegisterField);
+              
 
                 if(this.isEdit === false){
                     try {
@@ -815,10 +814,12 @@
                         let currentDate = moment();
 
                         // เพิ่ม 3 วัน
-                        currentDate.add(3, 'days');
+                       
 
                         // รูปแบบใหม่ (YYYY-MM-DD HH:mm:ss)
-                        let start_date = moment.format('YYYY-MM-DD HH:mm:ss');
+                        let start_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
+
+                        currentDate.add(3, 'days');
                         let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
 
                         const fd = {
@@ -827,7 +828,7 @@
                         "course_id"                 : this.valueCheckboxCourse[0].id,
                         "course_name"               : this.valueCheckboxCourse[0].name,
                         "course_price"              : this.valueCheckboxCourse[0].price,
-                        "check_course_other_other"        : this.dataFrom.check_course_other,
+                        "check_course_other_other"  : this.dataFrom.check_course_other,
                         "title_name"                : this.dataFrom.title_name,
                         "title_name_other"          : this.dataFrom.title_name_other,
                         "name_th"                   : this.dataFrom.name_th,
@@ -844,7 +845,7 @@
                         "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
                         "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
                         "postcode"                  : this.postcode,
-                        "email"                     : this.dataFrom.email,
+                        "email"                     : this.dataFrom.email1,
                         "phone"                     : this.dataFrom.phone,
                         "phone_other"               : this.dataFrom.phone_other,
                         "employee_id"               : this.dataFrom.employee_id,
@@ -855,7 +856,7 @@
                         "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
                         "food"                      : this.dataFrom.food,
                         "food_other"                : this.dataFrom.food_other,
-                        "receipt_order"             : this.dataFrom.select_receipt, 
+                        "receipt_order"             : this.dataFrom.receipt_order, 
                         "confirm_register"          : this.dataFrom.confirm_register,
                         "create_date"               : start_date,
                         "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
@@ -864,11 +865,12 @@
                     }
 
 
+                    console.log(fd);
                     const registerPath = `/api_gcp/Register/addRegister`
 
                     let response =  await axios.post(`${registerPath}`, fd)
 
-
+                    
                     if(response.data.data){
                         this.getDigit(response.data.data) 
                     }
@@ -883,7 +885,7 @@
 
                     });
 
-                    await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
+                    // await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
 
                     } catch (error) {
                         console.error('Error Insert register:', error);
@@ -912,7 +914,7 @@
                             "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
                             "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
                             "postcode"                  : this.postcode,
-                            "email"                     : this.dataFrom.email,
+                            "email"                     : this.dataFrom.email1,
                             "phone"                     : this.dataFrom.phone,
                             "phone_other"               : this.dataFrom.phone_other,
                             "employee_id"               : this.dataFrom.employee_id,
@@ -923,7 +925,7 @@
                             "food_allergy_detail"       : this.dataFrom.food_allergy !== "50001" ?  null : this.dataFrom.food_allergy_detail,
                             "food"                      : this.dataFrom.food,
                             "food_other"                : this.dataFrom.food !== "70004" ? null : this.dataFrom.food_other,
-                            "receipt_order"           : this.dataFrom.select_receipt, 
+                            "receipt_order"           : this.dataFrom.receipt_order, 
                             "confirm_register"          : this.dataFrom.confirm_register,
                             "modified_by"               : this.dataFrom.id,
                             "modified_date"             : formattedDate
@@ -934,14 +936,17 @@
                         const registerEditPath = `/api_gcp/Register/editRegister`
                         await axios.post(`${registerEditPath}`, fdEdit)
 
+                      
+
                         await Swal.fire({
                             icon: 'success',
                             title: 'บันทึกสำเร็จ',
                             text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
                         }).then( function(){
-
+                        
 
                         });
+                        this.fechRegisterById(this.dataFrom.id);
                     } catch (error) {
                         console.log('editRegister',error);
                     }
@@ -950,156 +955,7 @@
                
              
             },
-            // async saveRegister(){
-            //     if(this.$refs.form.validate()){
-            //         if(this.isEdit === false){
-            //             console.log('=======');
-            //             try {
-            //                 // รับวันที่ปัจจุบัน
-            //                 let currentDate = moment();
-
-            //                 // เพิ่ม 3 วัน
-            //                 currentDate.add(3, 'days');
-
-            //                 // รูปแบบใหม่ (YYYY-MM-DD HH:mm:ss)
-            //                 let start_date = moment.format('YYYY-MM-DD HH:mm:ss');
-            //                 let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
-
-            //                 const fd = {
-                    
-            //                 "register_type"             : this.dataFrom.register_type,
-            //                 "course_id"                 : this.valueCheckboxCourse[0].id,
-            //                 "course_name"               : this.valueCheckboxCourse[0].name,
-            //                 "course_price"              : this.valueCheckboxCourse[0].price,
-            //                 "check_course_other_other"        : this.dataFrom.check_course_other,
-            //                 "title_name"                : this.dataFrom.title_name,
-            //                 "title_name_other"          : this.dataFrom.title_name_other,
-            //                 "name_th"                   : this.dataFrom.name_th,
-            //                 "lastname_th"               : this.dataFrom.lastname_th,
-            //                 "name_en"                   : this.dataFrom.name_en,
-            //                 "lastname_en"               : this.dataFrom.lastname_en,
-            //                 "education"                 : this.dataFrom.education,
-            //                 "receipt_name"              : this.dataFrom.receipt_name,
-            //                 "id_card_number"            : this.dataFrom.id_card_number,
-            //                 "confirm_receipt"           : this.dataFrom.confirm_receipt,
-            //                 "company_name"              : this.dataFrom.company_name,
-            //                 "company_address"           : this.dataFrom.company_address,
-            //                 "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
-            //                 "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
-            //                 "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
-            //                 "postcode"                  : this.postcode,
-            //                 "email"                     : this.dataFrom.email,
-            //                 "phone"                     : this.dataFrom.phone,
-            //                 "phone_other"               : this.dataFrom.phone_other,
-            //                 "employee_id"               : this.dataFrom.employee_id,
-            //                 "job_position"              : this.dataFrom.job_position,
-            //                 "job_position_other"        : this.dataFrom.job_position_other,
-            //                 "work_experience"           : this.dataFrom.work_experience,
-            //                 "food_allergy"              : this.dataFrom.food_allergy,
-            //                 "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
-            //                 "food"                      : this.dataFrom.food,
-            //                 "food_other"                : this.dataFrom.food_other,
-            //                 "receipt_order"             : this.dataFrom.select_receipt, 
-            //                 "confirm_register"          : this.dataFrom.confirm_register,
-            //                 "create_date"               : start_date,
-            //                 "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
-            //                 "end_date"                  : end_date,
-            //                 "cance_oreder"              : 11002,
-            //             }
-
-            //             console.log(fd);
-            //             console.log(this.dataFrom);
-            //             console.log(this.valueCheckboxCourse);
-            //             const registerPath = `/api_gcp/Register/addRegister`
-
-            //             let response =  await axios.post(`${registerPath}`, fd)
-
-            //             console.log(response);
-
-            //             if(response.data.data){
-            //                 this.getDigit(response.data.data) 
-            //             }
-
-                        
-            //             await Swal.fire({
-            //                 icon: 'success',
-            //                 title: 'บันทึกสำเร็จ',
-            //                 text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-            //             }).then( function(){
-
-
-            //             });
-
-            //             await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
-
-            //             } catch (error) {
-            //                 console.error('Error Insert register:', error);
-            //             }
-            //         }else{
-
-            //             const date = moment();
-            //             const formattedDate = date.format('YYYY-MM-DD HH:mm:ss'); 
-
-            //             const fdEdit = {
-            //                 "register_id"               : this.dataFrom.id,
-            //                 "title_name"                : this.dataFrom.title_name,
-            //                 "title_name_other"          : this.dataFrom.title_name_other,
-            //                 "name_th"                   : this.dataFrom.name_th,
-            //                 "lastname_th"               : this.dataFrom.lastname_th,
-            //                 "name_en"                   : this.dataFrom.name_en,
-            //                 "lastname_en"               : this.dataFrom.lastname_en,
-            //                 "education"                 : this.dataFrom.education,
-            //                 "receipt_name"              : this.dataFrom.receipt_name,
-            //                 "id_card_number"            : this.dataFrom.id_card_number,
-            //                 "confirm_receipt"           : this.dataFrom.confirm_receipt,
-            //                 "company_name"              : this.dataFrom.company_name,
-            //                 "company_address"           : this.dataFrom.company_address,
-            //                 "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
-            //                 "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
-            //                 "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
-            //                 "postcode"                  : this.postcode,
-            //                 "email"                     : this.dataFrom.email,
-            //                 "phone"                     : this.dataFrom.phone,
-            //                 "phone_other"               : this.dataFrom.phone_other,
-            //                 "employee_id"               : this.dataFrom.employee_id,
-            //                 "job_position"              : this.dataFrom.job_position,
-            //                 "job_position_other"        : this.dataFrom.job_position_other,
-            //                 "work_experience"           : this.dataFrom.work_experience,
-            //                 "food_allergy"              : this.dataFrom.food_allergy,
-            //                 "food_allergy_detail"       : this.dataFrom.food_allergy !== "50001" ?  null : this.dataFrom.food_allergy_detail,
-            //                 "food"                      : this.dataFrom.food,
-            //                 "food_other"                : this.dataFrom.food !== "70004" ? null : this.dataFrom.food_other,
-            //                 "receipt_order"           : this.dataFrom.select_receipt, 
-            //                 "confirm_register"          : this.dataFrom.confirm_register,
-            //                 "modified_by"               : this.dataFrom.id,
-            //                 "modified_date"             : formattedDate
-            //             }
-
-            //             console.log(fdEdit);
-
-            //             const registerEditPath = `/api_gcp/Register/editRegister`
-            //             await axios.post(`${registerEditPath}`, fdEdit)
-
-            //             await Swal.fire({
-            //                 icon: 'success',
-            //                 title: 'บันทึกสำเร็จ',
-            //                 text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-            //             }).then( function(){
-
-
-            //             });
-
-
-            //         }
-                 
-            //     }else{
-            //         await Swal.fire({
-            //             icon: 'warning',
-            //             title: 'Oops...',
-            //         });
-            //     }
-            // },
-
+         
 
             async getDigit(id){
 
@@ -1143,6 +999,7 @@
                 }
 
             },
+            
             async fechRegisterById(id){
 
                 try {
@@ -1153,37 +1010,25 @@
                 const datas                     = response.data.data[0]
 
                 this.dataFrom                   = datas
-                
-                // this.valueCheckboxCourse        = datas.course_id
-                let test = {"id": datas.course_id };
+
+                this.dataFrom.check_course_other = datas.check_course_other === 1 ? true : false
+
+                this.selectedProvince       = datas.province_id
+
+                this.selectedDistrict       = datas.district_id
+
+                this.selectedSubdistrict    = datas.subdistrict_id
+
+                this.postcode            = datas.postcode
+
+                let test                        = {"id": datas.course_id };
                 
                 this.valueCheckboxCourse.push(test);
+                
+                this.dataFrom.email1        = datas.email
 
-                console.log(this.valueCheckboxCourse);
+                this.dataFrom.email2        = datas.email
 
-                console.log(datas);
-                // setTimeout(async ()  => {
-
-                        // this.dataFrom.name_th                 = datas.name_th, 
-                        // this.dataFrom.lastname_th             = datas.lastname_th, 
-                        // this.dataFrom.name_en                 = datas.name_th, 
-                        // this.dataFrom.lastname_en             = datas.lastname_en, 
-                        // this.dataFrom.phone                   = datas.phone,
-                        // this.dataFrom.phone_other             = datas.phone_other,
-                        // this.dataFrom.employee_id             = datas.employee_id,
-                        // this.dataFrom.company_name            = datas.company_name,
-                        // this.dataFrom.company_address         = datas.company_address,
-                        // this.dataFrom.selectedProvince        = datas.province_id,
-                        // this.dataFrom.selectedDistrict        = datas.district_id,
-                        // this.dataFrom.selectedSubdistrict     = datas.subdistrict_id,
-                        // this.valueRegisterStatus              = datas.register_type,
-                        // this.valueTitleName                   = datas.title_name,
-                        // this.dataFrom.title_name_other        = datas.title_name_other,
-                        // this.valuePositionJob                 = datas.job_position,
-                        // this.dataFrom.job_position_other      = datas.job_position_other,
-                        // this.valueEducation                   = datas.education
-                        // this.confirm_register                 = datas.confirm_register
-                        // this.selectOptionFoodb                = datas.check_course_other_other
 
                 } catch (error) {
                     console.log('fechRegisterById', error);
@@ -1271,8 +1116,9 @@
                 }
             },
             clearEditData() {
-                this.dataFrom = {}; // เคลียร์ข้อมูลการแก้ไข
-                this.isEdit = false; // สลับโหมดกลับไปยังโหมดการเพิ่มข้อมูล
+                this.dataFrom               = {}; // เคลียร์ข้อมูลการแก้ไข
+                this.isEdit                 = false; // สลับโหมดกลับไปยังโหมดการเพิ่มข้อมูล
+                this.valueCheckboxCourse    = []
             }
 
         },

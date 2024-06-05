@@ -15,11 +15,12 @@
                                     <table>
                                         <tr>
                                             <td style="width: 70%; text-align: right;"><b>เลขที่ (Receipt No.)</b></td>
-                                            <!-- <td style="padding-left: 25px;">{{ $data->receipt_no }}</td> -->
+                                            <td style="padding-left: 25px;">{{ data.receipt_no }}</td>
                                         </tr>
                                         <tr>
                                             <td style="width: 70%; text-align: right;"><b>วันที่ (Date)</b></td>
-                                            <!-- <td style="padding-left: 25px;">{{ App\Http\Controllers\Controller::date_format_thai($data->create_datetime) }}</td> -->
+                                            <td style="padding-left: 25px;">{{ getThaiDate(data.create_datetime) }}</td>
+                                            <!-- <td style="padding-left: 25px;">{{ App\Http\Controllers\Controller::date_format_thai(data.create_datetime) }}</td> -->
                                         </tr>
                                     </table>
                                 </td>
@@ -30,23 +31,24 @@
                                         <tr>
                                             <td style="width: 35%;"><b>ได้รับเงินจาก (Received)</b></td>
                                             <td>
-                                            <!-- {{ $data->name }} -->
+                                            {{ data.name }}
                                             </td>
                                         </tr>
 
                                         <tr>
                                             <td style="width: 35%;"><b>ชื่อผู้เข้าอบรม (Name)</b></td>
                                             <td>
-                                                <!-- {{ (!empty($data->title_th_other) ? $data->title_th_other : $data->title_th)." ".$data->firstname_th." ".$data->lastname_th }} -->
+                                                {{ receiptPrintData.title_name }} {{ receiptPrintData.name  }}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td><b>ที่อยู่ (Address)</b></td>
-                                            <!-- <td>{{ $data->address.(!empty($data->sub_district) ? " แขวง/ตำบล $data->sub_district " : NULL).(!empty($data->district) ? " เขต/อำเภอ $data->district " : NULL).(!empty($data->province) ? " จังหวัด $data->province " : NULL).(!empty($data->zip_code) ? " รหัสไปรษณีย์ $data->zip_code " : NULL) }}</td> -->
+                                            <!-- <td>{{ data.address + (!(data.sub_district) ? " แขวง/ตำบล " + {{  }}  : "") + (!(data.district) ? " เขต/อำเภอ data.district " : "") + (!(data.province) ? " จังหวัด data.province " : "") + (!(data.zip_code) ? " รหัสไปรษณีย์ data.zip_code " : "") }}</td> -->
+                                            <td>{{ data.address }} {{ data.sub_district }} {{ data.district }} {{ data.province }} {{ data.zip_code }}</td>
                                         </tr>
                                         <tr>
                                             <td><b>รหัสประจำตัวผู้เสียภาษี (Tax ID)</b></td>
-                                            <!-- <td>{{ $data->id_card_number }}</td> -->
+                                            <td>{{ data.id_card_number }}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -65,7 +67,7 @@
                                         <tr>
                                             <td style="text-align: center;">1</td>
                                             <td style="padding-left: 8%;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
-                                            <!-- <td style="text-align: center;">{{ number_format($data->price) }}</td> -->
+                                            <td style="text-align: center;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
                                             <td></td>
@@ -74,8 +76,9 @@
                                         </tr>
                                         <tr>
                                             <td style="text-align: center;">รวม</td>
-                                            <!-- <td style="padding-left: 8%;">{{ App\Http\Controllers\Controller::convertToBahtText($data->price) }}</td> -->
-                                            <!-- <td style="text-align: center; border-bottom: 3px double #000000;">{{ number_format($data->price) }}</td> -->
+                                            <!-- <td style="padding-left: 8%;">{{ App\Http\Controllers\Controller::convertToBahtText(data.price) }}</td> -->
+                                            <td style="padding-left: 8%;">หนึ่งพันห้าร้อยบาท</td>
+                                            <td style="text-align: center; border-bottom: 3px double #000000;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: center; padding-top: 0px;">(Total Amount)</td>
@@ -93,7 +96,7 @@
                                     <table>
                                     <tr>
                                             <td>
-                                                <!-- {{ $data->note }} -->
+                                                {{ data.note }}
                                             </td>
                                     </tr>
 
@@ -101,7 +104,7 @@
                                             <td>
 
 
-
+                                                <img src="@/assets/images/check.webp" class="checkbox-display"/>
                                                     <!-- <img src="{{ URL::asset('/image/check.jpg') }}" class="checkbox-display"/> -->
                                                     เงินโอน
 
@@ -127,7 +130,7 @@
                                                 <p>
                                                     เจ้าหน้าที่การเงิน
                                                     <br>
-                                                    <!-- ({{ $data->firstname_admin." ".$data->lastname_admin }}) -->
+                                                    <!-- ({{ data.firstname_admin." ".data.lastname_admin }}) -->
                                                 </p>
                                             </td>
                                             <td></td>
@@ -166,11 +169,12 @@
                                     <table>
                                         <tr>
                                             <td style="width: 70%; text-align: right;"><b>เลขที่ (Receipt No.)</b></td>
-                                            <!-- <td style="padding-left: 25px;">{{ $data->receipt_no }}</td> -->
+                                            <td style="padding-left: 25px;">{{ data.receipt_no }}</td>
                                         </tr>
                                         <tr>
                                             <td style="width: 70%; text-align: right;"><b>วันที่ (Date)</b></td>
-                                            <!-- <td style="padding-left: 25px;">{{ App\Http\Controllers\Controller::date_format_thai($data->create_datetime) }}</td> -->
+                                            <td style="padding-left: 25px;">{{ getThaiDate(data.create_datetime) }}</td>
+                                            <!-- <td style="padding-left: 25px;">{{ App\Http\Controllers\Controller::date_format_thai(data.create_datetime) }}</td> -->
                                         </tr>
                                     </table>
                                 </td>
@@ -180,24 +184,26 @@
                                     <table>
                                         <tr>
                                             <td style="width: 35%;"><b>ได้รับเงินจาก (Received)</b></td>
-                                            <!-- <td>{{ $data->name }}</td> -->
+                                            <td>{{ data.name }}</td>
                                         </tr>
 
                                         <tr>
                                             <td style="width: 35%;"><b>ชื่อผู้เข้าอบรม (Name)</b></td>
                                             <td>
-                                                <!-- {{ (!empty($data->title_th_other) ? $data->title_th_other : $data->title_th)." ".$data->firstname_th." ".$data->lastname_th }} -->
+                                                {{ receiptPrintData.title_name }} {{ receiptPrintData.name  }}
+                                                <!-- {{ (!empty(data.title_th_other) ? data.title_th_other : data.title_th)." ".data.firstname_th." ".data.lastname_th }} -->
                                             </td>
                                         </tr>
 
 
                                         <tr>
                                             <td><b>ที่อยู่ (Address)</b></td>
-                                            <!-- <td>{{ $data->address.(!empty($data->sub_district) ? " แขวง/ตำบล $data->sub_district " : NULL).(!empty($data->district) ? " เขต/อำเภอ $data->district " : NULL).(!empty($data->province) ? " จังหวัด $data->province " : NULL).(!empty($data->zip_code) ? " รหัสไปรษณีย์ $data->zip_code " : NULL) }}</td> -->
+                                            <td>{{ data.address }} {{ data.sub_district }} {{ data.district }} {{ data.province }} {{ data.zip_code }}</td>
+                                            <!-- <td>{{ data.address.(!empty(data.sub_district) ? " แขวง/ตำบล data.sub_district " : NULL).(!empty(data.district) ? " เขต/อำเภอ data.district " : NULL).(!empty(data.province) ? " จังหวัด data.province " : NULL).(!empty(data.zip_code) ? " รหัสไปรษณีย์ data.zip_code " : NULL) }}</td> -->
                                         </tr>
                                         <tr>
                                             <td><b>รหัสประจำตัวผู้เสียภาษี (Tax ID)</b></td>
-                                            <!-- <td>{{ $data->id_card_number }}</td> -->
+                                            <td>{{ data.id_card_number }}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -216,7 +222,7 @@
                                         <tr>
                                             <td style="text-align: center;">1</td>
                                             <td style="padding-left: 8%;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
-                                            <!-- <td style="text-align: center;">{{ number_format($data->price) }}</td> -->
+                                            <td style="text-align: center;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
                                             <td></td>
@@ -225,8 +231,9 @@
                                         </tr>
                                         <tr>
                                             <td style="text-align: center;">รวม</td>
-                                            <!-- <td style="padding-left: 8%;">{{ App\Http\Controllers\Controller::convertToBahtText($data->price) }}</td> -->
-                                            <!-- <td style="text-align: center; border-bottom: 3px double #000000;">{{ number_format($data->price) }}</td> -->
+                                            <td style= "padding-left: 8%;">หนึ่งพันห้าร้อยบาท</td>
+                                            <!-- <td style= "padding-left: 8%;">{{ App\Http\Controllers\Controller::convertToBahtText(data.price) }}</td> -->
+                                            <td style="text-align: center; border-bottom: 3px double #000000;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
                                             <td style="text-align: center; padding-top: 0px;">(Total Amount)</td>
@@ -244,13 +251,13 @@
                                     <table>
                                     <tr>
                                             <td>
-                                                <!-- {{ $data->note }} -->
+                                                {{ data.note }}
                                             </td>
                                     </tr>
 
                                         <tr>
                                             <td>
-
+                                                <img src="@/assets/images/check.webp" class="checkbox-display"/>
                                                     <!-- <img src="{{ URL::asset('/image/check.jpg') }}" class="checkbox-display"/> -->
                                                     เงินโอน
 
@@ -279,7 +286,7 @@
                                                 <p>
                                                     เจ้าหน้าที่การเงิน
                                                     <br>
-                                                    <!-- ({{ $data->firstname_admin." ".$data->lastname_admin }}) -->
+                                                    <!-- ({{ data.firstname_admin." ".data.lastname_admin }}) -->
                                                 </p>
                                             </td>
                                             <td></td>
@@ -319,40 +326,61 @@
            receiptPrintData: {}
         }),
         created(){
-            const encryptedData         = this.$route.params.receiptPrintData; // รับค่า receiptData จากพารามิเตอร์ใน URL
+            const encryptedData         = this.$route.params.receiptPrintData; // รับค่า receiptPrintData จากพารามิเตอร์ใน URL
             const key                   = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
             const bytes                 = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
             const decryptedData         = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
             this.receiptPrintData       = JSON.parse(decryptedData);
 
+            console.log(this.receiptPrintData);
+
         },
         mounted(){
             this.fechReceiptById()
-            console.log(this.decryptedData.reference_no_1);
+             window.print();
+                
+        },
+
+        filters: {
+            formatNumber(value) {
+                return new Intl.NumberFormat().format(value)
+            },
         },
 
          methods:{
+            getThaiDate(item){
+
+                if (item){
+                var d = new Date(item);
+                return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+                }else{
+                return "";
+                }            
+            },
             async fechReceiptById(){
                 try {
 
-                    const reference_no_1    = this.receiptPrintData.reference_no_1;
-                    const reference_no_2    = this.receiptPrintData.reference_no_2;
-                    const id                = this.receiptPrintData.id
+                    const reference_no_1        = this.receiptPrintData.reference_no_1;
+                    const reference_no_2        = this.receiptPrintData.reference_no_2;
+                    const payment_type_code     = this.receiptPrintData.payment_type_code
 
-                    const receiptDetailPath = `/api_gcp/detail_receipt/${reference_no_1}/${reference_no_2}/${id}`
+
+                    const receiptDetailPath = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
                     
-                    const response          =  await axios.post(`${receiptDetailPath}`)
+                    const response          =  await axios.get(`${receiptDetailPath}`)
 
                     this.data               = await response.data.data
 
-                    console.log(this.decryptedData.reference_no_1);
-                    console.log(reference_no_2);
-                    console.log( id);
+                    this.data.province      = response.data.data.province ? "จังหวัด " + response.data.data.province : "",
 
-                  
-                    window.print();
+                    this.data.district      = response.data.data.district ? "เขต/อำเภอ " + response.data.data.district : "",
                     
-                    this.$router.push({ path: '/' }); 
+                    this.data.sub_district  = response.data.data.sub_district ? "แขวง/ตำบล " + response.data.data.sub_district : "",
+                    
+                    this.data.zip_code      = response.data.data.zip_code ? " รหัสไปรษณีย์ " + response.data.data.zip_code : ""
+                
+          
+                // this.$router.push({ path: '/' }); 
 
                 } catch (error) {
                     console.log("fechReceiptById", error);   

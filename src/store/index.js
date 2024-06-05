@@ -73,6 +73,8 @@ export default new Vuex.Store({
         let checkEmployeePath = `/api_gcp/ManageEmployee/updateEmployee`
 
         let responseCheck = await axios.post(`${checkEmployeePath}`, fd);
+        
+        console.log(responseCheck);
 
         const expirationTime = await 1000 * 60 * 60; // 1 hour
 

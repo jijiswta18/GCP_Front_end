@@ -16,7 +16,8 @@
                                 solo
                                 single-line
                                 clearable 
-                                class="style-input"
+                                class="style-input disabled"
+                                disabled
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -25,13 +26,14 @@
                     <v-col cols="12" class="px-2">
                         <p class="style-label">จำนวนเงิน (บาท) : <span>*</span></p>
                             <v-text-field
-                                v-model="dataForm.course_price"
+                                v-model="dataForm.price"
                                 label=""
                                 dense
                                 solo
                                 single-line
                                 clearable 
-                                class="style-input"
+                                class="style-input disabled"
+                                disabled
                             ></v-text-field>
                     </v-col>
                 </v-row>
@@ -47,6 +49,7 @@
                                 single-line
                                 clearable 
                                 class="style-input"
+                                type="date"
                             ></v-text-field>
                     </v-col>
                     <v-col cols="6" class="px-2">
@@ -67,7 +70,7 @@
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน : <span>*</span></p>
                             <v-text-field
-                                v-model="dataForm.receipt_name"
+                                v-model="dataForm.name"
                                 label=""
                                 dense
                                 solo
@@ -82,7 +85,7 @@
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ที่อยู่ : <span>*</span></p>
                         <v-text-field
-                            v-model="dataForm.company_address"
+                            v-model="dataForm.address"
                             label="ที่อยู่ (หมู่ / ซอย / ถนน)"
                             dense
                             solo
@@ -169,7 +172,7 @@
                         <p class="style-label">หมายเหตุ : </p>
                         <v-textarea
                             label="หมายเหตุ"
-                            v-model="dataForm.detail"
+                            v-model="dataForm.note"
                             dense
                             solo
                             auto-grow
@@ -197,7 +200,7 @@
                 </v-row>
 
                 <div class="text-center">
-                <v-btn class="bg-green btn-confirm font-weight-bold" @click="saveEditReceipt">ยืนยัน</v-btn>
+                <v-btn class="bg-green btn-confirm" @click="saveEditReceipt">ยืนยัน</v-btn>
                 </div>
               
 
@@ -211,6 +214,7 @@
    import Swal from 'sweetalert2';
    import CryptoJS from 'crypto-js';
    import store from '../store/index.js';
+
 export default{
     data: () => ({
         valid: true,
@@ -245,27 +249,28 @@ export default{
     },
     mounted(){
         this.fetchProvinces();
-        // this.fetchReceiptById();
-        // this.fetchRegisterById();
+        this.fetchReceiptById();
     },
     methods: {
         async saveEditReceipt(){
             if(this.$refs.formReceipt.validate()){
                 try {
+
+                    const date = this.dataForm.receipt_date + ' ' + this.dataForm.receipt_time
                     
                     const fdReceipt = {
-                        "reference_1"       : this.dataForm.reference_no_1,
-                        "reference_2"       : this.dataForm.reference_no_2,
+                        "reference_1"       : this.dataForm.reference_1,
+                        "reference_2"       : this.dataForm.reference_2,
                         "payment_type_code" : "01",
-                        "name"              : this.dataForm.receipt_name,  
+                        "name"              : this.dataForm.name,  
                         "id_card_number"    : this.dataForm.id_card_number,
-                        "address"           : this.dataForm.company_address,
-                        "province"          : this.dataForm.province_id,
-                        "district"          : this.dataForm.district_id,
-                        "sub_district"      : this.dataForm.subdistrict_id,
-                        "zip_code"          : this.dataForm.postcode,
-                        "note"              : "",
-                        "create_datetime"   : "",
+                        "address"           : this.dataForm.address,
+                        "province"          : this.selectedProvince.province_code,
+                        "district"          : this.selectedDistrict.district_code,
+                        "sub_district"      : this.selectedSubdistrict.sub_district_code,
+                        "zip_code"          : this.postcode,
+                        "note"              : this.dataForm.note,
+                        "create_datetime"   : date,
                         "admin_id"          : this.user.employee_id
                     }
 
@@ -286,22 +291,49 @@ export default{
                 } catch (error) {
                    console.log("updateReceipt", error); 
                 }
-                console.log(this.dataForm);
+
             }
             
         },
 
-        async fechReceiptById(){
+        async fetchReceiptById(){
             try {
-                const reference_no_1    = this.receiptData.reference_no_1;
-                const reference_no_2    = this.receiptData.reference_no_2;
-                const id                = this.receiptData.id
+                const reference_no_1        = this.receiptData.reference_no_1;
+                const reference_no_2        = this.receiptData.reference_no_2;
+                const payment_type_code     = this.receiptData.payment_type_code
 
-                const receiptDetailPath = `/api_gcp/detail_receipt/${reference_no_1}/${reference_no_2}/${id}`
+                console.log(this.receiptData);
+
+                const receiptDetailPath = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
                 
-                const response          =  await axios.post(`${receiptDetailPath}`)
+                const response          =  await axios.get(`${receiptDetailPath}`)
 
-                this.data               = await response.data.data
+                const data              = response.data.data
+
+                const receipt_date      = data.create_datetime
+                var dateParts           = receipt_date.split(" ")
+
+                this.dataForm           = data
+
+                this.dataForm.receipt_date      = dateParts[0]
+                this.dataForm.receipt_time      = dateParts[1]
+
+                this.selectedProvince           = data.province_code
+                this.selectedDistrict           = data.district_code
+                this.selectedSubdistrict        = data.sub_district_code
+                this.postcode                   = data.zip_code
+
+                if (this.selectedProvince) {
+                    this.fetchDistricts(this.selectedProvince);
+                }
+
+                if (this.selectedDistrict) {
+                    this.fetchSubdistricts( this.selectedProvince, this.selectedDistrict);
+
+
+                }
+             
+
 
             } catch (error) {
                 console.log("fechReceiptById", error);   
@@ -309,19 +341,6 @@ export default{
         },
 
 
-
-        // async fetchRegisterById(){
-        //     try {
-        //         const registerByIdPath          = `/api_gcp/Register/getRegisterById`
-        //         const response                  = await axios.get(`${registerByIdPath}/` + this.$route.params.id)
-        //         const datas                     = response.data.data[0]
-        //         console.log(datas);
-        //         this.dataRegister               = datas
-
-        //     } catch (error) {
-        //         console.log('get register Page Receipt', error);
-        //     }
-        // },
         async fetchProvinces() {
                 try {
                     const response = await axios.get('/api_gcp/getProvince');
@@ -376,3 +395,19 @@ export default{
     }
 }
 </script>
+<style>
+ .btn-confirm{
+    height: 45px!important;
+        width: 270px!important;
+ }
+ .btn-confirm span{
+    font-size: 18px;
+ }
+ .disabled .v-input__slot{
+    background-color: #e9ecef!important;
+ }
+ .disabled input{
+    color: #333!important;
+
+ }
+</style>

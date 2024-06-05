@@ -18,9 +18,9 @@ module.exports = {
       "^/CRAServices" :{
         target: 'http://172.20.22.45:8080'
       },
-      // "^/api_gcp" :{
-      //   target: 'http://172.19.103.55:9203'
-      // },
+      "^/api" :{
+        target: 'http://172.19.103.55:9203'
+      },
 
     },
     // "^/api_gcp" :{

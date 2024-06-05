@@ -21,13 +21,14 @@
                 <SelectOption :options="filteredRegiterType" @selected="updateRegiterType" item-value="select_code"/>
             </v-col>
             <v-col cols="6" class="px-2">
+             
                 <p>รายการที่ต้องการสมัคร</p>
                 <SelectOption :options="courseOptions" @selected="updateCourseType" item-value="id"/>
             </v-col>
         </v-row>
 
         <div v-if="user">
-            <!-- <v-text-field
+            <v-text-field
                 v-model="search"
                 label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
                 solo
@@ -38,16 +39,13 @@
                 dense
             >
                 <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-            </v-text-field> -->
-
-            <br>
-
+            </v-text-field>
             <RegisterList :headers="headers" :datas="customFilter" type="employee"/>
         </div>
 
         <div v-else>
             <v-row no-gutters>
-                <v-col cols="6" class="px-2">
+                <v-col cols="10" class="px-2">
                     <v-text-field
                         v-model="searchEmail"
                         label="อีเมล (ไม่ต้องเว้นวรรค)"
@@ -61,8 +59,8 @@
                         <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
                     </v-text-field>
                 </v-col>
-                <v-col cols="6" class="px-2">
-                    <div @click="checkEmail">ค้นหา / search
+                <v-col cols="2" class="px-2">
+                    <div @click="checkEmail" class="btn-blue btn-search text-white">ค้นหา / search
                     </div>
                 </v-col>
             </v-row>
@@ -80,6 +78,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import store from '../store/index.js';
+import CryptoJS from 'crypto-js';
 import RegisterList from '@/components/RegisterList.vue';
 import SelectOption from '@/components/SelectOption.vue';
 
@@ -140,10 +139,10 @@ export default {
 
             return this.datas.filter(item => {
                 return (
-                    (this.valueRegisterStatus === null || item.status_register.toLowerCase().ToString() === this.valueRegisterStatus.toLowerCase().ToString())  &&
-                    (this.valueRegiterType === null || item.register_type.toLowerCase().ToString() === this.valueRegiterType.toLowerCase().ToString()) &&
-                    (this.valueCencelOrder === null || item.cancel_order.toLowerCase().ToString() === this.valueCencelOrder.toLowerCase().ToString())
-                    // (this.valueCourseType === null || item.course_id.toLowerCase().ToString() === this.valueCourseType.toLowerCase().ToString())
+                    (this.valueRegisterStatus === null || item.status_register.toLowerCase() === this.valueRegisterStatus.toLowerCase()) &&
+                    (this.valueRegiterType === null || item.register_type.toLowerCase() === this.valueRegiterType.toLowerCase()) &&
+                    (this.valueCencelOrder === null || item.cancel_order.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
+                    (this.valueCourseType === null || item.course_id.toString()  === this.valueCourseType.toString() )
 
                 );
             });
@@ -172,7 +171,9 @@ export default {
 
                 this.courseOptions = selectCourseList;
 
-                this.selectedOption = this.courseOptions.length > 0 ? this.courseOptions[0].id : null;
+            
+
+                // this.selectedOption = this.courseOptions.length > 0 ? this.courseOptions[0].id : null;
 
             } catch (error) {
                 console.error('Error fetching provinces:', error);
@@ -186,6 +187,7 @@ export default {
                const response = await axios.get(`${registerPath}`)
 
                this.datas = response.data.data
+
              
           
 
@@ -204,8 +206,6 @@ export default {
 
                 this.dataProfile = response.data.data
 
-                console.log(this.dataProfile);
-
             } catch (error) {
                 console.log('checkEmail',error);
             }
@@ -217,21 +217,26 @@ export default {
             this.valueRegisterStatus = value;
         },
         updateCencelOrder(value) {
-            console.log(value);
             this.valueCencelOrder = value;
         },
         updateRegiterType(value) {
             this.valueRegiterType = value;
         },
         updateCourseType(value) {
-            console.log('updateCourseType',value);
             this.valueCourseType = value;
         },
         updateFood(value) {
             this.valueFood = value;
         },
         detailRegister(value){
-            this.$router.push({ name: 'registration-detail', params: { id: value.id }})
+            const registerId = { id: value.id };
+
+            const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+            // Encrypt the receipt data
+            const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+
+            this.$router.push({ name: 'registration-detail', params: { encryptedData }})
         },
         formatDate(value) {
             return moment(value).format("YYYY-MM-DD HH:mm:ss")
@@ -304,5 +309,13 @@ export default {
         display: inline-block;
         cursor: pointer;
     }
+
+    .btn-search{
+        display: inline-block;
+        padding: 6.5px;
+        width: 100%;
+        text-align: center;
+    }
+ 
 
 </style>

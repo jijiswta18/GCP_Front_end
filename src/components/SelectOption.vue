@@ -1,5 +1,6 @@
 <template>
     <div class="select-list">
+     
         {{ selectValue }}
         <v-autocomplete
             label="เลือก"
@@ -25,11 +26,12 @@
         watch:{
             selectValue(){
                 if(this.selectValue){
+                    console.log('options',this.selectValue);
                     this.selectOptionValue = this.selectValue
                 }
             },
             selectOptionValue(newValue) {
-                console.log('1',newValue);
+              
                 this.$emit('selected', newValue);
             },
 
