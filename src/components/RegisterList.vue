@@ -59,6 +59,15 @@
             XLSX.writeFile(wb, 'รายงานข้อมูลผู้ลงทะเบียน.xlsx');
         },
         async checkRegister(value, type){
+
+            let check = ''
+            if(value.register_type === '40001'){
+                check = value.employee_id
+            }else{
+                check = value.email
+            }
+
+  
             if(type === 'employee'){
 
                     const registerId = { id: value.id};
@@ -84,7 +93,7 @@
                         preConfirm: async (checkPhone) => {
                             try {
                                 const CheckPhonepath = `/api_gcp/Register/checkPhone`;
-                                const response = await axios.get(CheckPhonepath, { params: { phone: checkPhone, email : value.email } });
+                                const response = await axios.get(CheckPhonepath, { params: { phone: checkPhone, email : check } });
                                 
                             
                                 // console.log(response.exists.success);

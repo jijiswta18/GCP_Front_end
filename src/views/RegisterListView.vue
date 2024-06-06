@@ -212,6 +212,13 @@ export default {
 
         async checkEmail(){
 
+            if(!this.searchEmail){
+                Swal.fire({
+                    title: "กรุณากรอกข้อมูล",
+                    icon: "warning"
+                });
+            }
+
             try {
                 const registerIdPath = `/api_gcp/Register/checkEmail`
 
@@ -219,23 +226,21 @@ export default {
 
                 if(response.data.exists){
                     this.dataProfile = response.data.data
-                    console.log('==========');
                 }else{
                     
                       Swal.fire({
                         title: "ไม่พบข้อมูล",
                         icon: "warning"
                     });
-
-
-                      console.log('111111111');
                 }
 
-              
-
-                console.log(response);
 
             } catch (error) {
+
+                Swal.fire({
+                    title: "กรุณากรอกข้อมูล",
+                    icon: "warning"
+                });
                 console.log('checkEmail',error);
             }
 
