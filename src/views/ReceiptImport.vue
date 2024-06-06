@@ -56,8 +56,7 @@
             </div>
 
             <div class="btn-import text-center">
-                <div @click="clearClass" class="f-22 bg-gray box-import">import อีกครั้ง</div>
-                <!-- <router-link to="/receipt-import" class="f-22 bg-gray">import อีกครั้ง</router-link> -->
+                <div @click="clearClass" class="f-22 bg-gray box-import cursor-pointer">import อีกครั้ง</div>
             </div>
         </div>
     </div>
@@ -86,134 +85,369 @@
     },
         methods: {
 
-           
             async uplaodFile() {
+                this.loading = true;
+                // Display loading message using SweetAlert2
+                Swal.fire({
+                    title: 'Loading',
+                    html: 'Please wait while data is being loaded...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                    Swal.showLoading();
+                    }
+                });
 
-                    const file = this.file
 
-                    const reader = new FileReader();
+                const file = this.file
 
-                    reader.onload = async() => {
-                        const content = reader.result;
+                const reader = new FileReader();
 
-                        // อ่านไฟล์และแปลงรหัสอักขระของสตริงให้เป็น UTF-8
+                reader.onload = async() => {
+                    const content = reader.result;
+
+                    // อ่านไฟล์และแปลงรหัสอักขระของสตริงให้เป็น UTF-8
+
+                    const utf8Content = this.decodeUnicode(content);
+
+                                    // Simulate loading data from an API
+                    try {
+                        // Replace this with actual data loading code
+                        const digitPath = `/CRAServices/payment/get_format_256`
+
+                        const response = await axios.post(`${digitPath}`, utf8Content, {
+                            headers: {
+                                    "Accept": "text/html",
+                                    "Content-Type": "text/html"   
+                                }
+                        })
+
+                        let success = [];
+                        let unsuccess = [];
+                        const dataFormat256 = response.data[0].detail
+
+                        for(let i = 0; i<dataFormat256.length; i++){
+
+
+                            const reference_1 = dataFormat256[i].reference_1;
+                            const reference_2 = dataFormat256[i].reference_2;
+                            const amount = dataFormat256[i].amount;
+
+                            // const replaceReference_1 = reference_1.replace(/\D/g, "")
+                            // const replaceReference_2 = reference_2.replace(/\D/g, "")
+                            // const replaceAmount      = amount.replace(/\D/g, "")
+
+                            const data = {
+                                "reference_no_1"    : reference_1,
+                                "reference_no_2"    : reference_2,
+                                "course_price"      : amount,
+                                "status_register"   : 12003,
+                                "modified_by"       :  this.user.employee_id,
+                                "modified_date"     :  moment().format('YYYY-MM-DD HH:mm:ss'),
+                            }
+
+                            try {
+                                const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
+
+                                const response = await axios.post(`${mapStatusReceiptPath}`, data)
+
+                                if(parseInt(response.data[0].SUCCESS) >= 1)
+                                {
+                                    success.push(dataFormat256[i]);
+                                }else {
+                                    unsuccess.push(dataFormat256[i]);
+                                }
+
+                                
+                            } catch (error) {
+                                console.log('mapStatusReceipt', error);
+                            }
+
+                            
+                            console.log(response);
+
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        // After data is loaded
+                        this.data_success = success
+                        this.success = success.length
+                        this.unsuccess = unsuccess.length
+                        console.log("SUCCESS ====> " + this.success);
+                        console.log("UNSUCCESS ====> " + unsuccess.length);
+                        this.dataLoaded = true;
+                    } catch (error) {
+                        console.error('Error loading data:', error);
+                        this.dataLoaded = false;
+                    } finally {
+                        // Close loading message using SweetAlert2
+                        Swal.close();
+                        this.loading = false;
+
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'บันทึกสำเร็จ',
+                            text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                        })
+                        this.isModified = true;
+                        this.isImport = true;
+                    }
+                },
+
+                   
+                await reader.readAsText(file);
+
+                //  await Swal.fire({
+                //     icon: 'success',
+                //     title: 'บันทึกสำเร็จ',
+                //     text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                // }).then( function(){
+                // });
+
+                // this.isModified = await true;
+                // this.isImport = await true;
+
+
                 
-                        const utf8Content = this.decodeUnicode(content);
-
-                        try {
-
-                            const digitPath = `/CRAServices/payment/get_format_256`
-
-                            const response = await axios.post(`${digitPath}`, utf8Content, {
-                                headers: {
-                                        "Accept": "text/html",
-                                        "Content-Type": "text/html"   
-                                    }
-                            })
-
-                            let success = [];
-                            let unsuccess = [];
-                            const dataFormat256 = response.data[0].detail
-
-                            for(let i = 0; i<dataFormat256.length; i++){
+                
+            },
 
 
-                                const reference_1 = dataFormat256[i].reference_1;
-                                const reference_2 = dataFormat256[i].reference_2;
-                                const amount = dataFormat256[i].amount;
+            // async uplaodFile() {
 
-                                // const replaceReference_1 = reference_1.replace(/\D/g, "")
-                                // const replaceReference_2 = reference_2.replace(/\D/g, "")
-                                // const replaceAmount      = amount.replace(/\D/g, "")
+            //     const file = this.file
 
-                                const data = {
-                                    "reference_no_1"    : reference_1,
-                                    "reference_no_2"    : reference_2,
-                                    "course_price"      : amount,
-                                    "status_register"   : 12003,
-                                    "modified_by"       :  this.user.username,
-                                    "modified_date"     :  moment().format('YYYY-MM-DD HH:mm:ss'),
-                                }
+            //     const reader = new FileReader();
 
-                                try {
-                                    const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
+            //     reader.onload = async() => {
+            //         const content = reader.result;
 
-                                    const response = await axios.post(`${mapStatusReceiptPath}`, data)
+            //         // อ่านไฟล์และแปลงรหัสอักขระของสตริงให้เป็น UTF-8
 
-                                    if(parseInt(response.data[0].SUCCESS) >= 1)
-                                    {
-                                        success.push(dataFormat256[i]);
-                                    }else {
-                                        unsuccess.push(dataFormat256[i]);
-                                    }
+            //         const utf8Content = this.decodeUnicode(content);
 
-                                    console.log(response);
+            //         try {
+
+            //             const digitPath = `/CRAServices/payment/get_format_256`
+
+            //             const response = await axios.post(`${digitPath}`, utf8Content, {
+            //                 headers: {
+            //                         "Accept": "text/html",
+            //                         "Content-Type": "text/html"   
+            //                     }
+            //             })
+
+            //             let success = [];
+            //             let unsuccess = [];
+            //             const dataFormat256 = response.data[0].detail
+
+            //             for(let i = 0; i<dataFormat256.length; i++){
+
+
+            //                 const reference_1 = dataFormat256[i].reference_1;
+            //                 const reference_2 = dataFormat256[i].reference_2;
+            //                 const amount = dataFormat256[i].amount;
+
+            //                 // const replaceReference_1 = reference_1.replace(/\D/g, "")
+            //                 // const replaceReference_2 = reference_2.replace(/\D/g, "")
+            //                 // const replaceAmount      = amount.replace(/\D/g, "")
+
+            //                 const data = {
+            //                     "reference_no_1"    : reference_1,
+            //                     "reference_no_2"    : reference_2,
+            //                     "course_price"      : amount,
+            //                     "status_register"   : 12003,
+            //                     "modified_by"       :  this.user.username,
+            //                     "modified_date"     :  moment().format('YYYY-MM-DD HH:mm:ss'),
+            //                 }
+
+            //                 try {
+            //                     const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
+
+            //                     const response = await axios.post(`${mapStatusReceiptPath}`, data)
+
+            //                     if(parseInt(response.data[0].SUCCESS) >= 1)
+            //                     {
+            //                         success.push(dataFormat256[i]);
+            //                     }else {
+            //                         unsuccess.push(dataFormat256[i]);
+            //                     }
+
+            //                     console.log(response);
+                                
+            //                 } catch (error) {
+            //                     console.log('mapStatusReceipt', error);
+            //                 }
+
+                            
+            //                 console.log(response);
+
+            //             }
+
+
+                        
+                    
+            //             this.data_success = success
+            //             this.success = success.length
+            //             this.unsuccess = unsuccess.length
+            //             console.log("SUCCESS ====> " + this.success);
+            //             console.log("UNSUCCESS ====> " + unsuccess.length);
+
+            //             } catch (error) {
+            //                 // หากเกิดข้อผิดพลาดในการส่งข้อมูล
+            //                 console.error('Error:', error);
+            //             }
+            //     };
+
+            //     await reader.readAsText(file);
+
+            //     // await this.$router.push({name:'ImportListView'})
+
+                
+
+
+            //     await Swal.fire({
+            //         icon: 'success',
+            //         title: 'บันทึกสำเร็จ',
+            //         text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+            //     }).then( function(){
+            //     });
+
+            //     this.isModified = true;
+            //     this.isImport = true;
+
+
+            //     },
+
+
+           
+            // async uplaodFile() {
+
+            //         const file = this.file
+
+            //         const reader = new FileReader();
+
+            //         reader.onload = async() => {
+            //             const content = reader.result;
+
+            //             // อ่านไฟล์และแปลงรหัสอักขระของสตริงให้เป็น UTF-8
+                
+            //             const utf8Content = this.decodeUnicode(content);
+
+            //             try {
+
+            //                 const digitPath = `/CRAServices/payment/get_format_256`
+
+            //                 const response = await axios.post(`${digitPath}`, utf8Content, {
+            //                     headers: {
+            //                             "Accept": "text/html",
+            //                             "Content-Type": "text/html"   
+            //                         }
+            //                 })
+
+            //                 let success = [];
+            //                 let unsuccess = [];
+            //                 const dataFormat256 = response.data[0].detail
+
+                            
+
+            //                 for(let i = 0; i<dataFormat256.length; i++){
+
+
+            //                     const reference_1 = dataFormat256[i].reference_1;
+            //                     const reference_2 = dataFormat256[i].reference_2;
+            //                     const amount = dataFormat256[i].amount;
+
+            //                     // const replaceReference_1 = reference_1.replace(/\D/g, "")
+            //                     // const replaceReference_2 = reference_2.replace(/\D/g, "")
+            //                     // const replaceAmount      = amount.replace(/\D/g, "")
+
+            //                     const data = {
+            //                         "reference_no_1"    : reference_1,
+            //                         "reference_no_2"    : reference_2,
+            //                         "course_price"      : amount,
+            //                         "status_register"   : 12003,
+            //                         "modified_by"       :  this.user.username,
+            //                         "modified_date"     :  moment().format('YYYY-MM-DD HH:mm:ss'),
+            //                     }
+
+            //                     try {
+            //                         const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
+
+            //                         const response = await axios.post(`${mapStatusReceiptPath}`, data)
+
+            //                         if(parseInt(response.data[0].SUCCESS) >= 1)
+            //                         {
+            //                             success.push(dataFormat256[i]);
+            //                         }else {
+            //                             unsuccess.push(dataFormat256[i]);
+            //                         }
+
+            //                         console.log(response);
                                     
-                                } catch (error) {
-                                    console.log('mapStatusReceipt', error);
-                                }
+            //                     } catch (error) {
+            //                         console.log('mapStatusReceipt', error);
+            //                     }
 
                                 
 
-                                // const response = this.mapStatusRegister(dataFormat256[i])
+            //                     // const response = this.mapStatusRegister(dataFormat256[i])
                                 
-                                console.log(response);
+            //                     console.log(response);
 
-                                //DATA สุทธิ
-                                // let data = {
-                                //     "reference_no_1" : dataFormat256[i].reference_1,
-                                //     "reference_no_2":dataFormat256[i].reference_2,
-                                //     "course_price":dataFormat256[i].amount
-                                // }
+            //                     //DATA สุทธิ
+            //                     // let data = {
+            //                     //     "reference_no_1" : dataFormat256[i].reference_1,
+            //                     //     "reference_no_2":dataFormat256[i].reference_2,
+            //                     //     "course_price":dataFormat256[i].amount
+            //                     // }
                                 
 
-                                // const MapRefAndAmount = `/api_gcp/Register/MapRefAndAmount`
+            //                     // const MapRefAndAmount = `/api_gcp/Register/MapRefAndAmount`
 
-                                // const response = await axios.post(`${MapRefAndAmount}`, data)
+            //                     // const response = await axios.post(`${MapRefAndAmount}`, data)
 
-                                // console.log(response);
+            //                     // console.log(response);
 
                              
 
-                                // if(parseInt(response.data[0].SUCCESS) >= 1)
-                                // {
-                                //     success.push(dataFormat256[i]);
-                                // }
-                                // else {
-                                //     unsuccess.push(dataFormat256[i]);
-                                // }
-                            }
+            //                     // if(parseInt(response.data[0].SUCCESS) >= 1)
+            //                     // {
+            //                     //     success.push(dataFormat256[i]);
+            //                     // }
+            //                     // else {
+            //                     //     unsuccess.push(dataFormat256[i]);
+            //                     // }
+            //                 }
 
                         
-                            this.data_success = success
-                            this.success = success.length
-                            this.unsuccess = unsuccess.length
-                            console.log("SUCCESS ====> " + this.success);
-                            console.log("UNSUCCESS ====> " + unsuccess.length);
+            //                 this.data_success = success
+            //                 this.success = success.length
+            //                 this.unsuccess = unsuccess.length
+            //                 console.log("SUCCESS ====> " + this.success);
+            //                 console.log("UNSUCCESS ====> " + unsuccess.length);
 
-                            } catch (error) {
-                                // หากเกิดข้อผิดพลาดในการส่งข้อมูล
-                                console.error('Error:', error);
-                            }
-                    };
+            //                 } catch (error) {
+            //                     // หากเกิดข้อผิดพลาดในการส่งข้อมูล
+            //                     console.error('Error:', error);
+            //                 }
+            //         };
 
-                    await reader.readAsText(file);
+            //         await reader.readAsText(file);
 
-                    // await this.$router.push({name:'ImportListView'})
+            //         // await this.$router.push({name:'ImportListView'})
                     
 
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'บันทึกสำเร็จ',
-                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-                    }).then( function(){
-                    });
+            //         await Swal.fire({
+            //             icon: 'success',
+            //             title: 'บันทึกสำเร็จ',
+            //             text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+            //         }).then( function(){
+            //         });
 
-                    this.isModified = true;
-                    this.isImport = true;
+            //         this.isModified = true;
+            //         this.isImport = true;
 
 
-                },
+            //     },
 
             async mapStatusRegister(value){
 

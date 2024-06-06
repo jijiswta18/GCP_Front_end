@@ -27,57 +27,68 @@
             </v-col>
         </v-row>
 
-        <div v-if="user">
-            <v-text-field
-                v-model="search"
-                label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
-                solo
-                class="style-input-search"
-                single-line
-                hide-details="auto"
-                clearable 
-                dense
-            >
-                <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-            </v-text-field>
-            <RegisterList :headers="headers" :datas="customFilter" type="employee"/>
-        </div>
+       
 
-        <div v-else>
-            <v-row no-gutters>
-                <v-col cols="10" class="px-2">
-                    <v-text-field
-                        v-model="searchEmail"
-                        label="อีเมล (ไม่ต้องเว้นวรรค)"
-                        solo
-                        class="style-input-search"
-                        single-line
-                        hide-details="auto"
-                        clearable 
-                        dense
-                    >
-                        <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-                    </v-text-field>
-                </v-col>
-                <v-col cols="2" class="px-2">
-                    <div @click="checkEmail" class="btn-blue btn-search text-white">ค้นหา / search
-                    </div>
-                </v-col>
-            </v-row>
-            <div v-if="dataProfile.length  > 0">
-                <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+            <div v-if="user">
+                <v-text-field
+                    v-model="search"
+                    label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
+                    solo
+                    class="style-input-search"
+                    single-line
+                    hide-details="auto"
+                    clearable 
+                    dense
+                >
+                    <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+                </v-text-field>
+                <div class="loader" v-if="loader"></div>
+                <div v-else>
+                    <RegisterList :headers="headers" :datas="customFilter" type="employee"/>
+                </div>
+             
             </div>
 
-          
+            <div v-else>
+                <v-row no-gutters>
+                    <v-col cols="10" class="px-2">
+                        <v-text-field
+                            v-model="searchEmail"
+                            label="อีเมล (ไม่ต้องเว้นวรรค)"
+                            solo
+                            class="style-input-search"
+                            single-line
+                            hide-details="auto"
+                            clearable 
+                            dense
+                        >
+                            <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+                        </v-text-field>
+                    </v-col>
+                    <v-col cols="2" class="px-2">
+                        <div @click="checkEmail" class="btn-blue btn-search text-white">ค้นหา / search
+                        </div>
+                    </v-col>
+                </v-row>
+                <div class="loader" v-if="loader"></div>
+                <div v-else>
+                    <div v-if="dataProfile.length  > 0">
+                        <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+                    </div>
+                </div>
+               
+            </div>
+    
         </div>
- 
-    </div>
+
+
 
 </template>
 <script>
 import axios from 'axios';
 import moment from 'moment';
 import store from '../store/index.js';
+import Swal from 'sweetalert2';
 import CryptoJS from 'crypto-js';
 import RegisterList from '@/components/RegisterList.vue';
 import SelectOption from '@/components/SelectOption.vue';
@@ -85,6 +96,7 @@ import SelectOption from '@/components/SelectOption.vue';
 export default {
     components: { RegisterList, SelectOption},
     data: () => ({
+        loader : true,
         user: store.getters.user,
         searchEmail: '',
         search: '',
@@ -182,14 +194,15 @@ export default {
         async fechRegister(){
 
             try {
+
                const registerPath = `/api_gcp/Register/getRegister`
 
                const response = await axios.get(`${registerPath}`)
 
-               this.datas = response.data.data
+               this.datas = await response.data.data
 
-             
-          
+               this.loader = await false
+
 
             } catch (error) {
                 console.log('register', error);
@@ -204,7 +217,23 @@ export default {
 
                 const response = await axios.get(`${registerIdPath}`,{ params: {email: this.searchEmail}})
 
-                this.dataProfile = response.data.data
+                if(response.data.exists){
+                    this.dataProfile = response.data.data
+                    console.log('==========');
+                }else{
+                    
+                      Swal.fire({
+                        title: "ไม่พบข้อมูล",
+                        icon: "warning"
+                    });
+
+
+                      console.log('111111111');
+                }
+
+              
+
+                console.log(response);
 
             } catch (error) {
                 console.log('checkEmail',error);
@@ -316,6 +345,29 @@ export default {
         width: 100%;
         text-align: center;
     }
- 
+
+
+
+    .loader {
+        border: 4px solid #1976d2;
+        /* border: 4px solid rgba(0, 0, 0, .1); */
+        border-left-color: transparent;
+        width: 100px;
+        height: 100px;
+        animation: spin89345 1s linear infinite;
+        border-radius: 50%;
+        margin: 2rem auto;
+    }
+
+    @keyframes spin89345 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+    }
+    
 
 </style>

@@ -73,22 +73,22 @@
                             </ul>
                         </p>   
                         <p><span>เข้าร่วมอบรม : </span>{{ data.course_name }}</p>   
-                        <p><span>กำหนดชำระเงินภายใน : </span><span class="text-danger">{{ data.end_date }}</span></p>     
-                        <p><span>สถานะออกใบเสร็จรับเงิน : </span><span :class="getColorClass(data.status_receipt)">{{ data.statusReceiptName }}</span></p>   
+                        <p v-if="data.register_type === '40002'"><span>กำหนดชำระเงินภายใน : </span><span class="text-danger">{{ data.end_date }}</span></p>     
+                        <p v-if="data.register_type === '40002'"><span>สถานะออกใบเสร็จรับเงิน : </span><span :class="getColorClass(data.status_receipt)">{{ data.statusReceiptName }}</span></p>   
                     </div>
                     <v-card class="pd-125 mb-6">
-                        <h2   class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
-                        <div v-if="user.approve_employee && data.status_register === '12002'" class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
-                        <div v-if="user.approve_receipt && data.register_type === '12001' " class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
-                        <div v-if="user.refund_receipt" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
-                        <div v-if="user.cancel_register" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
+                        <h2 class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
+                        <div v-if="user?.approve_employee && data.status_register === '12002'" class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
+                        <div v-if="user?.approve_receipt && data.register_type === '12001' " class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
+                        <div v-if="user?.refund_receipt" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
+                        <div v-if="user?.cancel_register" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
                     </v-card>
                     <v-card class="pd-125"  v-if="data.register_type === '40002'" >
                         <h2   class="mb-3 text-center">เมนูข้อมูลใบเสร็จรับเงิน</h2>
-                        <div v-if="user.preview_receipt" class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
-                        <div v-if="user.edit_receipt" class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
-                        <div v-if="user.cancel_receipt" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
-                        <div v-if="user.receive_receipt && data.status_register === '12003' && data.status_receipt === '13001'" class="btn-success text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogReceipt = true">ออกใบเสร็จรับเงิน</div>
+                        <div v-if="user?.preview_receipt" class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
+                        <div v-if="user?.edit_receipt" class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
+                        <div v-if="user?.cancel_receipt" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
+                        <div v-if="user?.receive_receipt && data.status_register === '12003' && data.status_receipt === '13001'" class="btn-success text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogReceipt = true">ออกใบเสร็จรับเงิน</div>
                     </v-card>
                 </v-col>
                 

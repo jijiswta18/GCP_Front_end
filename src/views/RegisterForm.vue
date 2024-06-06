@@ -268,7 +268,7 @@
 
                 <v-row no-gutters v-if="dataFrom.register_type === '40002'">
                     <v-col cols="3" class="px-2">
-                        <p class="style-label">จังหวัด : <span>*</span> </p>{{ selectedProvince }}
+                        <p class="style-label">จังหวัด : <span>*</span> </p>
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedProvince"
@@ -286,7 +286,7 @@
                     </v-col>
                     
                     <v-col cols="3" class="px-2">
-                        <p class="style-label">เขต/อำเภอ : <span>*</span></p> {{ selectedDistrict }}
+                        <p class="style-label">เขต/อำเภอ : <span>*</span></p>
                         <v-autocomplete 
                             label="เลือก"
                             v-model="selectedDistrict"
@@ -304,7 +304,7 @@
                         ></v-autocomplete>
                     </v-col>
                     <v-col cols="3" class="px-2">
-                        <p class="style-label">แขวง/ตำบล : <span>*</span></p> {{ selectedSubdistrict }}
+                        <p class="style-label">แขวง/ตำบล : <span>*</span></p>
                         <v-autocomplete
                             label="เลือก"
                             v-model="selectedSubdistrict"
@@ -397,7 +397,10 @@
                             single-line
                             clearable 
                             :class="{ 'error-text': !handleEnter }"
+                            :messages="!handleEnter ? ['ข้อมูลยืนยันอีเมลไม่ถูกต้อง'] : []"
+                         
                         ></v-text-field>
+                        <!-- <span v-if="!handleEnter" class="v-message text-red"> ข้อมูลไม่ตรงกัน</span> -->
                     </v-col>
                 </v-row>
 
@@ -409,6 +412,7 @@
                         color="primary"
                         hide-details
                         class="pt-0 mt-0"
+                        
                     ></v-checkbox>
                     <span class="h5 font-weight-bold text-dark"> ยืนยันว่าข้อมูลในใบเสร็จรับเงินถูกต้อง</span>
                 </div>
@@ -510,7 +514,7 @@
                 <v-row no-gutters>
                     <v-col cols="12">
                         <p class="style-label"> ท่านแพ้อาหารหรือไม่ : <span>*</span></p>
-                        <v-radio-group v-model="dataFrom.food_allergy" >
+                        <v-radio-group v-model="dataFrom.food_allergy" ref="foodAllergyField">
                             <v-radio v-for="option in filteredOptionFoodAllergy" :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
                         </v-radio-group>
@@ -533,8 +537,8 @@
                     </v-col>
                     <v-col cols="12">
                         <p class="style-label"> เลือกประเภทอาหารของท่าน : <span>*</span></p>
-                        <v-radio-group v-model="dataFrom.food" >
-                            <v-radio v-for="option in filteredOptionFood" :key="option.id" :label="option.name" :value="option.select_code">
+                        <v-radio-group v-model="dataFrom.food"  ref="FoodField">
+                            <v-radio v-for="option in filteredOptionFood"  :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
                         </v-radio-group>
                         <!-- <RadioOption ref="food" :options="filteredOptionFood"  @selected="updateSelectFood"/> -->
@@ -625,11 +629,7 @@
 
     </div>
 </template>
-<style>
-.error-text {
-  color: red;
-}
-</style>
+
 <script>
     import axios from 'axios';
     import CryptoJS from 'crypto-js';
@@ -728,10 +728,49 @@
         methods: {
 
             async getCountRegister(){
-                const countRegisterPath          = `/api_gcp/Register/CounterRegister`
+                try {
+                    const countRegisterPath          = `/api_gcp/Register/CounterRegister`
                 const response                  = await axios.get(`${countRegisterPath}`)
-                
-                console.log(response);
+        
+                let full = false;
+
+            if(response.data.sum_check_course_other <= 30)
+            {
+                //สามารถสมัครได้
+                full = false;
+                console.log("onsite_other ==== < 30")
+            }else{ 
+                //เต็ม
+                full = true;
+                console.log("onsite_other ==== > 30")
+            }
+            
+
+            if(response.data.COUNT <= 80){
+                full = false;
+                console.log("onsite ==== < 80")
+            }
+            else
+            {
+                full = true;               
+                console.log("onsite ==== > 80")
+            }
+
+            if(full)
+            {
+                Swal.fire({
+                    icon: 'warning',
+                    // title: message,
+                    text: "ขณะนี้ระบบลงทะเบียนเต็มจำนวน อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งได้ วันที่ 06 มิ.ย 67"
+                });
+            }
+           
+           
+
+                } catch (error) {
+                    console.log('getCountRegister', error);
+                }
+             
             },
      
             textMatch() {
@@ -802,9 +841,11 @@
                  if (!job_position) return this.showError('กรุณาระบุตำแหน่งงาน', this.$refs.JobPositionField);
                  if (job_position === '20008' && !job_position_other) return this.showError('กรุณาระบุตำแหน่งงานอื่น ๆ', this.$refs.JobPositionOtherField);
                  if (register_type === '40002' && !work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
+                 if (!food_allergy) return this.showError('กรุณาระบุอาการการแพ้อาหาร', this.$refs.foodAllergyField);
                  if (food_allergy === '50001' && !food_allergy_detail) return this.showError('กรุณาระบุรายละเอียดอาหารที่มีอาการแพ้', this.$refs.FoodAllergyDetailField);
+                 if (!food) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodField);
                  if (food === '70004' && !food_other) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodOtherField);
-                 if (!receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
+                 if (register_type === '40002' && !receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
                  if (!confirm_register) return this.showError('กรุณายืนยันว่าข้อมูลการลงทะเบียนถูกต้อง', this.$refs.ConfirmRegisterField);
               
 
@@ -823,12 +864,11 @@
                         let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
 
                         const fd = {
-                
                         "register_type"             : this.dataFrom.register_type,
                         "course_id"                 : this.valueCheckboxCourse[0].id,
                         "course_name"               : this.valueCheckboxCourse[0].name,
                         "course_price"              : this.valueCheckboxCourse[0].price,
-                        "check_course_other_other"  : this.dataFrom.check_course_other,
+                        "check_course_other"        : this.dataFrom.check_course_other,
                         "title_name"                : this.dataFrom.title_name,
                         "title_name_other"          : this.dataFrom.title_name_other,
                         "name_th"                   : this.dataFrom.name_th,
@@ -861,14 +901,20 @@
                         "create_date"               : start_date,
                         "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
                         "end_date"                  : end_date,
-                        "cance_oreder"              : 11002,
+                        "cancel_order"              : 11002,
                     }
 
-
-                    console.log(fd);
                     const registerPath = `/api_gcp/Register/addRegister`
 
                     let response =  await axios.post(`${registerPath}`, fd)
+
+                    const registerId = { id: response.data.data };
+
+                    const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+                    // Encrypt the receipt data
+                    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+
 
                     
                     if(response.data.data){
@@ -882,10 +928,9 @@
                         text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
                     }).then( function(){
 
-
                     });
 
-                    // await this.$router.push({ name: 'registration-detail', params: { id: response.data.data }})
+                    await this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
 
                     } catch (error) {
                         console.error('Error Insert register:', error);
@@ -910,9 +955,9 @@
                             "confirm_receipt"           : this.dataFrom.confirm_receipt,
                             "company_name"              : this.dataFrom.company_name,
                             "company_address"           : this.dataFrom.company_address,
-                            "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
-                            "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
-                            "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
+                            "province_id"               : this.selectedProvince.length ? this.selectedProvince : this.selectedProvince.province_code,
+                            "district_id"               : this.selectedDistrict.length ? this.selectedDistrict : this.selectedDistrict.district_code,
+                            "subdistrict_id"            : this.selectedSubdistrict.length ? this.selectedSubdistrict : this.selectedSubdistrict.sub_district_code,
                             "postcode"                  : this.postcode,
                             "email"                     : this.dataFrom.email1,
                             "phone"                     : this.dataFrom.phone,
@@ -931,12 +976,8 @@
                             "modified_date"             : formattedDate
                         }
 
-                        console.log(fdEdit);
-
                         const registerEditPath = `/api_gcp/Register/editRegister`
                         await axios.post(`${registerEditPath}`, fdEdit)
-
-                      
 
                         await Swal.fire({
                             icon: 'success',
@@ -1005,29 +1046,32 @@
                 try {
 
 
-                const registerByIdPath          = `/api_gcp/Register/getRegisterById`
-                const response                  = await axios.get(`${registerByIdPath}/${id}`)
-                const datas                     = response.data.data[0]
-
-                this.dataFrom                   = datas
-
-                this.dataFrom.check_course_other = datas.check_course_other === 1 ? true : false
-
-                this.selectedProvince       = datas.province_id
-
-                this.selectedDistrict       = datas.district_id
-
-                this.selectedSubdistrict    = datas.subdistrict_id
-
-                this.postcode            = datas.postcode
-
-                let test                        = {"id": datas.course_id };
+                const registerByIdPath              = `/api_gcp/Register/getRegisterById`
+                const response                      = await axios.get(`${registerByIdPath}/${id}`)
+                const datas                         = response.data.data[0]
                 
+                this.dataFrom                       = datas
+
+                this.dataFrom.check_course_other    = datas.check_course_other === 1 ? true : false
+
+                this.selectedProvince               = datas.province_id
+
+                this.selectedDistrict               = datas.district_id
+                this.selectedSubdistrict            = datas.subdistrict_id
+                this.postcode                       = datas.postcode
+                this.dataFrom.email1                = datas.email
+                this.dataFrom.email2                = datas.email
+                let test                            = {"id": datas.course_id };
+        
                 this.valueCheckboxCourse.push(test);
                 
-                this.dataFrom.email1        = datas.email
+                if (this.selectedProvince) {
+                    this.fetchDistricts(this.selectedProvince);
+                }
 
-                this.dataFrom.email2        = datas.email
+                if (this.selectedDistrict) {
+                    this.fetchSubdistricts( this.selectedProvince, this.selectedDistrict);
+                }
 
 
                 } catch (error) {
@@ -1035,6 +1079,7 @@
                 }
 
             },
+
             async fetchSelectList(){
                 try {
                     const response = await axios.get('/api_gcp/getSelectList');
@@ -1049,6 +1094,7 @@
                     console.error('Error fetching provinces:', error);
                 }
             },
+
             async fetchCourses(){
                 try {
                     const response = await axios.get('/api_gcp/getSelectCourses');
@@ -1057,13 +1103,12 @@
 
                     this.optionsCourses = selectcourses;
                     
-                    console.log(this.optionsCourses);
-
 
                 } catch (error) {
                     console.error('Error fetching courses:', error);
                 }
             },
+
             async fetchProvinces() {
                 try {
                     const response = await axios.get('/api_gcp/getProvince');
@@ -1072,6 +1117,7 @@
                     console.error('Error fetching provinces:', error);
                 }
             },
+
             async fetchDistricts(provinceId) {
                 try {
                     const response = await axios.get(`/api_gcp/getDistricts?provinceId=${provinceId}`);
@@ -1081,6 +1127,7 @@
                     console.error('Error fetching districts:', error);
                 }
             },
+
             async fetchSubdistricts(provinceId,districtId) {
                 try {
                     const response = await axios.get(`/api_gcp/getSubdistricts?provinceId=${provinceId}&districtId=${districtId}`);
@@ -1090,6 +1137,7 @@
                     console.error('Error fetching subdistricts:', error);
                 }
             },
+
             onProvinceChange() {
                 this.selectedDistrict = null;
                 this.selectedSubdistrict = null;
@@ -1100,14 +1148,18 @@
         
                 }
             },
+
             onDistrictChange() {
                 this.selectedSubdistrict = null;
                 this.selectedPostcode = null;
                 this.postcode = '';
-                if (this.selectedDistrict) {
+                console.log();
+                if (this.selectedDistrict ) {
+                  
                     this.fetchSubdistricts(this.selectedProvince.province_code, this.selectedDistrict.district_code);
                 }
             },
+            
             onSubdistrictChange() {
                 this.selectedPostcode = null;
                 this.postcode = '';
@@ -1115,6 +1167,7 @@
                     this.postcode = this.selectedSubdistrict.zip_code
                 }
             },
+
             clearEditData() {
                 this.dataFrom               = {}; // เคลียร์ข้อมูลการแก้ไข
                 this.isEdit                 = false; // สลับโหมดกลับไปยังโหมดการเพิ่มข้อมูล
@@ -1162,5 +1215,11 @@
     }
     .error-text input{
         color: red!important;
+    }
+    .error-text {
+        color: red;
+    }
+    .error-text .v-messages__message{
+        color: red;
     }
 </style>

@@ -10,6 +10,7 @@
         <v-data-table
             :headers="headers"
             :items="datas"
+            
             item-key="id"
             v-model="selectedItems"
             :search="search"
@@ -67,7 +68,7 @@
                     // Encrypt the receipt data
                     const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
-                this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
+                    this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
             }else{
                 try {
                     const { value: checkPhone } = await Swal.fire({
@@ -83,7 +84,7 @@
                         preConfirm: async (checkPhone) => {
                             try {
                                 const CheckPhonepath = `/api_gcp/Register/checkPhone`;
-                                const response = await axios.get(CheckPhonepath, { params: { phone: checkPhone } });
+                                const response = await axios.get(CheckPhonepath, { params: { phone: checkPhone, email : value.email } });
                                 
                             
                                 // console.log(response.exists.success);
@@ -102,9 +103,18 @@
                     if (checkPhone) {
 
                         const id = checkPhone.data[0].id
+
+                        const registerId = { id: id};
+
+                        const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+                        // Encrypt the receipt data
+                        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+
+                        this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
                         
 
-                        this.$router.push({ name: 'registration-detail', params: { id: id}})
+                        // this.$router.push({ name: 'registration-detail', params: { id: id}})
                 
                     }
                 } catch (error) {

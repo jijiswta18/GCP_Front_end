@@ -329,8 +329,6 @@ export default{
 
                 if (this.selectedDistrict) {
                     this.fetchSubdistricts( this.selectedProvince, this.selectedDistrict);
-
-
                 }
              
 

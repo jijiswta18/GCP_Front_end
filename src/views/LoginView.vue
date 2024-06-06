@@ -1,5 +1,5 @@
 <template>
-    <div class="login-form">
+    <div class="login-form pt-64">
         <v-container>
           
             <v-form
@@ -181,6 +181,10 @@ export default {
     }
     .w-100{
         width: 100%;
+    }
+
+    .pt-64{
+        padding-top: 64px;
     }
 
 
