@@ -25,7 +25,8 @@
             active-class="activemenu"
             :to="{ name: 'registration'}"              >
           
-            <v-list-item link v-if="user?.menu_register || checkDate">
+            <v-list-item link>
+            <!-- <v-list-item link v-if="user?.menu_register || checkDate"> -->
                 <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
             </v-list-item>
           </router-link>
@@ -104,7 +105,8 @@
               active-class="activemenu"
               :to="{ name: 'registration'}"              >
             
-              <v-list-item link v-if="user?.menu_register || checkDate">
+              <!-- <v-list-item link v-if="user?.menu_register || checkDate"> -->
+              <v-list-item link >
                   <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
               </v-list-item>
             </router-link>

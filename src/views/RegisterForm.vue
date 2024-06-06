@@ -9,14 +9,14 @@
                 <v-row no-gutters>
                     <v-col cols="12">
                         <p class="style-label"><span>*</span> ประเภทผู้สมัคร</p>
-                        <v-radio-group v-model="dataFrom.register_type"  ref="RegisterTypeField" :disabled="isEdit">
+                        <v-radio-group v-model="register_type"  ref="RegisterTypeField" :disabled="isEdit">
                             <v-radio v-for="option in filteredRegiterStatus" :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
                         </v-radio-group>
                     </v-col>
                 </v-row>
 
-                <v-row  justify="center" class="mt-3" v-if="dataFrom.register_type">
+                <v-row  justify="center" class="mt-3" v-if="register_type">
                   
                     <v-col cols="10">
                         
@@ -32,12 +32,15 @@
                             hide-default-footer
                             :single-select="true"
                             class="table-regis"
+                           :class="{'disabled' : isEdit}"
+                            
                         >
+                       
                       
                         <template v-slot:header>
                             <thead>
                                 <tr>
-                                    <th v-if="dataFrom.register_type === '40001'" colspan="4" class="text-center">
+                                    <th v-if="register_type === '40001'" colspan="4" class="text-center">
                                         อัตราค่าสมัครเข้าอบรม สำหรับบุคลากรภายใน <span>*</span>
                                     </th> 
                                     <th v-else colspan="4" class="text-center">
@@ -48,7 +51,7 @@
                         </template>
                      
                         <template v-slot:[`item.price`]="{ item }">
-                            <span v-if="dataFrom.register_type === '40001'">ไม่มีค่าลงทะเบียน</span>
+                            <span v-if="register_type === '40001'">ไม่มีค่าลงทะเบียน</span>
                             <span v-else>{{ item.price | formatNumber }} บาท</span>
                         
                         </template>
@@ -165,7 +168,7 @@
                             ></v-text-field>
                     </v-col>
                 </v-row>
-                <v-row  no-gutters v-if="dataFrom.register_type === '40002'">
+                <v-row  no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p  class="style-label">คุณวุฒิการศึกษาสูงสุด  : <span>*</span></p>
                         <v-autocomplete
@@ -185,10 +188,10 @@
             </div>
 
             <div class="box-contact">
-                <div v-if="dataFrom.register_type === '40001'" class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการติดต่อ</div>
+                <div v-if="register_type === '40001'" class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการติดต่อ</div>
                 <div v-else class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการติดต่อ <span class="text-warning">(โปรดกรอกข้อมูลให้ถูกต้อง เพื่อระบุข้อมูลในใบเสร็จรับเงิน)</span></div>
 
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'" >
+                <v-row no-gutters v-if="register_type === '40002'" >
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน : <span>*</span></p>
                         <v-text-field
@@ -211,7 +214,7 @@
 
 
              
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'" >
+                <v-row no-gutters v-if="register_type === '40002'" >
                     <v-col cols="12" class="px-2">
                         <p class="style-label">เลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร : <span>*</span></p>
                         <v-text-field
@@ -223,6 +226,8 @@
                             single-line
                             clearable 
                             class="style-input"
+                            :rules="numberRules"
+                            type="number"
                         ></v-text-field>
                         <p class="style-label text-danger mb-0">หมายเหตุ :</p>
                         <div class="mb-4">
@@ -234,7 +239,7 @@
                 </v-row>
             
 
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'" >
+                <!-- <v-row no-gutters v-if="register_type === '40002'" >
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ชื่อสถานที่ปฏิบัติงาน : <span>*</span></p>
                         <v-text-field
@@ -248,9 +253,9 @@
                             class="style-input"
                         ></v-text-field>
                     </v-col>
-                </v-row>
+                </v-row> -->
 
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'">
+                <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ที่อยู่สถานที่ทำงานเลขที่ : <span>*</span></p>
                         <v-text-field
@@ -266,7 +271,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'">
+                <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="3" class="px-2">
                         <p class="style-label">จังหวัด : <span>*</span> </p>
                         <v-autocomplete
@@ -349,6 +354,9 @@
                             single-line
                             clearable 
                             class="style-input"
+                            maxlength="10"
+                            :rules="numberRules"
+                            type="number"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -365,11 +373,13 @@
                             single-line
                             clearable 
                             class="style-input"
+                            :rules="numberRules"
+                            type="number"
                         ></v-text-field>
                     </v-col>
                 </v-row>
                 <p v-if="errorMessage" class="error_message not-match">ข้อมูลไม่ตรงกัน</p>
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'">
+                <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label">อีเมล : <span>*</span></p>
                         <v-text-field
@@ -385,7 +395,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row no-gutters v-if="dataFrom.register_type === '40002'">
+                <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label"> ยืนยันอีเมล : <span>*</span></p>
                         <v-text-field
@@ -404,7 +414,7 @@
                     </v-col>
                 </v-row>
 
-                <div v-if="dataFrom.register_type === '40002'" class="d-flex align-center justify-center mb-4">
+                <div v-if="register_type === '40002'" class="d-flex align-center justify-center mb-4">
                  
                     <v-checkbox
                         v-model="dataFrom.confirm_receipt"
@@ -422,7 +432,7 @@
 
             <div class="box-job">
                 <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการทำงาน</div>
-                <v-row  no-gutters v-if="dataFrom.register_type === '40001'">
+                <v-row  no-gutters v-if="register_type === '40001'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label">รหัสพนักงาน : <span>*</span></p>
                         <v-text-field
@@ -435,6 +445,9 @@
                             clearable 
                             class="style-input"
                             required
+                            maxlength="6"
+                            :rules="numberRules"
+                            type="number"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -475,7 +488,7 @@
                     </v-col>
                 </v-row>
                 
-                <v-row  no-gutters v-if="dataFrom.register_type === '40001'">
+                <v-row  no-gutters v-if="register_type === '40001'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ชื่อหน่วยงาน : <span>*</span></p>
                         <v-text-field
@@ -492,7 +505,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row  no-gutters v-if="dataFrom.register_type === '40002'">
+                <v-row  no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ประสบการณ์ทำงาน (ปี) : <span>*</span></p>
                         <v-text-field
@@ -569,7 +582,7 @@
 
             </div>
 
-            <div class="box-receipt mt-5" v-if="dataFrom.register_type === '40002'" >
+            <div class="box-receipt mt-5" v-if="register_type === '40002'" >
                 <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลใบเสร็จรับเงิน</div>
                 <v-row no-gutters>
                     <v-col cols="12">
@@ -637,6 +650,7 @@
     import Swal from 'sweetalert2';
     export default {
         data: () => ({
+            register_type : null,
             isEdit: false,
             valid: true,
             dataFrom: {},
@@ -659,7 +673,43 @@
                 { text: 'price', align: 'left', value: 'price' },
 
             ],
+            numberRules: [
+                value => /^\d+$/.test(value) || 'โปรดป้อนตัวเลขเท่านั้น'
+            ]
         }),
+        watch: {
+            'register_type': function(newValue) {
+                if (newValue && !this.isEdit) {
+                    this.valueCheckboxCourse    = []
+                    this.selectedProvince       = null,
+                    this.selectedDistrict       = null,
+                    this.selectedSubdistrict    = null,
+                    this.postcode               = ''
+                    this.dataFrom               = {}
+                
+                }
+            },
+            'dataFrom.title_name': function(newValue) {
+                if (newValue !== '10013') {
+                    this.dataFrom.title_name_other = ''; // Clear title_name_other
+                }
+            },
+            'dataFrom.job_position': function(newValue) {
+                if (newValue !== '20008') {
+                    this.dataFrom.job_position_other = ''; // Clear title_name_other
+                }
+            },
+            'dataFrom.food_allergy': function(newValue) {
+                if (newValue !== '50001') {
+                    this.dataFrom.food_allergy_detail = ''; // Clear title_name_other
+                }
+            },
+            'dataFrom.food': function(newValue) {
+                if (newValue !== '70004') {
+                    this.dataFrom.food_other = ''; // Clear title_name_other
+                }
+            }
+        },
         filters: {
             formatNumber(value) {
             return new Intl.NumberFormat().format(value)
@@ -673,6 +723,7 @@
                 return this.$route.params.id  ? 'แก้ไขข้อมูลลงทะเบียน' : 'ลงทะเบียน'
             },
             filteredTitleName() {
+
                 return this.options.filter(option => option.select_catagory === 1);
             },
             filteredEducation() {
@@ -696,7 +747,7 @@
             filteredOptionCourses() {
                 
                 let optionsCourses = []
-                if(this.dataFrom.register_type === '40001'){
+                if(this.register_type === '40001'){
                     optionsCourses = this.optionsCourses.filter(option => option.type_register === '40001' );
                 }else{
                     optionsCourses = this.optionsCourses.filter(option =>  option.type_register != '40001' );
@@ -746,7 +797,7 @@
             }
             
 
-            if(response.data.COUNT <= 80){
+            if(response.data.COUNT <= 2){
                 full = false;
                 console.log("onsite ==== < 80")
             }
@@ -804,17 +855,17 @@
 
             async saveRegister(){
                 const { 
-                    register_type, 
+                    
                     title_name, title_name_other,
                     name_th, lastname_th, name_en, lastname_en, education,
-                    receipt_name, id_card_number, company_name, company_address, 
+                    receipt_name, id_card_number,  company_address, 
                     phone, phone_other, email1, email2, confirm_receipt,
                     employee_id, job_position, job_position_other, work_experience,
                     food_allergy, food_allergy_detail, food, food_other, receipt_order,
                     confirm_register
                  } = this.dataFrom;
 
-                if (!register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
+                if (!this.register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
                 //  if (this.valueCheckboxCourse) return this.showError('กรุณาระบุอัตราค่าสมัครเข้าอบรม', this.$refs.ValueCourseField);
                 //  if (this.valueCheckboxCourse.find(it => it.id === 1 || it.id === 2) && !check_course_other) return this.showError('กรุณาระบุการเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming"', this.$refs.CheckCourseOtherField);
                  if (!title_name) return this.showError('กรุณาระบุคำนำหน้า', this.$refs.titleNameField);
@@ -823,29 +874,29 @@
                  if (!lastname_th) return this.showError('กรุณาระบุนามสกุล', this.$refs.LastNameThField);
                  if (!name_en) return this.showError('กรุณาระบุชื่อภาษาอังกฤษ', this.$refs.NameEnField);
                  if (!lastname_en) return this.showError('กรุณาระบุนามสกุลภาษาอังกฤษ', this.$refs.LastNameEnField);
-                 if (register_type === '40002' && !education) return this.showError('กรุณาระบุคุณวุฒิการศึกษาสูงสุด', this.$refs.EducationField);
-                 if (register_type === '40002' && !receipt_name) return this.showError('กรุณาระบุชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน', this.$refs.ReceiptNameField);
-                 if (register_type === '40002' && !id_card_number) return this.showError('กรุณาระบุเลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร ', this.$refs.IdCardNumberField);
-                 if (!company_name) return this.showError('กรุณาระบุชื่อสถานที่ปฏิบัติงาน', this.$refs.CompanyNameField);
-                 if (register_type === '40002' && !company_address) return this.showError('กรุณาระบุที่อยู่สถานที่ทำงานเลขที่', this.$refs.CompanyAddressField);
-                 if (register_type === '40002' && !this.selectedProvince) return this.showError('กรุณาเลือกจังหวัด', this.$refs.ProvinceField);
-                 if (register_type === '40002' && !this.selectedDistrict) return this.showError('กรุณาเลือกเขต/อำเภอ', this.$refs.DistrictField);
-                 if (register_type === '40002' && !this.selectedSubdistrict) return this.showError('กรุณาเลือกแขวง/ตำบล', this.$refs.SubdistrictField);
-                 if (register_type === '40002' && !this.postcode) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.PostcodeField);
+                 if (this.register_type === '40002' && !education) return this.showError('กรุณาระบุคุณวุฒิการศึกษาสูงสุด', this.$refs.EducationField);
+                 if (this.register_type === '40002' && !receipt_name) return this.showError('กรุณาระบุชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน', this.$refs.ReceiptNameField);
+                 if (this.register_type === '40002' && !id_card_number) return this.showError('กรุณาระบุเลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร ', this.$refs.IdCardNumberField);
+                //  if (!company_name) return this.showError('กรุณาระบุชื่อสถานที่ปฏิบัติงาน', this.$refs.CompanyNameField);
+                 if (this.register_type === '40002' && !company_address) return this.showError('กรุณาระบุที่อยู่สถานที่ทำงานเลขที่', this.$refs.CompanyAddressField);
+                 if (this.register_type === '40002' && !this.selectedProvince) return this.showError('กรุณาเลือกจังหวัด', this.$refs.ProvinceField);
+                 if (this.register_type === '40002' && !this.selectedDistrict) return this.showError('กรุณาเลือกเขต/อำเภอ', this.$refs.DistrictField);
+                 if (this.register_type === '40002' && !this.selectedSubdistrict) return this.showError('กรุณาเลือกแขวง/ตำบล', this.$refs.SubdistrictField);
+                 if (this.register_type === '40002' && !this.postcode) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.PostcodeField);
                  if (!phone) return this.showError('กรุณาระบุเบอร์โทรศัพท์มือถือ', this.$refs.PhoneField);
                  if (!phone_other) return this.showError('กรุณาระบุเบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้)', this.$refs.PhoneOtherField);
-                 if (register_type === '40002' && !email1) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
-                 if (register_type === '40002' && !email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
-                 if (register_type === '40002' && !confirm_receipt) return this.showError('กรุณายืนยันว่าข้อมูลในใบเสร็จรับเงินถูกต้อง', this.$refs.ConfirmReceiptField);
-                 if (register_type === '40001' &&!employee_id) return this.showError('กรุณาระบุรหัสพนักงาน', this.$refs.EmployeeIdField);
+                 if (this.register_type === '40002' && !email1) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
+                 if (this.register_type === '40002' && !email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
+                 if (this.register_type === '40002' && !confirm_receipt) return this.showError('กรุณายืนยันว่าข้อมูลในใบเสร็จรับเงินถูกต้อง', this.$refs.ConfirmReceiptField);
+                 if (this.register_type === '40001' &&!employee_id) return this.showError('กรุณาระบุรหัสพนักงาน', this.$refs.EmployeeIdField);
                  if (!job_position) return this.showError('กรุณาระบุตำแหน่งงาน', this.$refs.JobPositionField);
                  if (job_position === '20008' && !job_position_other) return this.showError('กรุณาระบุตำแหน่งงานอื่น ๆ', this.$refs.JobPositionOtherField);
-                 if (register_type === '40002' && !work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
+                 if (this.register_type === '40002' && !work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
                  if (!food_allergy) return this.showError('กรุณาระบุอาการการแพ้อาหาร', this.$refs.foodAllergyField);
                  if (food_allergy === '50001' && !food_allergy_detail) return this.showError('กรุณาระบุรายละเอียดอาหารที่มีอาการแพ้', this.$refs.FoodAllergyDetailField);
                  if (!food) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodField);
                  if (food === '70004' && !food_other) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodOtherField);
-                 if (register_type === '40002' && !receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
+                 if (this.register_type === '40002' && !receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
                  if (!confirm_register) return this.showError('กรุณายืนยันว่าข้อมูลการลงทะเบียนถูกต้อง', this.$refs.ConfirmRegisterField);
               
 
@@ -864,7 +915,7 @@
                         let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
 
                         const fd = {
-                        "register_type"             : this.dataFrom.register_type,
+                        "register_type"             : this.register_type,
                         "course_id"                 : this.valueCheckboxCourse[0].id,
                         "course_name"               : this.valueCheckboxCourse[0].name,
                         "course_price"              : this.valueCheckboxCourse[0].price,
@@ -899,7 +950,7 @@
                         "receipt_order"             : this.dataFrom.receipt_order, 
                         "confirm_register"          : this.dataFrom.confirm_register,
                         "create_date"               : start_date,
-                        "status_register"           : this.dataFrom.register_type === "40001" ? "12002" : "12001",
+                        "status_register"           : this.register_type === "40001" ? "12002" : "12001",
                         "end_date"                  : end_date,
                         "cancel_order"              : 11002,
                     }
@@ -1045,22 +1096,28 @@
 
                 try {
 
-
                 const registerByIdPath              = `/api_gcp/Register/getRegisterById`
                 const response                      = await axios.get(`${registerByIdPath}/${id}`)
                 const datas                         = response.data.data[0]
                 
                 this.dataFrom                       = datas
 
+                this.register_type                  = datas.register_type
+
                 this.dataFrom.check_course_other    = datas.check_course_other === 1 ? true : false
 
                 this.selectedProvince               = datas.province_id
 
                 this.selectedDistrict               = datas.district_id
+
                 this.selectedSubdistrict            = datas.subdistrict_id
+                
                 this.postcode                       = datas.postcode
+                
                 this.dataFrom.email1                = datas.email
+                
                 this.dataFrom.email2                = datas.email
+
                 let test                            = {"id": datas.course_id };
         
                 this.valueCheckboxCourse.push(test);
@@ -1153,7 +1210,7 @@
                 this.selectedSubdistrict = null;
                 this.selectedPostcode = null;
                 this.postcode = '';
-                console.log();
+             
                 if (this.selectedDistrict ) {
                   
                     this.fetchSubdistricts(this.selectedProvince.province_code, this.selectedDistrict.district_code);
@@ -1178,7 +1235,6 @@
         beforeRouteLeave(to, from, next) {
             // ตรวจสอบว่ากำลังออกจากหน้าแก้ไขไปยังหน้าลงทะเบียนหรือไม่
             if (from.name === 'registration-edit' && to.name === 'registration') {
-                console.log('==========test');
             this.clearEditData(); // เรียกใช้เมื่อกำลังออกจากหน้าแก้ไขไปยังหน้าลงทะเบียน
             }
             next(); // ดำเนินการต่อไป
@@ -1222,4 +1278,9 @@
     .error-text .v-messages__message{
         color: red;
     }
+  
+    .disabled .v-data-table__checkbox{
+        pointer-events: none;
+    }
+    
 </style>
