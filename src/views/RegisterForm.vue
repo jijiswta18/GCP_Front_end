@@ -60,16 +60,22 @@
                     </v-data-table>
                     </v-col>
                 </v-row>
+
                 <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 4)" class="mt-7">
                     <v-col cols="12" class="px-2">
                         <v-card class="px-5 py-5">
                             <p class="style-label">ท่านสนใจเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming " วันที่ 26 กรกฏาคม 2567 ณ ห้องพระอินทร์ 1-2 ชั้น 2  <br> โรงแรมอัศวิน แกรนด์ คอนเวนชั่น หรือไม่ ? * Onsite จำกัด 80 ท่าน เท่านั้น <span>*</span></p>
-                            <v-radio-group v-model="dataFrom.check_course_other" ref="CheckCourseOtherField" :disabled="isEdit">
+                            <v-radio-group v-model="dataFrom.check_course_other" ref="CheckCourseOtherField" :disabled="isEdit || checkLimitCourseOther">
                                 <v-radio label="เข้าร่วม" :value="true"></v-radio>
                                 <v-radio label="ไม่เข้ารวม" :value="false"></v-radio>
                             </v-radio-group>
+                            <h4 v-if="checkLimitCourseOther" class="text-danger text-center mt-3">ขณะนี้ระบบลงทะเบียนเต็มจำนวน อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งได้</h4>
                         </v-card>
+
                     </v-col>
+                    <!-- <v-col cols="12" class="px-2" v-if="limitCourseOther">
+                        <h4 v-if="limitCourseOther" class="text-danger text-center mt-3">ขณะนี้ระบบลงทะเบียนเต็มจำนวน อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งได้</h4>
+                    </v-col> -->
                 </v-row>
 
             </div>
@@ -226,8 +232,7 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="numberRules"
-                            type="number"
+                            @keyup="handleInput('id_card_number')"
                         ></v-text-field>
                         <p class="style-label text-danger mb-0">หมายเหตุ :</p>
                         <div class="mb-4">
@@ -355,8 +360,8 @@
                             clearable 
                             class="style-input"
                             maxlength="10"
-                            :rules="numberRules"
-                            type="number"
+                            @keyup="handleInput('phone')"
+                        
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -373,8 +378,8 @@
                             single-line
                             clearable 
                             class="style-input"
-                            :rules="numberRules"
-                            type="number"
+                            maxlength="10"
+                            @keyup="handleInput('phone_other')"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -391,6 +396,7 @@
                             single-line
                             clearable 
                             class="style-input"
+                            :rules="emailRules"
                         ></v-text-field>
                     </v-col>
                 </v-row>
@@ -398,6 +404,7 @@
                 <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label"> ยืนยันอีเมล : <span>*</span></p>
+                        
                         <v-text-field
                             v-model="dataFrom.email2"
                             ref="EmailConfirmField"
@@ -406,8 +413,10 @@
                             solo
                             single-line
                             clearable 
+                            class="style-input"
                             :class="{ 'error-text': !handleEnter }"
                             :messages="!handleEnter ? ['ข้อมูลยืนยันอีเมลไม่ถูกต้อง'] : []"
+                            :rules="emailRules"
                          
                         ></v-text-field>
                         <!-- <span v-if="!handleEnter" class="v-message text-red"> ข้อมูลไม่ตรงกัน</span> -->
@@ -446,11 +455,36 @@
                             class="style-input"
                             required
                             maxlength="6"
-                            :rules="numberRules"
-                            type="number"
+                            @keyup="handleInput('employee_id')"
+                           
                         ></v-text-field>
                     </v-col>
                 </v-row>
+                <v-row  no-gutters v-if="register_type === '40001'">
+                    <v-col cols="12" class="px-2">
+                        <p class="style-label">รหัสผ่านพนักงาน : <span>*</span></p>
+                        <v-text-field
+                            v-model="dataFrom.password"
+                            ref="PasswordField"
+                            label="รหัสผ่านพนักงาน"
+                            dense
+                            solo
+                            single-line
+                            clearable 
+                            class="style-input"
+                            required
+                            @input="checkEmployee"
+                            :type="showPassword ? 'text' : 'password'"
+                            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                            @click:append="showPassword = !showPassword"
+                            autocomplete="on"
+
+                          
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+
+                <div v-if="check_employee" class="text-danger text-center">ข้อมูลรหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง</div> 
               
 
                 <v-row  no-gutters>
@@ -651,6 +685,7 @@
     export default {
         data: () => ({
             register_type : null,
+            check_employee : false,
             isEdit: false,
             valid: true,
             dataFrom: {},
@@ -675,7 +710,16 @@
             ],
             numberRules: [
                 value => /^\d+$/.test(value) || 'โปรดป้อนตัวเลขเท่านั้น'
-            ]
+            ],
+            emailRules: [
+                v => /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(v) || 'รูปแบบอีเมล์ไม่ถูกต้อง'
+            ],
+            limitCourse: '',
+            limitCourseOther: '',
+            checkLimitCourseOther: false,
+            emailErrors: [],
+            emailType: 'text',
+            showPassword: false,
         }),
         watch: {
             'register_type': function(newValue) {
@@ -744,8 +788,7 @@
             filteredOptionReceipt(){
                 return this.options.filter(option => option.select_catagory === 9);
             },
-            filteredOptionCourses() {
-                
+            filteredOptionCourses() {   
                 let optionsCourses = []
                 if(this.register_type === '40001'){
                     optionsCourses = this.optionsCourses.filter(option => option.type_register === '40001' );
@@ -753,9 +796,14 @@
                     optionsCourses = this.optionsCourses.filter(option =>  option.type_register != '40001' );
 
                 }
-
                 return optionsCourses;
             },
+            // limitRegisterOnsite(){
+            //     return this.limitRegister.filter(option => option.select_catagory === 15);
+
+            // }
+
+
 
 
         },
@@ -777,38 +825,85 @@
             }
         },
         methods: {
+            handleInput(field) {
+            // Replace non-numeric characters with an empty string
+            this.dataFrom[field] = this.dataFrom[field].replace(/[^0-9]/g, '');
+            },
 
+            async checkEmployee (){
+                try {
+                    const data = {
+                        "username": this.dataFrom.employee_id,
+                        "password": this.dataFrom.password,
+                    }
+                    const adPath = `/active_directory/login`
+                    const response = await axios.post(adPath, data);
+
+
+                    if(response.data.code === '200'){
+                        this.check_employee = false;
+                    }else{
+                        this.check_employee = true;
+                    }
+
+                    if(!this.check_employee){
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'ยืนยันตัวตนสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                    // }else{
+                    //     await Swal.fire({
+                    //         icon: 'warning',
+                    //         title: 'ไม่พบข้อมูล',
+                    //         showConfirmButton: false,
+                    //         timer: 1500
+                    //     })
+                    }
+
+                  
+
+                    console.log(response.data);
+
+                } catch (error) {
+                    console.log('checkEmployee', error);
+                }
+              
+            },
             async getCountRegister(){
                 try {
                     const countRegisterPath          = `/api_gcp/Register/CounterRegister`
-                const response                  = await axios.get(`${countRegisterPath}`)
+                    const response                  = await axios.get(`${countRegisterPath}`)
         
-                let full = false;
+                    let full = false;
 
-            if(response.data.sum_check_course_other <= 30)
-            {
-                //สามารถสมัครได้
-                full = false;
-                console.log("onsite_other ==== < 30")
-            }else{ 
+                 
+
+            if(response.data.sum_check_course_other >= parseInt(this.limitCourseOther)){
                 //เต็ม
-                full = true;
-                console.log("onsite_other ==== > 30")
+                this.checkLimitCourseOther = true;
+                console.log("onsite_other ==== <", this.limitCourseOther)
+            }else{ 
+                //สามารถสมัครได้
+                this.checkLimitCourseOther = false;
+                console.log("onsite_other ==== >", this.limitCourseOther)
             }
             
+         
 
-            if(response.data.COUNT <= 2){
-                full = false;
-                console.log("onsite ==== < 80")
-            }
-            else
-            {
-                full = true;               
-                console.log("onsite ==== > 80")
+            if(response.data.COUNT >= parseInt(this.limitCourse)){
+                 //เต็ม
+                full = true;
+                console.log("onsite ==== <", this.limitCourse)
+            }else{
+                 //สามารถสมัครได้
+                full = false;               
+                console.log("onsite ==== >", this.limitCourse)
             }
 
-            if(full)
-            {
+
+            if(full){
                 Swal.fire({
                     icon: 'warning',
                     // title: message,
@@ -816,8 +911,6 @@
                 });
             }
            
-           
-
                 } catch (error) {
                     console.log('getCountRegister', error);
                 }
@@ -852,6 +945,7 @@
                     }
                 });
             },
+
 
             async saveRegister(){
                 const { 
@@ -902,6 +996,24 @@
 
                 if(this.isEdit === false){
                     try {
+
+                        // let responseEmployee = ''
+                        // if(this.register_type === "40001"){
+
+                        //     const data = {
+                        //         "username": this.dataFrom.employee_id,
+                        //         "password": this.dataFrom.password,
+                        //     }
+
+                        //     const adPath = `/active_directory/login`
+                    
+                        //     responseEmployee = await axios.post(adPath, data);
+
+                        // }
+
+  
+                        // console.log(responseEmployee);
+
                         // รับวันที่ปัจจุบัน
                         let currentDate = moment();
 
@@ -913,6 +1025,7 @@
 
                         currentDate.add(3, 'days');
                         let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
+
 
                         const fd = {
                         "register_type"             : this.register_type,
@@ -951,25 +1064,42 @@
                         "confirm_register"          : this.dataFrom.confirm_register,
                         "create_date"               : start_date,
                         "status_register"           : this.register_type === "40001" ? "12002" : "12001",
+                        "status_receipt"           : this.register_type === "40001" ? null : "13001",
                         "end_date"                  : end_date,
                         "cancel_order"              : 11002,
                     }
 
-                    const registerPath = `/api_gcp/Register/addRegister`
+                    // let Action = false;
+                    // if(responseEmployee === '' )
+                    // {
+                    //     Action = true;
+                    // }
+                    // else if(responseEmployee.data.code === '200')
+                    // {
+                    //     Action = true;
+                    // }
 
-                    let response =  await axios.post(`${registerPath}`, fd)
+                    if (this.register_type === "40001" && this.check_employee) return this.showError('ข้อมูลรหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง', this.$refs.PasswordField);
 
-                    const registerId = { id: response.data.data };
+                    if( !this.check_employee ||  this.register_type === "40002"){
 
-                    const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+                        console.log('======');
+                        console.log(fd);
+                        const registerPath = `/api_gcp/Register/addRegister`
 
-                    // Encrypt the receipt data
-                    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+                        let response =  await axios.post(`${registerPath}`, fd)
 
+                        const registerId = { id: response.data.data };
+                        
+                        const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
 
-                    
-                    if(response.data.data){
+                        // Encrypt the receipt data
+                        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+                        
+
+                        if(response.data.data){
                         this.getDigit(response.data.data) 
+                     
                     }
 
                     
@@ -982,6 +1112,8 @@
                     });
 
                     await this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
+                    }
+                
 
                     } catch (error) {
                         console.error('Error Insert register:', error);
@@ -1139,13 +1271,19 @@
 
             async fetchSelectList(){
                 try {
-                    const response = await axios.get('/api_gcp/getSelectList');
+                    const response          = await axios.get('/api_gcp/getSelectList');
 
-                    const selectList = await response.data.data
+                    const selectList        = await response.data.data
 
-                    this.options = selectList;
+                    this.options            = selectList;
 
-                    this.selectedOption = this.options.length > 0 ? this.options[0].id : null;
+                    const limitCourse       = selectList.filter(option => option.select_catagory === 14);
+
+                    const limitCourseOther  = selectList.filter(option => option.select_catagory === 15);
+
+                    this.limitCourse        =  limitCourse[0].limit
+                    
+                    this.limitCourseOther   =  limitCourseOther[0].limit
 
                 } catch (error) {
                     console.error('Error fetching provinces:', error);
@@ -1229,6 +1367,7 @@
                 this.dataFrom               = {}; // เคลียร์ข้อมูลการแก้ไข
                 this.isEdit                 = false; // สลับโหมดกลับไปยังโหมดการเพิ่มข้อมูล
                 this.valueCheckboxCourse    = []
+                this.register_type          = null
             }
 
         },
