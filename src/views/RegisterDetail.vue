@@ -76,15 +76,15 @@
                         <p v-if="data.register_type === '40002'"><span>กำหนดชำระเงินภายใน : </span><span class="text-danger">{{ data.end_date }}</span></p>     
                         <p v-if="data.register_type === '40002'"><span>สถานะออกใบเสร็จรับเงิน : </span><span :class="getColorClass(data.status_receipt)">{{ data.statusReceiptName }}</span></p>   
                     </div>
-                    <v-card class="pd-125 mb-6">
+                    <v-card v-if="user != null" class="pd-125 mb-6">
                         <h2 class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
                         <div v-if="user?.approve_employee && data.status_register === '12002'" class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
-                        <div v-if="user?.approve_receipt && data.register_type === '12001' " class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
-                        <div v-if="user?.refund_receipt" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
+                        <div v-if="user?.approve_receipt && data.status_register === '12001' && data.register_type === '40002'" class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogConfirmReceipt = true">ยืนยันชำระเงิน</div>
+                        <div v-if="user?.refund_receipt && data.register_type === '40002'&& data.status_register === '12003'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
                         <div v-if="user?.cancel_register" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
                     </v-card>
-                    <v-card class="pd-125"  v-if="data.register_type === '40002'" >
-                        <h2   class="mb-3 text-center">เมนูข้อมูลใบเสร็จรับเงิน</h2>
+                    <v-card class="pd-125" v-if="user != null && data.register_type === '40002' && data.status_register === '12003'">
+                        <h2  class="mb-3 text-center">เมนูข้อมูลใบเสร็จรับเงิน</h2>
                         <div v-if="user?.preview_receipt" class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
                         <div v-if="user?.edit_receipt" class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
                         <div v-if="user?.cancel_receipt" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
@@ -131,6 +131,43 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        
+        <!-- ยืนยันชำระเงิน -->
+        <v-dialog
+            v-model="dialogConfirmReceipt"
+            width="500"
+            class="dialog-search"
+            >
+            <v-card>
+                <v-toolbar class="head-toolbar">
+                    <v-toolbar-title >ยืนยันชำระเงิน</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="dialogConfirmReceipt= false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+
+
+                  <v-container>
+                    <v-row>
+                      <v-col>
+                        <h4 class="text-left pt-1 pb-1">ยืนยันชำระเงิน</h4>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
+                
+                  <div  class="btn-success btn-receipt f-22 text-dark mr-2" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
 
         <!-- คืนค่าการชำระเงิน -->
@@ -165,7 +202,7 @@
 
                   <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div @click="updateStatusRegister('1')" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการยืนยันชำระเงิน</div>
+                  <div @click="updateStatusRegister('12001')" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการยืนยันชำระเงิน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -297,6 +334,7 @@ export default{
         data: {},
         user: store.getters.user,
         dialogApprove: false,
+        dialogConfirmReceipt: false,
         dialogRefund: false,
         dialogReceipt: false,
         dialogCancelOrder: false,
@@ -323,12 +361,13 @@ export default{
             try {
 
                 this.loading = true;
-                const formattedEndDate          = moment(this.data.end_date).format('DD-MM-YYYY');
+                
                 const registerByIdPath          = `/api_gcp/Register/getRegisterById`
                 const response                  = await axios.get(`${registerByIdPath}/` + this.registerId.id)
                 const datas                     = response.data.data[0]
-
+                const formattedEndDate          = moment(datas.end_date).format('DD-MM-YYYY');
                 this.data                       = datas
+            
                 this.data.name_th               = `${datas.name_th} ` + `${datas.lastname_th}`  
                 this.data.name_en               = `${datas.name_en} ` + `${datas.lastname_en}`  
                 this.data.titleName             = datas.title_name_other !== null ? datas.title_name_other : datas.titleName
@@ -344,9 +383,6 @@ export default{
                 this.loading = false;
             }
          },
-
-         
-
                 
         async updateStatusRegister(status){
             try {
@@ -361,6 +397,33 @@ export default{
                 }
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusRegister`
+
+                await axios.post(`${updateStatusRegisterPath}`, fd)
+
+                Swal.fire('บันทึกข้อมูลเรีบร้อยเเล้ว', '', 'success')
+
+                this.dialogApprove = false
+
+                this.$router.push({ name: 'RegisterListView' });
+
+                } catch (error) {
+                    console.log('updateStatusRegister', error);
+                }
+        },
+
+        async updateStatusReceipt(status){
+            try {
+             
+                let currentDate = moment();
+            
+                let fd = {
+                    "register_id"       : this.data.id,
+                    "status_receipt"    : status,
+                    "modified_by"       : this.user.employee_id,
+                    "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
+                }
+
+                let updateStatusRegisterPath = `/api_gcp/Register/updateStatusReceipt`
 
                 await axios.post(`${updateStatusRegisterPath}`, fd)
 
@@ -396,14 +459,17 @@ export default{
             
             }
 
+            console.log(fdCreateReceipt);
 
             try {
 
             const createReceiptPath          = `/api/create_receipt`
             const response = await axios.post(`${createReceiptPath}`, `${fdCreateReceipt}`)
 
-            if(response.response){
-                this.updateStatusRegister('13002')
+            console.log(response);
+
+            if(response.data){
+                this.updateStatusReceipt('13002')
             }
 
        
@@ -414,12 +480,6 @@ export default{
       
         },
 
-        editReceipt(){
-            const encryptedData = this.getreceiptData();
-            this.$router.push({ name: 'receipt', params: { receiptData: encryptedData }});
-        },
-
-
         async cancelReceipt(){
 
             const fdCencelReceipt = {
@@ -429,15 +489,27 @@ export default{
                 "admin_id"              : this.user.employee_id
             }
 
+            console.log(fdCencelReceipt);
+ 
             try {
                 const cancelReceiptPath  = `/api/cancel_receipt`
-                await axios.post(`${cancelReceiptPath}`, `${fdCencelReceipt}`)
+                const response = await axios.post(`${cancelReceiptPath}`, `${fdCencelReceipt}`)
+                
+            if(response.data){
+                this.updateStatusReceipt('13001')
+            }
+            console.log(response);
             
             } catch (error) {
                 console.log('cacelReceipt', error);
             }
         },
 
+
+        editReceipt(){
+            const encryptedData = this.getreceiptData();
+            this.$router.push({ name: 'receipt', params: { receiptData: encryptedData }});
+        },
 
         editRegister(){
 
@@ -450,6 +522,7 @@ export default{
 
             this.$router.push({name: 'registration-edit', params: { id: encryptedData}})
         },  
+
         printPayment(){
 
             const formattedStartDate    = moment(this.data.create_date).format('DD-MM-YYYY');
