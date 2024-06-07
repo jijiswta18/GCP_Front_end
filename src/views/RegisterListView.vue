@@ -70,12 +70,12 @@
                         </div>
                     </v-col>
                 </v-row>
-                <div class="loader" v-if="loader"></div>
-                <div v-else>
+                <!-- <div class="loader" v-if="loader"></div>
+                <div v-else> -->
                     <div v-if="dataProfile.length  > 0">
                         <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
                     </div>
-                </div>
+                <!-- </div> -->
                
             </div>
     
@@ -129,9 +129,12 @@ export default {
         valueFood: null,
     }),
     mounted(){
-        this.fetchSelectList();
-        this.fetchCoursetList();
-        this.fechRegister();
+        if(this.user){
+            this.fetchSelectList();
+            this.fetchCoursetList();
+            this.fechRegister();
+        }
+       
     },
     computed: {
         filteredCancelOrder() {
@@ -202,6 +205,8 @@ export default {
                this.datas = await response.data.data
 
                this.loader = await false
+
+               console.log(this.datas);
 
 
             } catch (error) {
