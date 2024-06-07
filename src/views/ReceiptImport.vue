@@ -85,9 +85,19 @@
     },
         methods: {
 
+
             async uplaodFile() {
-                this.loading = true;
-                // Display loading message using SweetAlert2
+
+               
+                if(this.file === null){
+
+                    Swal.fire({
+                        title: "กรุณาเลือกไฟล์",
+                        icon: "warning"
+                    });
+                }else{
+                    this.loading = true;
+             
                 Swal.fire({
                     title: 'Loading',
                     html: 'Please wait while data is being loaded...',
@@ -163,8 +173,7 @@
                             }
 
                             
-                            console.log(response);
-
+                          
                         }
                         await new Promise(resolve => setTimeout(resolve, 2000));
                         // After data is loaded
@@ -192,8 +201,11 @@
                     }
                 },
 
-                   
+                    
                 await reader.readAsText(file);
+
+                }
+
 
                 //  await Swal.fire({
                 //     icon: 'success',
