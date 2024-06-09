@@ -109,7 +109,7 @@ export default {
             { text: 'ID', align: 'center', value: 'id' },
             { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
             { text: 'ชื่อ', align: 'left', value: 'name' },
-            { text: 'สถานะ', align: 'center', value: 'statusRegisterName' },
+            // { text: 'สถานะ', align: 'center', value: 'statusRegisterName' },
         ],
         dataProfile: [],
         headers: [
@@ -206,8 +206,6 @@ export default {
 
                this.loader = await false
 
-               console.log(this.datas);
-
 
             } catch (error) {
                 console.log('register', error);
@@ -229,8 +227,10 @@ export default {
 
                 const response = await axios.get(`${registerIdPath}`,{ params: {email: this.searchEmail}})
 
+
                 if(response.data.exists){
                     this.dataProfile = response.data.data
+
                 }else{
                     
                       Swal.fire({

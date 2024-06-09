@@ -33,16 +33,19 @@ export default {
 
   }),
   methods: {
+ 
     async testSendMail(){
       try {
         const path = `/api_gcp/Register/sendMail`
-
+      
         const data = {
           "mail" : 'sawitta.sri@cra.ac.th',
           "name" : 'สวิตตา ศรีจันทร์'
         }
         const response = await axios.post(`${path}`, data)
+
         console.log(response);
+
       } catch (error) {
         console.log('testSendMail', error);
         

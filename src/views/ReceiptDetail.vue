@@ -7,6 +7,7 @@
                 <div @click="printReceipt" class="btn-print text-white f-18">พิมพ์ใบเสร็จรับเงิน</div>
             </div>
             <table>
+           
                 <tr>
                     <td style="width: 50%; padding: 12% 2% 0% 2%;">
                         <table>
@@ -106,7 +107,7 @@
                                     </tr>
 
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
 
 
                                                 <img src="@/assets/images/check.webp" class="checkbox-display"/>
@@ -135,6 +136,7 @@
                                                 <p>
                                                     เจ้าหน้าที่การเงิน
                                                     <br>
+                                                {{ admin_name }}
                                                     <!-- ({{ data.firstname_admin." ".data.lastname_admin }}) -->
                                                 </p>
                                             </td>
@@ -147,7 +149,7 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
                                                 <p>
                                                     *หมายเหตุ* ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์เมื่อ
                                                     <br>
@@ -262,7 +264,7 @@
                                     </tr>
 
                                         <tr>
-                                            <td>
+                                            <td  class="text-left">
                                                 <img src="@/assets/images/check.webp" class="checkbox-display"/>
                                                     <!-- <img src="{{ URL::asset('/image/check.jpg') }}" class="checkbox-display"/> -->
                                                     เงินโอน
@@ -292,6 +294,7 @@
                                                 <p>
                                                     เจ้าหน้าที่การเงิน
                                                     <br>
+                                                    {{admin_name}}
                                                     <!-- ({{ data.firstname_admin." ".data.lastname_admin }}) -->
                                                 </p>
                                             </td>
@@ -304,7 +307,7 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
                                                 <p>
                                                     *หมายเหตุ* ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์เมื่อ
                                                     <br>
@@ -332,6 +335,7 @@
     export default{
         data: () => ({
            data: {},
+           admin_name: '',
            receiptData: {},
            decryptedData: {}
            
@@ -344,9 +348,11 @@
             this.receiptData        = JSON.parse(decryptedData);
 
 
+
         },
         mounted(){
             this.fechReceiptById()
+
         },
         filters: {
             formatNumber(value) {
@@ -387,10 +393,10 @@
                 
                 this.data.zip_code      = response.data.data.zip_code ? " รหัสไปรษณีย์ " + response.data.data.zip_code : "",
 
+                this.getEmployeeFinanceId(this.data.admin_id)
+
 
                 // data.address + (!(data.sub_district) ? " แขวง/ตำบล " + {{  }}  : "") + (!(data.district) ? " เขต/อำเภอ data.district " : "") + (!(data.province) ? " จังหวัด data.province " : "") + (!(data.zip_code) ? " รหัสไปรษณีย์ data.zip_code " : "")
-
-                console.log(this.data );
 
                
 
@@ -398,10 +404,51 @@
                 console.log("fechReceiptById", error);   
             }
         },
+        async getEmployeeFinanceId(admin_id){
+            try {
+            const EmployeeFinanceIdPath = `/api_gcp/ManageEmployee/EmployeeFinanceById`
+
+            const response = await axios.get(`${EmployeeFinanceIdPath}`,{ params: {admin_id: admin_id }})
+
+            this.admin_name = response.data.data.full_name
+
+            // console.log('============111111111',this.data.admin_name );
+            // this.receiptEmployees = response.data.data
+
+
+            } catch (error) {
+                console.log('EmployeeFinanceId', error);
+            }
+
+        },
+
+        getreceiptData(){
+            
+            const receiptData = { 
+                id: this.receiptData.id, 
+                name: this.receiptData.name, 
+                title_name: this.receiptData.title_name, 
+                reference_no_1: this.receiptData.reference_no_1, 
+                reference_no_2: this.receiptData.reference_no_2,  
+                payment_type_code: "01",  
+                admin_id: this.admin_name,  
+            };
+
+
+            const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+
+            // Encrypt the receipt data
+            const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(receiptData), key).toString();
+
+            return encryptedData
+        },
 
         printReceipt(){
 
-            window.open(this.$router.resolve({ name: 'ReceiptPrint', params: { receiptPrintData: this.$route.params.receiptData }}).href, '_blank');
+        
+            const encryptedData = this.getreceiptData();
+
+            window.open(this.$router.resolve({ name: 'ReceiptPrint', params: { receiptData: encryptedData }}).href, '_blank');
 
             // this.$router.push({ name: 'ReceiptDetail', params: { receiptData: encryptedData }});
 
@@ -410,7 +457,10 @@
 
        
         DecimalText(txt, unitName) {
-            console.log('===>>>>>>>>>',txt);
+            if(txt== undefined)
+            {
+                return;
+            }
             var thaiBathText = "";
 
             var valueText = txt.toString(); //.split(".")

@@ -4,6 +4,7 @@
 
             <h2 class="mb-3 d-flex">ข้อมูลผู้ลงทะเบียน | <div class="text-warning ml-2 cursor-pointer" @click="editRegister"> แก้ไขข้อมูล</div></h2>
             <v-row>
+               
                 <v-col>
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลรายละเอียดผู้สมัคร </div>
                     <div class="box-profile">
@@ -85,9 +86,9 @@
                     </v-card>
                     <v-card class="pd-125" v-if="user != null && data.register_type === '40002' && data.status_register === '12003'">
                         <h2  class="mb-3 text-center">เมนูข้อมูลใบเสร็จรับเงิน</h2>
-                        <div v-if="user?.preview_receipt" class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
-                        <div v-if="user?.edit_receipt" class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
-                        <div v-if="user?.cancel_receipt" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
+                        <div v-if="user?.preview_receipt && data.status_receipt === '13002'" class="btn-blue text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="previewReceipt">พรีวิวข้อมูลใบเสร็จรับเงิน</div>
+                        <div v-if="user?.edit_receipt && data.status_receipt === '13002'" class="btn-warning text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="editReceipt">แก้ไขข้อมูลใบเสร็จรับเงิน</div>
+                        <div v-if="user?.cancel_receipt && data.status_receipt === '13002'" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelReceipt = true">ยกเลิกใบเสร็จรับเงิน</div>
                         <div v-if="user?.receive_receipt && data.status_register === '12003' && data.status_receipt === '13001'" class="btn-success text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogReceipt = true">ออกใบเสร็จรับเงิน</div>
                     </v-card>
                 </v-col>
@@ -361,21 +362,17 @@ export default{
             try {
 
                 this.loading = true;
-                
                 const registerByIdPath          = `/api_gcp/Register/getRegisterById`
                 const response                  = await axios.get(`${registerByIdPath}/` + this.registerId.id)
                 const datas                     = response.data.data[0]
                 const formattedEndDate          = moment(datas.end_date).format('DD-MM-YYYY');
                 this.data                       = datas
-            
                 this.data.name_th               = `${datas.name_th} ` + `${datas.lastname_th}`  
                 this.data.name_en               = `${datas.name_en} ` + `${datas.lastname_en}`  
-                this.data.titleName             = datas.title_name_other !== null ? datas.title_name_other : datas.titleName
-                this.data.jobPositionName       = datas.job_position_other !== null ? datas.job_position_other : datas.jobPositionName
-                this.data.foodName              = datas.food_other !== null ? datas.food_other : datas.foodName
+                this.data.titleName             = `${datas.title_name_other  === '' || datas.title_name_other  === null ? datas.titleName : datas.title_name_other}`
+                this.data.jobPositionName       = `${datas.job_position_other  === '' || datas.job_position_other  === null ? datas.jobPositionName : datas.job_position_other}`
+                this.data.foodName              = `${datas.food_other  === '' || datas.food_other  === null ? datas.foodName : datas.food_other}`
                 this.data.end_date              = formattedEndDate
-
-                console.log(this.data );
 
             } catch (error) {
                 console.log('fechRegisterById', error);
@@ -442,40 +439,47 @@ export default{
 
             const fdCreateReceipt = {
 
-                "master_id"             : this.data.id,
-                "project_code"          : "0041",
-                "payment_type_code"     : "01",
-                "price"                 : this.data.course_price,
-                "reference_1"           : this.data.reference_no_1,
-                "reference_2"           : this.data.reference_no_2,
-                "name"                  : this.data.receipt_name,    
-                "id_card_number"        : this.data.id_card_number,
-                "address"               : this.data.company_address,  
-                "province"              : this.data.province_id,
-                "district"              : this.data.district_id,
-                "sub_district"          : this.data.subdistrict_id,
-                "zip_code"              : this.data.postcode,
-                "admin_id"              : this.user.employee_id
+                master_id             : this.data.id,
+                project_code          : "0041",
+                payment_type_code     : "01",
+                price                 : this.data.course_price,
+                reference_1           : this.data.reference_no_1,
+                reference_2           : this.data.reference_no_2,
+                name                  : this.data.receipt_name,    
+                id_card_number        : this.data.id_card_number,
+                address               : this.data.company_address,  
+                province              : this.data.province_id,
+                district              : this.data.district_id,
+                sub_district          : this.data.subdistrict_id,
+                zip_code              : this.data.postcode,
+                admin_id              : this.user.employee_id
             
             }
 
-            console.log(fdCreateReceipt);
-
             try {
+                
+                const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
+                    headers: {
+                        'accept': '*/*',
+                        'accept-language': 'en-US,en;q=0.8',
+                        'content-type': 'application/json'
+                    },
+                    timeout: 10000
+                });
 
-            const createReceiptPath          = `/api/create_receipt`
-            const response = await axios.post(`${createReceiptPath}`, `${fdCreateReceipt}`)
 
-            console.log(response);
+                //true
+                if(!response.data.response){
 
-            if(response.data){
-                this.updateStatusReceipt('13002')
-            }
+                    this.updateStatusReceipt('13002')
+                }
 
-       
-
+                    return response.data;
             } catch (error) {
-                console.log('createReceipt', error);   
+
+                console.log('========',error.message);
+
+                return error.message;
             }
       
         },
@@ -483,23 +487,33 @@ export default{
         async cancelReceipt(){
 
             const fdCencelReceipt = {
-                "reference_1"           : this.data.reference_no_1,
-                "reference_2"           : this.data.reference_no_2,
-                "payment_type_code"     : "01",
-                "admin_id"              : this.user.employee_id
-            }
+                
+                admin_id:  this.user.employee_id,
+                payment_type_code: "01",
+                reference_1: this.data.reference_no_1,
+                reference_2: this.data.reference_no_2,
 
-            console.log(fdCencelReceipt);
+            }
  
             try {
                 const cancelReceiptPath  = `/api/cancel_receipt`
-                const response = await axios.post(`${cancelReceiptPath}`, `${fdCencelReceipt}`)
-                
-            if(response.data){
+
+                const response = await axios.post(cancelReceiptPath, fdCencelReceipt, {
+                    headers: {
+                        'accept': '*/*',
+                        'accept-language': 'en-US,en;q=0.8',
+                        'content-type': 'application/json'
+                    },
+                    timeout: 10000
+                });
+
+
+             
+            // true
+            if(!response.data.response){
                 this.updateStatusReceipt('13001')
             }
-            console.log(response);
-            
+
             } catch (error) {
                 console.log('cacelReceipt', error);
             }
@@ -533,20 +547,12 @@ export default{
             const referencetwo          = this.data.reference_no_2
             const coursePrice           = this.data.course_price
 
-            console.log(startDate);
-            console.log(endDate);
-            console.log(name);
-            console.log(referenceOne);
-            console.log(referencetwo);
-            console.log(coursePrice);
-
             let url = `https://fsrx.cra.ac.th/CRAServices/payment/sis_payslip/16/${startDate}/${endDate}/${name}/${referenceOne}/${referencetwo}/${coursePrice}`;
 
             window.open(url, '_blank');
 
         },
 
-  
         previewReceipt(){
 
             const encryptedData = this.getreceiptData();
@@ -555,8 +561,6 @@ export default{
             this.$router.push({ name: 'ReceiptDetail', params: { receiptData: encryptedData }});
 
         },
-
-    
 
         getreceiptData(){
             

@@ -29,26 +29,26 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td style="width: 35%;"><b>ได้รับเงินจาก (Received)</b></td>
-                                            <td>
+                                            <td style="width: 35%; text-align: left;"><b>ได้รับเงินจาก (Received)</b></td>
+                                            <td style="text-align: left;">
                                             {{ data.name }}
                                             </td>
                                         </tr>
 
                                         <tr>
-                                            <td style="width: 35%;"><b>ชื่อผู้เข้าอบรม (Name)</b></td>
-                                            <td>
-                                                {{ receiptPrintData.title_name }} {{ receiptPrintData.name  }}
+                                            <td style="width: 35%; text-align: left;"><b>ชื่อผู้เข้าอบรม (Name)</b></td>
+                                            <td style="text-align: left;">
+                                                {{ this.receiptData.title_name }} {{ this.receiptData.name  }}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><b>ที่อยู่ (Address)</b></td>
+                                            <td style="text-align: left;"><b>ที่อยู่ (Address)</b></td>
                                             <!-- <td>{{ data.address + (!(data.sub_district) ? " แขวง/ตำบล " + {{  }}  : "") + (!(data.district) ? " เขต/อำเภอ data.district " : "") + (!(data.province) ? " จังหวัด data.province " : "") + (!(data.zip_code) ? " รหัสไปรษณีย์ data.zip_code " : "") }}</td> -->
-                                            <td>{{ data.address }} {{ data.sub_district }} {{ data.district }} {{ data.province }} {{ data.zip_code }}</td>
+                                            <td style="text-align: left;">{{ data.address }} {{ data.sub_district }} {{ data.district }} {{ data.province }} {{ data.zip_code }}</td>
                                         </tr>
                                         <tr>
-                                            <td><b>รหัสประจำตัวผู้เสียภาษี (Tax ID)</b></td>
-                                            <td>{{ data.id_card_number }}</td>
+                                            <td style="text-align: left;"><b>รหัสประจำตัวผู้เสียภาษี (Tax ID)</b></td>
+                                            <td style="text-align: left;">{{ data.id_card_number }}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -66,7 +66,7 @@
                                         </tr>
                                         <tr>
                                             <td style="text-align: center;">1</td>
-                                            <td style="padding-left: 8%;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
+                                            <td style="padding-left: 8%; text-align: left;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
                                             <td style="text-align: center;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
@@ -77,7 +77,7 @@
                                         <tr>
                                             <td style="text-align: center;">รวม</td>
                                             <!-- <td style="padding-left: 8%;">{{ App\Http\Controllers\Controller::convertToBahtText(data.price) }}</td> -->
-                                            <td style="padding-left: 8%;">หนึ่งพันห้าร้อยบาท</td>
+                                            <td style="padding-left: 8%; text-align: left;">{{ DecimalText(data.price , 'บาท') }}</td>
                                             <td style="text-align: center; border-bottom: 3px double #000000;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
@@ -101,7 +101,7 @@
                                     </tr>
 
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
 
 
                                                 <img src="@/assets/images/check.webp" class="checkbox-display"/>
@@ -130,6 +130,7 @@
                                                 <p>
                                                     เจ้าหน้าที่การเงิน
                                                     <br>
+                                                    {{ receiptData.admin_id }}
                                                     <!-- ({{ data.firstname_admin." ".data.lastname_admin }}) -->
                                                 </p>
                                             </td>
@@ -142,7 +143,7 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
                                                 <p>
                                                     *หมายเหตุ* ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์เมื่อ
                                                     <br>
@@ -183,27 +184,27 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td style="width: 35%;"><b>ได้รับเงินจาก (Received)</b></td>
-                                            <td>{{ data.name }}</td>
+                                            <td style="width: 35%; text-align: left;"><b>ได้รับเงินจาก (Received)</b></td>
+                                            <td style="text-align: left;"> {{ data.name }}</td>
                                         </tr>
 
                                         <tr>
-                                            <td style="width: 35%;"><b>ชื่อผู้เข้าอบรม (Name)</b></td>
-                                            <td>
-                                                {{ receiptPrintData.title_name }} {{ receiptPrintData.name  }}
+                                            <td style="width: 35%;text-align: left;"><b>ชื่อผู้เข้าอบรม (Name)</b></td>
+                                            <td style="text-align: left;">
+                                                {{ this.receiptData.title_name }} {{ this.receiptData.name  }}
                                                 <!-- {{ (!empty(data.title_th_other) ? data.title_th_other : data.title_th)." ".data.firstname_th." ".data.lastname_th }} -->
                                             </td>
                                         </tr>
 
 
                                         <tr>
-                                            <td><b>ที่อยู่ (Address)</b></td>
-                                            <td>{{ data.address }} {{ data.sub_district }} {{ data.district }} {{ data.province }} {{ data.zip_code }}</td>
+                                            <td style="text-align: left;"><b>ที่อยู่ (Address)</b></td>
+                                            <td style="text-align: left;">{{ data.address }} {{ data.sub_district }} {{ data.district }} {{ data.province }} {{ data.zip_code }}</td>
                                             <!-- <td>{{ data.address.(!empty(data.sub_district) ? " แขวง/ตำบล data.sub_district " : NULL).(!empty(data.district) ? " เขต/อำเภอ data.district " : NULL).(!empty(data.province) ? " จังหวัด data.province " : NULL).(!empty(data.zip_code) ? " รหัสไปรษณีย์ data.zip_code " : NULL) }}</td> -->
                                         </tr>
                                         <tr>
-                                            <td><b>รหัสประจำตัวผู้เสียภาษี (Tax ID)</b></td>
-                                            <td>{{ data.id_card_number }}</td>
+                                            <td style="text-align: left;"><b>รหัสประจำตัวผู้เสียภาษี (Tax ID)</b></td>
+                                            <td style="text-align: left;">{{ data.id_card_number }}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -221,7 +222,7 @@
                                         </tr>
                                         <tr>
                                             <td style="text-align: center;">1</td>
-                                            <td style="padding-left: 8%;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
+                                            <td style="padding-left: 8%; text-align: left;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
                                             <td style="text-align: center;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
@@ -230,8 +231,9 @@
                                             <td style="border-bottom: 1px solid #000000;"></td>
                                         </tr>
                                         <tr>
+                                          
                                             <td style="text-align: center;">รวม</td>
-                                            <td style= "padding-left: 8%;">หนึ่งพันห้าร้อยบาท</td>
+                                            <td style= "padding-left: 8%; text-align: left;">{{ DecimalText(data.price , 'บาท') }}</td>
                                             <!-- <td style= "padding-left: 8%;">{{ App\Http\Controllers\Controller::convertToBahtText(data.price) }}</td> -->
                                             <td style="text-align: center; border-bottom: 3px double #000000;">{{ data.price | formatNumber }}</td>
                                         </tr>
@@ -256,7 +258,7 @@
                                     </tr>
 
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
                                                 <img src="@/assets/images/check.webp" class="checkbox-display"/>
                                                     <!-- <img src="{{ URL::asset('/image/check.jpg') }}" class="checkbox-display"/> -->
                                                     เงินโอน
@@ -286,6 +288,8 @@
                                                 <p>
                                                     เจ้าหน้าที่การเงิน
                                                     <br>
+                                                 
+                                                    {{ receiptData.admin_id }}
                                                     <!-- ({{ data.firstname_admin." ".data.lastname_admin }}) -->
                                                 </p>
                                             </td>
@@ -298,7 +302,7 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td>
+                                            <td class="text-left">
                                                 <p>
                                                     *หมายเหตุ* ใบเสร็จรับเงินฉบับนี้จะสมบูรณ์เมื่อ
                                                     <br>
@@ -323,21 +327,23 @@
     export default{
         data: () => ({
            data: {},
-           receiptPrintData: {}
+           receiptData: {},
+           admin_name: '',
         }),
         created(){
-            const encryptedData         = this.$route.params.receiptPrintData; // รับค่า receiptPrintData จากพารามิเตอร์ใน URL
+            const encryptedData         = this.$route.params.receiptData; // รับค่า receiptData จากพารามิเตอร์ใน URL
             const key                   = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
             const bytes                 = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
             const decryptedData         = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
-            this.receiptPrintData       = JSON.parse(decryptedData);
-
-            console.log(this.receiptPrintData);
-
+            this.receiptData         = JSON.parse(decryptedData);
         },
         mounted(){
             this.fechReceiptById()
-             window.print();
+
+            setTimeout(() => {
+                window.print();
+            }, 500); 
+             
                 
         },
 
@@ -360,9 +366,9 @@
             async fechReceiptById(){
                 try {
 
-                    const reference_no_1        = this.receiptPrintData.reference_no_1;
-                    const reference_no_2        = this.receiptPrintData.reference_no_2;
-                    const payment_type_code     = this.receiptPrintData.payment_type_code
+                    const reference_no_1        = this.receiptData.reference_no_1;
+                    const reference_no_2        = this.receiptData.reference_no_2;
+                    const payment_type_code     = this.receiptData.payment_type_code
 
 
                     const receiptDetailPath = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
@@ -378,6 +384,8 @@
                     this.data.sub_district  = response.data.data.sub_district ? "แขวง/ตำบล " + response.data.data.sub_district : "",
                     
                     this.data.zip_code      = response.data.data.zip_code ? " รหัสไปรษณีย์ " + response.data.data.zip_code : ""
+
+                 
                 
           
                 // this.$router.push({ path: '/' }); 
@@ -388,6 +396,115 @@
 
              
             },
+
+               
+        DecimalText(txt, unitName) {
+            if(txt == undefined)
+            {
+                return;
+            }
+
+            var thaiBathText = "";
+
+            var valueText = txt.toString(); //.split(".")
+            var unitOrder = 1;
+    
+            
+            // Manage Full Value
+            for (var i = valueText.length; i >= 1; i--) {
+                if (i !== 1) {                    
+                    thaiBathText = this.GetValueName(unitOrder, parseInt(valueText.charAt(i - 1))) + this.GetUnitName(unitOrder, parseInt(valueText.charAt(i - 1))) + thaiBathText;
+                } else {
+                    thaiBathText = this.GetValueName(unitOrder, parseInt(valueText.charAt(i - 1)), true) + this.GetUnitName(unitOrder, parseInt(valueText.charAt(i - 1)), true) + thaiBathText;
+                }
+
+                if (unitOrder === 7) unitOrder = 1;
+                unitOrder += 1;
+            }
+
+           
+
+            return thaiBathText  + unitName;
+        },
+
+        GetUnitName(unitOrder, value) {
+            var unitName = "";
+            if (value === 0 && unitOrder < 7) return unitName;
+            switch (unitOrder) {
+                case 1:
+                    break;
+                case 2:
+                    unitName = "สิบ";
+                    break;
+                case 3:
+                    unitName = "ร้อย";
+                    break;
+                case 4:
+                    unitName = "พัน";
+                    break;
+                case 5:
+                    unitName = "หมื่น";
+                    break;
+                case 6:
+                    unitName = "แสน";
+                    break;
+                case 7:
+                    unitName = "ล้าน";
+                    break;
+            }
+
+            return unitName;
+        },
+
+        GetValueName(unitOrder, value, lastOrder = false, isDecimal = false) {
+            var valueName = "";
+            switch (value) {
+                case 0:
+                    if (lastOrder || isDecimal) {
+                        valueName = "ศูนย์";
+                    }
+                    break;
+                case 1:
+                    if (isDecimal) valueName = "หนึ่ง";
+                    else {
+                        if ((lastOrder && unitOrder !== 2) || (unitOrder > 2 && unitOrder < 7)) {
+                            valueName = "หนึ่ง";
+                        } else if (unitOrder !== 2) {
+                            valueName = "เอ็ด";
+                        }
+                    }
+                    break;
+                case 2:
+                    if (unitOrder === 2 && !isDecimal) {
+                        valueName = "ยี่";
+                    } else valueName = "สอง";
+                    break;
+                case 3:
+                    valueName = "สาม";
+                    break;
+                case 4:
+                    valueName = "สี่";
+                    break;
+                case 5:
+                    valueName = "ห้า";
+                    break;
+                case 6:
+                    valueName = "หก";
+                    break;
+                case 7:
+                    valueName = "เจ็ด";
+                    break;
+                case 8:
+                    valueName = "แปด";
+                    break;
+                case 9:
+                    valueName = "เก้า";
+                    break;
+            }
+
+            return valueName;
+        }
+
         }
     }
 </script>

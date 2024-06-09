@@ -10,7 +10,7 @@ import Receipt from '../views/ReceiptForm.vue'
 
 import RegisterListView from '../views/RegisterListView.vue'
 import RegisDetail from '../views/RegisterDetail.vue'
-import DocumentView from '../views/DocumentView.vue'
+// import DocumentView from '../views/DocumentView.vue'
 import ReceiptList from '../views/ReceiptList.vue'
 import ReceiptImport from '../views/ReceiptImport.vue'
 import ReceiptPrint from '../views/ReceiptPrint.vue'
@@ -47,7 +47,7 @@ const routes = [
       // { path: 'registration/:id', name: 'registration-edit', component: RegisterEdit },
       { path: 'registration-list',  name: 'RegisterListView', component: RegisterListView },
       { path: 'registration-detail/:id', name: 'registration-detail', component: RegisDetail },
-      { path: 'document', component: DocumentView },
+      // { path: 'document', component: DocumentView },
       { path: 'receipt/:receiptData',   name: 'receipt', component: Receipt },
       { path: 'receipt-list', component: ReceiptList },
       { path: 'receipt-import', name: 'ReceiptImport', component: ReceiptImport },
@@ -59,7 +59,7 @@ const routes = [
   },
 
   { path: '/receipt_detail/:receiptData', name: 'ReceiptDetail', component: ReceiptDetail },
-  { path: '/receipt_print/:receiptPrintData', name: 'ReceiptPrint', component: ReceiptPrint },
+  { path: '/receipt_print/:receiptData', name: 'ReceiptPrint', component: ReceiptPrint },
 
   // {
   //   path: '/login',

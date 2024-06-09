@@ -140,6 +140,7 @@ export default {
   },
     mounted(){
       this.fechstatusRegisterReceipt()
+     
     },
     methods: {
       exportToExcel() {
@@ -167,40 +168,51 @@ export default {
      
 
       },
+    
+
       async createReceipt(){
+
+        for(let i = 0; i < this.selectedItems.length; i++){
+          
+          const fdCreateReceipt = {
+
+            master_id             : this.selectedItems[i].id,
+            project_code          : "0041",
+            payment_type_code     : "01",
+            price                 : this.selectedItems[i].course_price,
+            reference_1           : this.selectedItems[i].reference_no_1,
+            reference_2           : this.selectedItems[i].reference_no_2,
+            name                  : this.selectedItems[i].receipt_name,    
+            id_card_number        : this.selectedItems[i].id_card_number,
+            address               : this.selectedItems[i].company_address,  
+            province              : this.selectedItems[i].province_id,
+            district              : this.selectedItems[i].district_id,
+            sub_district          : this.selectedItems[i].subdistrict_id,
+            zip_code              : this.selectedItems[i].postcode,
+            admin_id              : this.user.employee_id
+
+            }
 
             try {
 
-              for(let i = 0; i < this.selectedItems.length; i++){
-                
-                const fdCreateReceipt = {
-
-                  "master_id"     : this.selectedItems[i].id,
-                  "project_code"  : "0041",
-                  "price"         : this.selectedItems[i].course_price,
-                  "reference_1"   : this.selectedItems[i].reference_no_1,
-                  "reference_2"   : this.selectedItems[i].reference_no_2,
-                  "name"          : this.selectedItems[i].receipt_name,    
-                  "id_card_number": this.selectedItems[i].id_card_number,
-                  "address"       : this.selectedItems[i].company_address,  
-                  "province"      : this.selectedItems[i].province_id,
-                  "district"      : this.selectedItems[i].district_id,
-                  "sub_district"  : this.selectedItems[i].subdistrict_id,
-                  "zip_code"      : this.postcode,
-                  "admin_id"      : this.user.employee_id
-
-                }
-
- 
-                const createReceiptPath          = `/api/create_receipt`
-                
-                await axios.post(`${createReceiptPath}`, `${fdCreateReceipt}`)
+              const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
+              headers: {
+                  'accept': '*/*',
+                  'accept-language': 'en-US,en;q=0.8',
+                  'content-type': 'application/json'
+              },
+              timeout: 10000
+              });
 
 
-              }
-              
+              console.log('========',response);
 
-              await Swal.fire({
+
+            if(!response.data.data.response){
+              this.updateStatusReceipt(this.selectedItems[i],'13002')
+            }
+
+            await Swal.fire({
                         icon: 'success',
                         title: 'บันทึกสำเร็จ',
                         text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
@@ -213,9 +225,37 @@ export default {
 
 
             } catch (error) {
-                console.log('createReceipt', error);   
+
+            console.log('========',error.message);
+
             }
+
+        }
+
+
+
+
+      },
       
+      async updateStatusReceipt(data,status){
+            try {
+             
+                let currentDate = moment();
+            
+                let fd = {
+                    "register_id"       : data.id,
+                    "status_receipt"    : status,
+                    "modified_by"       : this.user.employee_id,
+                    "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
+                }
+
+                let updateStatusRegisterPath = `/api_gcp/Register/updateStatusReceipt`
+
+                await axios.post(`${updateStatusRegisterPath}`, fd)
+
+                } catch (error) {
+                    console.log('updateStatusRegister', error);
+                }
         },
 
       async fechstatusRegisterReceipt(){
@@ -246,7 +286,6 @@ export default {
 
         this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
 
-            // this.$router.push({ name: 'registration-detail', params: { id: value.id }})
         },
         formatDate(value) {
             return moment(value).format("YYYY-MM-DD HH:mm:ss")

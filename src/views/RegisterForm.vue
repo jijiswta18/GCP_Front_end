@@ -58,10 +58,16 @@
                                    
                                
                     </v-data-table>
+    
+                    <h4 v-if="checkLimitCourse" class="text-danger text-center mt-3">
+                        ขณะนี้ระบบลงทะเบียนหลักสูตร "แนวทางปฏิบัติการวิจัยทางคลินิคที่ดี"2567 แบบ Onsite เต็มจำนวน 
+                        <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน
+                    </h4>
                     </v-col>
                 </v-row>
 
-                <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 4)" class="mt-7">
+               
+                <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 4 || it.id === 2)" class="mt-7">
                     <v-col cols="12" class="px-2">
                         <v-card class="px-5 py-5">
                             <p class="style-label">ท่านสนใจเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming " วันที่ 26 กรกฏาคม 2567 ณ ห้องพระอินทร์ 1-2 ชั้น 2  <br> โรงแรมอัศวิน แกรนด์ คอนเวนชั่น หรือไม่ ? * Onsite จำกัด 80 ท่าน เท่านั้น <span>*</span></p>
@@ -69,7 +75,10 @@
                                 <v-radio label="เข้าร่วม" :value="true"></v-radio>
                                 <v-radio label="ไม่เข้ารวม" :value="false"></v-radio>
                             </v-radio-group>
-                            <h4 v-if="checkLimitCourseOther" class="text-danger text-center mt-3">ขณะนี้ระบบลงทะเบียนเต็มจำนวน อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งได้</h4>
+                            <h4 v-if="checkLimitCourseOther" class="text-danger text-center mt-3">
+                                ขณะนี้ระบบลงทะเบียนอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming" เต็มจำนวน 
+                                <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน
+                            </h4>
                         </v-card>
 
                     </v-col>
@@ -446,6 +455,7 @@
                         <p class="style-label">รหัสพนักงาน : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.employee_id"
+                            :disabled="isEdit"
                             ref="EmployeeIdField"
                             label="รหัสพนักงาน"
                             dense
@@ -453,6 +463,7 @@
                             single-line
                             clearable 
                             class="style-input"
+                            :class="{'disabled' : isEdit}"
                             required
                             maxlength="6"
                             @keyup="handleInput('employee_id')"
@@ -465,6 +476,7 @@
                         <p class="style-label">รหัสผ่านพนักงาน : <span>*</span></p>
                         <v-text-field
                             v-model="dataFrom.password"
+                            :disabled="isEdit"
                             ref="PasswordField"
                             label="รหัสผ่านพนักงาน"
                             dense
@@ -472,6 +484,7 @@
                             single-line
                             clearable 
                             class="style-input"
+                            :class="{'disabled' : isEdit}"
                             required
                             @input="checkEmployee"
                             :type="showPassword ? 'text' : 'password'"
@@ -668,6 +681,7 @@
                 </div>
                 
                 <v-btn class="bg-green btn-confirm font-weight-bold" @click="saveRegister">ยืนยัน</v-btn>
+                <!-- <v-btn class="bg-green btn-confirm font-weight-bold" @click="sendEmail">เมล</v-btn> -->
 
 
             </div>
@@ -717,6 +731,7 @@
             limitCourse: '',
             limitCourseOther: '',
             checkLimitCourseOther: false,
+            checkLimitCourse: false,
             emailErrors: [],
             emailType: 'text',
             showPassword: false,
@@ -853,18 +868,7 @@
                             showConfirmButton: false,
                             timer: 1500
                         })
-                    // }else{
-                    //     await Swal.fire({
-                    //         icon: 'warning',
-                    //         title: 'ไม่พบข้อมูล',
-                    //         showConfirmButton: false,
-                    //         timer: 1500
-                    //     })
                     }
-
-                  
-
-                    console.log(response.data);
 
                 } catch (error) {
                     console.log('checkEmployee', error);
@@ -876,7 +880,7 @@
                     const countRegisterPath          = `/api_gcp/Register/CounterRegister`
                     const response                  = await axios.get(`${countRegisterPath}`)
         
-                    let full = false;
+                    // let full = false;
 
                  
 
@@ -894,23 +898,26 @@
 
             if(response.data.COUNT >= parseInt(this.limitCourse)){
                  //เต็ม
-                full = true;
+                // full = true;
+                this.checkLimitCourse = true;
                 console.log("onsite ==== <", this.limitCourse)
             }else{
                  //สามารถสมัครได้
-                full = false;               
+                // full = false;    
+                this.checkLimitCourse = false;           
                 console.log("onsite ==== >", this.limitCourse)
             }
 
 
-            if(full){
+            if(this.checkLimitCourse){
                 Swal.fire({
                     icon: 'warning',
-                    // title: message,
-                    text: "ขณะนี้ระบบลงทะเบียนเต็มจำนวน อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งได้ วันที่ 06 มิ.ย 67"
+                    html: 'ขณะนี้ระบบลงทะเบียนหลักสูตร "แนวทางปฏิบัติการวิจัยทางคลินิคที่ดี"2567 แบบ Onsite เต็มจำนวน  <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน',  
+            
                 });
             }
-           
+          
+                        
                 } catch (error) {
                     console.log('getCountRegister', error);
                 }
@@ -946,10 +953,21 @@
                 });
             },
 
+            // Validation functions
+            validateRequiredField(field, errorMessage, ref) {
+                if (!field) {
+                    return this.showError(errorMessage, ref);
+                }
+            },
 
+            validateConditionalField(condition, field, errorMessage, ref) {
+                if (condition && !field) {
+                    return this.showError(errorMessage, ref);
+                }
+            },
             async saveRegister(){
+
                 const { 
-                    
                     title_name, title_name_other,
                     name_th, lastname_th, name_en, lastname_en, education,
                     receipt_name, id_card_number,  company_address, 
@@ -1083,8 +1101,6 @@
 
                     if( !this.check_employee ||  this.register_type === "40002"){
 
-                        console.log('======');
-                        console.log(fd);
                         const registerPath = `/api_gcp/Register/addRegister`
 
                         let response =  await axios.post(`${registerPath}`, fd)
@@ -1098,9 +1114,22 @@
                         
 
                         if(response.data.data){
-                        this.getDigit(response.data.data) 
-                     
-                    }
+                            
+                            this.getDigit(response.data.data)
+
+                            const dataEmail = {
+
+                            "register_type"         : this.register_type,
+                            "course_name"           : this.valueCheckboxCourse[0].name,
+                            "check_course_other"    : this.dataFrom.check_course_other,
+
+                            }
+
+
+                            const responseEmail = await axios.post('/api_gcp/Register/sendMailRegister', dataEmail)
+
+                            console.log(responseEmail);
+                        }
 
                     
                     await Swal.fire({
@@ -1250,9 +1279,10 @@
                 
                 this.dataFrom.email2                = datas.email
 
-                let test                            = {"id": datas.course_id };
+                let course                          = {"id": datas.course_id };
         
-                this.valueCheckboxCourse.push(test);
+                this.valueCheckboxCourse.push(course);
+
                 
                 if (this.selectedProvince) {
                     this.fetchDistricts(this.selectedProvince);

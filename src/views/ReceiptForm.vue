@@ -187,10 +187,10 @@
                         <p class="style-label">เจ้าหน้าที่ออกใบเสร็จ : <span>*</span></p>
                         <v-autocomplete
                             label="เลือก"
-                            v-model="dataForm.receipt_employee"
-                            :items="filteredReceiptEmployee"
-                            item-text="name"
-                            item-value="select_code"
+                            v-model="dataForm.admin_id"
+                            :items="receiptEmployees"
+                            item-text="full_name"
+                            item-value="employee_id"
                             solo
                             clearable 
                             class="style-select"
@@ -213,7 +213,7 @@
    import axios from 'axios';
    import Swal from 'sweetalert2';
    import CryptoJS from 'crypto-js';
-   import store from '../store/index.js';
+//    import store from '../store/index.js';
 
 export default{
     data: () => ({
@@ -228,9 +228,10 @@ export default{
         selectedDistrict: null,
         selectedSubdistrict: null,
         optionsReceiptRegister: [],
-        user: store.getters.user,
+        // user: store.getters.user,
         receiptData: {},
-        decryptedData: {}
+        decryptedData: {},
+        receiptEmployees: []
     }),
     computed: {
         filteredReceiptEmployee(){
@@ -243,15 +244,28 @@ export default{
         const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
         const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
         this.receiptData        = JSON.parse(decryptedData);
-
-        console.log(this.receiptData );
-
     },
     mounted(){
         this.fetchProvinces();
         this.fetchReceiptById();
+        this.getEmployeeFinance();
     },
     methods: {
+        async getEmployeeFinance(){
+
+            try {
+            const EmployeeFinancePath = `/api_gcp/ManageEmployee/EmployeeFinance`
+
+            const response = await axios.get(`${EmployeeFinancePath}`)
+
+            this.receiptEmployees = response.data.data
+
+
+            } catch (error) {
+                console.log('EmployeeFinancegister', error);
+            }
+
+        },
         async saveEditReceipt(){
             if(this.$refs.formReceipt.validate()){
                 try {
@@ -271,7 +285,7 @@ export default{
                         "zip_code"          : this.postcode,
                         "note"              : this.dataForm.note,
                         "create_datetime"   : date,
-                        "admin_id"          : this.user.employee_id
+                        "admin_id"          : this.dataForm.admin_id
                     }
 
                     const updateReceiptPath = `/api/update_receipt`
@@ -302,8 +316,6 @@ export default{
                 const reference_no_2        = this.receiptData.reference_no_2;
                 const payment_type_code     = this.receiptData.payment_type_code
 
-                console.log(this.receiptData);
-
                 const receiptDetailPath = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
                 
                 const response          =  await axios.get(`${receiptDetailPath}`)
@@ -314,10 +326,8 @@ export default{
                 var dateParts           = receipt_date.split(" ")
 
                 this.dataForm           = data
-
                 this.dataForm.receipt_date      = dateParts[0]
                 this.dataForm.receipt_time      = dateParts[1]
-
                 this.selectedProvince           = data.province_code
                 this.selectedDistrict           = data.district_code
                 this.selectedSubdistrict        = data.sub_district_code
