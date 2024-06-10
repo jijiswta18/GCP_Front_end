@@ -7,10 +7,10 @@
         </div>
 
         <br>
+        
         <v-data-table
             :headers="headers"
             :items="datas"
-            
             item-key="id"
             v-model="selectedItems"
             :search="search"
@@ -35,9 +35,9 @@
     import CryptoJS from 'crypto-js';
     import * as XLSX from 'xlsx';
     export default {
-    props: ['headers', 'datas', 'type'],
+    props: ['headers', 'datas', 'type', 'search'],
     data: () => ({
-        search: '',
+        // search: '',
         selectedItems: [],
     }),
     create(){

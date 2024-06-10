@@ -23,63 +23,62 @@
             <v-col cols="6" class="px-2">
              
                 <p>รายการที่ต้องการสมัคร</p>
-                <SelectOption :options="courseOptions" @selected="updateCourseType" item-value="id"/>
+                <SelectOption :options="filteredOptionCourses" @selected="updateCourseType" item-value="select_code"/>
             </v-col>
         </v-row>
 
        
-
-            <div v-if="user">
-                <v-text-field
-                    v-model="search"
-                    label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
-                    solo
-                    class="style-input-search"
-                    single-line
-                    hide-details="auto"
-                    clearable 
-                    dense
-                >
-                    <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-                </v-text-field>
-                <div class="loader" v-if="loader"></div>
-                <div v-else>
-                    <RegisterList :headers="headers" :datas="customFilter" type="employee"/>
-                </div>
-             
-            </div>
-
+        <div v-if="user">
+            <v-text-field
+                v-model="search"
+                label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
+                solo
+                class="style-input-search"
+                single-line
+                hide-details="auto"
+                clearable 
+                dense
+            >
+                <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+            </v-text-field>
+            <div class="loader" v-if="loader"></div>
             <div v-else>
-                <v-row no-gutters>
-                    <v-col cols="10" class="px-2">
-                        <v-text-field
-                            v-model="searchEmail"
-                            label="อีเมล (ไม่ต้องเว้นวรรค)"
-                            solo
-                            class="style-input-search"
-                            single-line
-                            hide-details="auto"
-                            clearable 
-                            dense
-                        >
-                            <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-                        </v-text-field>
-                    </v-col>
-                    <v-col cols="2" class="px-2">
-                        <div @click="checkEmail" class="btn-blue btn-search text-white">ค้นหา / search
-                        </div>
-                    </v-col>
-                </v-row>
-                <!-- <div class="loader" v-if="loader"></div>
-                <div v-else> -->
-                    <div v-if="dataProfile.length  > 0">
-                        <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
-                    </div>
-                <!-- </div> -->
-               
+                <RegisterList :headers="headers" :datas="customFilter" type="employee" :search="search"/>
             </div>
-    
+            
         </div>
+
+        <div v-else>
+            <v-row no-gutters>
+                <v-col cols="10" class="px-2">
+                    <v-text-field
+                        v-model="searchEmail"
+                        label="อีเมล (ไม่ต้องเว้นวรรค)"
+                        solo
+                        class="style-input-search"
+                        single-line
+                        hide-details="auto"
+                        clearable 
+                        dense
+                    >
+                        <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+                    </v-text-field>
+                </v-col>
+                <v-col cols="2" class="px-2">
+                    <div @click="checkEmail" class="btn-blue btn-search text-white">ค้นหา / search
+                    </div>
+                </v-col>
+            </v-row>
+            <!-- <div class="loader" v-if="loader"></div>
+            <div v-else> -->
+                <div v-if="dataProfile.length  > 0">
+                    <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+                </div>
+            <!-- </div> -->
+            
+        </div>
+
+    </div>
 
 
 
@@ -117,9 +116,12 @@ export default {
             { text: 'ID', align: 'center', value: 'id' },
             { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
             { text: 'ชื่อ', align: 'left', value: 'name' },
-            { text: 'สถานะ', align: 'center', value: 'statusRegisterName' },
+            { text: 'สถานะ', align: 'left', value: 'statusRegisterName' },
             { text: 'Reference No 1', align: 'center', value: 'reference_no_1' },
             { text: 'Reference No 2', align: 'center', value: 'reference_no_2' },
+            { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
+            { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
+            { text: 'อีเมล', value: 'email', align: ' d-none' },
         ],
         datas: [],
         valueRegisterStatus: null,
@@ -131,7 +133,7 @@ export default {
     mounted(){
         if(this.user){
             this.fetchSelectList();
-            this.fetchCoursetList();
+            // this.fetchCoursetList();
             this.fechRegister();
         }
        
@@ -149,15 +151,27 @@ export default {
         filteredOptionFood() {
             return this.options.filter(option => option.select_catagory === 7);
         },
+        filteredOptionCourses() {
+            
+            return this.options.filter(option => option.select_catagory === 17);
+        },
+        
         
         customFilter() {
+
+            
 
             return this.datas.filter(item => {
                 return (
                     (this.valueRegisterStatus === null || item.status_register.toLowerCase() === this.valueRegisterStatus.toLowerCase()) &&
                     (this.valueRegiterType === null || item.register_type.toLowerCase() === this.valueRegiterType.toLowerCase()) &&
                     (this.valueCencelOrder === null || item.cancel_order.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
-                    (this.valueCourseType === null || item.course_id.toString()  === this.valueCourseType.toString() )
+                    (this.valueCourseType === null || item.course_id.toLowerCase()  === this.valueCourseType.toLowerCase() )
+
+                    
+                    // (this.valueCourseType === null || item.course_id.toString()  === this.valueCourseType.toString() )
+
+                    
 
                 );
             });
@@ -178,22 +192,22 @@ export default {
                 console.error('Error fetching provinces:', error);
             }
         },
-        async fetchCoursetList(){
-            try {
-                const response = await axios.get('/api_gcp/getSelectCourses');
+        // async fetchCoursetList(){
+        //     try {
+        //         const response = await axios.get('/api_gcp/getSelectCourses');
 
-                const selectCourseList = await response.data.data
+        //         const selectCourseList = await response.data.data
 
-                this.courseOptions = selectCourseList;
+        //         this.courseOptions = selectCourseList;
 
             
 
-                // this.selectedOption = this.courseOptions.length > 0 ? this.courseOptions[0].id : null;
+        //         // this.selectedOption = this.courseOptions.length > 0 ? this.courseOptions[0].id : null;
 
-            } catch (error) {
-                console.error('Error fetching provinces:', error);
-            }
-        },
+        //     } catch (error) {
+        //         console.error('Error fetching provinces:', error);
+        //     }
+        // },
         async fechRegister(){
 
             try {
@@ -262,6 +276,7 @@ export default {
             this.valueRegiterType = value;
         },
         updateCourseType(value) {
+            console.log(value);
             this.valueCourseType = value;
         },
         updateFood(value) {

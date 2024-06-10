@@ -8,7 +8,7 @@
                 <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ลงทะเบียนเข้ารับการอบรม</div> 
                 <v-row no-gutters>
                     <v-col cols="12">
-                        <p class="style-label"><span>*</span> ประเภทผู้สมัคร</p>
+                        <p class="style-label">ประเภทผู้สมัคร : <span>*</span> </p>
                         <v-radio-group v-model="register_type"  ref="RegisterTypeField" :disabled="isEdit">
                             <v-radio v-for="option in filteredRegiterStatus" :key="option.id" :label="option.name" :value="option.select_code">
                             </v-radio>
@@ -19,24 +19,22 @@
                 <v-row  justify="center" class="mt-3" v-if="register_type">
                   
                     <v-col cols="10">
-                        
                         <v-data-table
                             v-model="valueCheckboxCourse"
                             ref="ValueCourseField" 
                             :headers="headerCourses"
                             :items="filteredOptionCourses"
                             item-value="name"
-                            item-key="id"
+                            item-key="select_code"
                             show-select
                             hide-default-header
-                            hide-default-footer
+                              hide-default-footer
                             :single-select="true"
                             class="table-regis"
                            :class="{'disabled' : isEdit}"
                             
                         >
-                       
-                      
+                    
                         <template v-slot:header>
                             <thead>
                                 <tr>
@@ -50,10 +48,12 @@
                             </thead>
                         </template>
                      
-                        <template v-slot:[`item.price`]="{ item }">
+                        <template v-slot:[`item.course_price`]="{ item }">
                             <span v-if="register_type === '40001'">ไม่มีค่าลงทะเบียน</span>
-                            <span v-else>{{ item.price | formatNumber }} บาท</span>
-                        
+                            <span v-else>{{ item.course_price | formatNumber }} บาท</span>
+                        </template>
+                        <template v-slot:[`item.name`]="{ item }">
+                            <span>{{ item.name }} <span class="text-danger">* </span>{{ item.course_detail }}<span class="text-danger"> *</span></span>
                         </template>
                                    
                                
@@ -66,27 +66,23 @@
                     </v-col>
                 </v-row>
 
-               
-                <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.id === 1 || it.id === 4 || it.id === 2)" class="mt-7">
+              
+                <v-row no-gutters v-if="valueCheckboxCourse.find(it => it.course_type === 'Onsite')" class="mt-7">
                     <v-col cols="12" class="px-2">
                         <v-card class="px-5 py-5">
-                            <p class="style-label">ท่านสนใจเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming " วันที่ 26 กรกฏาคม 2567 ณ ห้องพระอินทร์ 1-2 ชั้น 2  <br> โรงแรมอัศวิน แกรนด์ คอนเวนชั่น หรือไม่ ? * Onsite จำกัด 80 ท่าน เท่านั้น <span>*</span></p>
+                            <p class="style-label">ท่านสนใจเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming " วันที่ 26 กรกฏาคม 2567 ณ ห้องพระอินทร์ 1-2 ชั้น 2  
+                                <br> โรงแรมอัศวิน แกรนด์ คอนเวนชั่น หรือไม่ ? * Onsite จำกัด 30 ท่าน *</p>
                             <v-radio-group v-model="dataFrom.check_course_other" ref="CheckCourseOtherField" :disabled="isEdit || checkLimitCourseOther">
                                 <v-radio label="เข้าร่วม" :value="true"></v-radio>
-                                <v-radio label="ไม่เข้ารวม" :value="false"></v-radio>
+                                <v-radio label="ไม่เข้าร่วม" :value="false"></v-radio>
                             </v-radio-group>
                             <h4 v-if="checkLimitCourseOther" class="text-danger text-center mt-3">
                                 ขณะนี้ระบบลงทะเบียนอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming" เต็มจำนวน 
                                 <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน
                             </h4>
                         </v-card>
-
                     </v-col>
-                    <!-- <v-col cols="12" class="px-2" v-if="limitCourseOther">
-                        <h4 v-if="limitCourseOther" class="text-danger text-center mt-3">ขณะนี้ระบบลงทะเบียนเต็มจำนวน อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งได้</h4>
-                    </v-col> -->
                 </v-row>
-
             </div>
 
             <div class="box-register mt-7">
@@ -393,7 +389,7 @@
                     </v-col>
                 </v-row>
                 <p v-if="errorMessage" class="error_message not-match">ข้อมูลไม่ตรงกัน</p>
-                <v-row no-gutters v-if="register_type === '40002'">
+                <v-row no-gutters>
                     <v-col cols="12" class="px-2">
                         <p class="style-label">อีเมล : <span>*</span></p>
                         <v-text-field
@@ -410,7 +406,7 @@
                     </v-col>
                 </v-row>
 
-                <v-row no-gutters v-if="register_type === '40002'">
+                <v-row no-gutters>
                     <v-col cols="12" class="px-2">
                         <p class="style-label"> ยืนยันอีเมล : <span>*</span></p>
                         
@@ -498,6 +494,8 @@
                 </v-row>
 
                 <div v-if="check_employee" class="text-danger text-center">ข้อมูลรหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง</div> 
+                <!-- <div v-if="check_employee" class="text-danger text-center">ข้อมูลรหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง</div>  -->
+                <div v-if="!check_employee && dataFrom.password" class="text-success text-center">ยืนยันตัวตนสำเร็จ</div> 
               
 
                 <v-row  no-gutters>
@@ -649,7 +647,7 @@
                     <v-col cols="12">
                         <p class="style-label">หมายเหตุ *</p>
                         <div>
-                            <p class="mb-0">1. ผู้สมัครเข้าร่วมอบรมกรุณาชำระค่าสมัครผ่านระบบลงทะเบียนได้ที่ https://daa/gcp2024</p>
+                            <p class="mb-0">1. ผู้สมัครเข้าร่วมอบรมกรุณาชำระค่าสมัครผ่านระบบลงทะเบียนได้ที่ https://registergcpcrmu.cra.ac.th</p>
                             <p class="mb-0">2. ผู้สมัครต้องชำระเงินด้วยตนเองเท่านั้น เพื่อให้ชื่อผู้ชำระเงินตรงกับใบชำระเงินในระบบลงทะเบียน <span class="text-danger">(ไม่สามารถชำระเงินแทนผู้อื่นได้)</span></p>
                             <p class="mb-0">3. หากมีข้อสงสัยในการลงทะเบียนหรือการเข้าร่วมอบรม ติดต่อได้ที่เบอร์โทร 093-4172747 หรือติดต่อ Email : daraporn.dua@cra.ac.th</p>
                         </div>
@@ -708,7 +706,7 @@
             districts: [],
             subdistricts: [],
             options: [],
-            optionsCourses: [],
+            // optionsCourses: [],
             valueCheckboxCourse: [],
             selectedItems: [],
             selectedProvince: null,
@@ -718,8 +716,9 @@
             errorMessage:'',
             headerCourses: [
                 { text: 'name', align: 'left', value: 'name' },
-                { text: 'type_register', align: 'left', value: 'type_seminar' },
-                { text: 'price', align: 'left', value: 'price' },
+                { text: 'course_seminar', align: 'left', value: 'course_seminar' },
+                { text: 'price', align: 'left', value: 'course_price' },
+           
 
             ],
             numberRules: [
@@ -803,15 +802,20 @@
             filteredOptionReceipt(){
                 return this.options.filter(option => option.select_catagory === 9);
             },
-            filteredOptionCourses() {   
-                let optionsCourses = []
+            filteredOptionCourses() { 
                 if(this.register_type === '40001'){
-                    optionsCourses = this.optionsCourses.filter(option => option.type_register === '40001' );
+                    this.options.filter(option => option.select_catagory === 9);
+                }  
+                // let optionsCourses = []
+                if(this.register_type === '40001'){
+                    // optionsCourses = this.optionsCourses.filter(option => option.type_register === 'employee' );
+                    return this.options.filter(option => option.type_register === 'employee' );
                 }else{
-                    optionsCourses = this.optionsCourses.filter(option =>  option.type_register != '40001' );
+                    // optionsCourses = this.optionsCourses.filter(option =>  option.type_register === 'user' );
+                    return this.options.filter(option =>  option.type_register === 'user' );
 
                 }
-                return optionsCourses;
+                // return optionsCourses;
             },
             // limitRegisterOnsite(){
             //     return this.limitRegister.filter(option => option.select_catagory === 15);
@@ -825,7 +829,7 @@
         mounted(){
             this.fetchProvinces();
             this.fetchSelectList();
-            this.fetchCourses();
+            // this.fetchCourses();
             this.getCountRegister();
             if (this.$route.name === 'registration-edit') {
             this.isEdit = true;
@@ -855,20 +859,23 @@
                     const response = await axios.post(adPath, data);
 
 
+
+
+
                     if(response.data.code === '200'){
                         this.check_employee = false;
                     }else{
                         this.check_employee = true;
                     }
 
-                    if(!this.check_employee){
-                        await Swal.fire({
-                            icon: 'success',
-                            title: 'ยืนยันตัวตนสำเร็จ',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                    }
+                    // if(!this.check_employee){
+                    //     await Swal.fire({
+                    //         icon: 'success',
+                    //         title: 'ยืนยันตัวตนสำเร็จ',
+                    //         showConfirmButton: false,
+                    //         timer: 1500
+                    //     })
+                    // }
 
                 } catch (error) {
                     console.log('checkEmployee', error);
@@ -968,7 +975,7 @@
             async saveRegister(){
 
                 const { 
-                    title_name, title_name_other,
+                    title_name, title_name_other, 
                     name_th, lastname_th, name_en, lastname_en, education,
                     receipt_name, id_card_number,  company_address, 
                     phone, phone_other, email1, email2, confirm_receipt,
@@ -977,9 +984,11 @@
                     confirm_register
                  } = this.dataFrom;
 
+
+                 
                 if (!this.register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
                 //  if (this.valueCheckboxCourse) return this.showError('กรุณาระบุอัตราค่าสมัครเข้าอบรม', this.$refs.ValueCourseField);
-                //  if (this.valueCheckboxCourse.find(it => it.id === 1 || it.id === 2) && !check_course_other) return this.showError('กรุณาระบุการเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming"', this.$refs.CheckCourseOtherField);
+                //  if (this.valueCheckboxCourse.find(it => it.course_type === 'Onsite') && check_course_other) return this.showError('กรุณาระบุการเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming"', this.$refs.CheckCourseOtherField);
                  if (!title_name) return this.showError('กรุณาระบุคำนำหน้า', this.$refs.titleNameField);
                  if (title_name === '10013' && !title_name_other) return this.showError('กรุณาระบุคำนำหน้าอื่น ๆ', this.$refs.titleNameOtherField);
                  if (!name_th) return this.showError('กรุณาระบุชื่อ', this.$refs.NameThField);
@@ -997,8 +1006,8 @@
                  if (this.register_type === '40002' && !this.postcode) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.PostcodeField);
                  if (!phone) return this.showError('กรุณาระบุเบอร์โทรศัพท์มือถือ', this.$refs.PhoneField);
                  if (!phone_other) return this.showError('กรุณาระบุเบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้)', this.$refs.PhoneOtherField);
-                 if (this.register_type === '40002' && !email1) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
-                 if (this.register_type === '40002' && !email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
+                 if (!email1) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
+                 if (!email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
                  if (this.register_type === '40002' && !confirm_receipt) return this.showError('กรุณายืนยันว่าข้อมูลในใบเสร็จรับเงินถูกต้อง', this.$refs.ConfirmReceiptField);
                  if (this.register_type === '40001' &&!employee_id) return this.showError('กรุณาระบุรหัสพนักงาน', this.$refs.EmployeeIdField);
                  if (!job_position) return this.showError('กรุณาระบุตำแหน่งงาน', this.$refs.JobPositionField);
@@ -1047,9 +1056,9 @@
 
                         const fd = {
                         "register_type"             : this.register_type,
-                        "course_id"                 : this.valueCheckboxCourse[0].id,
+                        "course_id"                 : this.valueCheckboxCourse[0].select_code,
                         "course_name"               : this.valueCheckboxCourse[0].name,
-                        "course_price"              : this.valueCheckboxCourse[0].price,
+                        "course_price"              : this.valueCheckboxCourse[0].course_price,
                         "check_course_other"        : this.dataFrom.check_course_other,
                         "title_name"                : this.dataFrom.title_name,
                         "title_name_other"          : this.dataFrom.title_name_other,
@@ -1117,18 +1126,18 @@
                             
                             this.getDigit(response.data.data)
 
-                            const dataEmail = {
+                            // const dataEmail = {
 
-                            "register_type"         : this.register_type,
-                            "course_name"           : this.valueCheckboxCourse[0].name,
-                            "check_course_other"    : this.dataFrom.check_course_other,
+                            // "register_type"         : this.register_type,
+                            // "course_name"           : this.valueCheckboxCourse[0].name,
+                            // "check_course_other"    : this.dataFrom.check_course_other,
 
-                            }
+                            // }
 
 
-                            const responseEmail = await axios.post('/api_gcp/Register/sendMailRegister', dataEmail)
+                            // const responseEmail = await axios.post('/api_gcp/Register/sendMailRegister', dataEmail)
 
-                            console.log(responseEmail);
+                            // console.log(responseEmail);
                         }
 
                     
@@ -1279,7 +1288,7 @@
                 
                 this.dataFrom.email2                = datas.email
 
-                let course                          = {"id": datas.course_id };
+                let course                          = {"select_code": datas.course_id, "course_type": datas.course_type };
         
                 this.valueCheckboxCourse.push(course);
 
@@ -1320,19 +1329,19 @@
                 }
             },
 
-            async fetchCourses(){
-                try {
-                    const response = await axios.get('/api_gcp/getSelectCourses');
+            // async fetchCourses(){
+            //     try {
+            //         const response = await axios.get('/api_gcp/getSelectCourses');
 
-                    const selectcourses = await response.data.data
+            //         const selectcourses = await response.data.data
 
-                    this.optionsCourses = selectcourses;
+            //         this.optionsCourses = selectcourses;
                     
 
-                } catch (error) {
-                    console.error('Error fetching courses:', error);
-                }
-            },
+            //     } catch (error) {
+            //         console.error('Error fetching courses:', error);
+            //     }
+            // },
 
             async fetchProvinces() {
                 try {

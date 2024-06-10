@@ -17,16 +17,16 @@
       </v-col>
     </v-row>
 
-    <div class="button" @click="testSendMail">
+    <!-- <div class="button" @click="testSendMail">
       send mail
-    </div>
+    </div> -->
 
   </div>
 
 </template>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
 export default {
 
   data:() =>({
@@ -34,24 +34,24 @@ export default {
   }),
   methods: {
  
-    async testSendMail(){
-      try {
-        const path = `/api_gcp/Register/sendMail`
+    // async testSendMail(){
+    //   try {
+    //     const path = `/api_gcp/Register/sendMailRegister`
       
-        const data = {
-          "mail" : 'sawitta.sri@cra.ac.th',
-          "name" : 'สวิตตา ศรีจันทร์'
-        }
-        const response = await axios.post(`${path}`, data)
+    //     const data = {
+    //       "mail" : 'sawitta.sri@cra.ac.th',
+    //       "name" : 'สวิตตา ศรีจันทร์'
+    //     }
+    //     const response = await axios.post(`${path}`, data)
 
-        console.log(response);
+    //     console.log(response);
 
-      } catch (error) {
-        console.log('testSendMail', error);
+    //   } catch (error) {
+    //     console.log('testSendMail', error);
         
-      }
+    //   }
     
-    }
+    // }
   },
 
   mounted() {}

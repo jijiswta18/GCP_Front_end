@@ -109,12 +109,12 @@ export default {
       selectedItems: [],
       selectAll: false,
       headers: [
-          { text: 'สถานะออกใบเสร็จรับเงิน', align: 'center', value: 'statusReceipt' },
+          { text: 'สถานะออกใบเสร็จรับเงิน', align: 'left', value: 'statusReceipt' },
           { text: '', align: 'center', value: 'detail' },
           { text: 'ID', align: 'center', value: 'id' },
           { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
           { text: 'ชื่อ', align: 'left', value: 'name' },
-          { text: 'สถานะ', align: 'center', value: 'statusRegister' },
+          { text: 'สถานะ', align: 'lefts', value: 'statusRegister' },
           { text: 'Reference No 1', align: 'center', value: 'reference_no_1' },
           { text: 'Reference No 2', align: 'center', value: 'reference_no_2' },
       ],
@@ -264,6 +264,7 @@ export default {
           const statusRegisterReceiptPath = `/api_gcp/Register/statusRegisterReceipt`
 
           const response = await axios.get(`${statusRegisterReceiptPath}`)
+
 
 
           this.datas = response.data.data

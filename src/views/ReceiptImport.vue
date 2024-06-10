@@ -84,10 +84,7 @@
         }
     },
         methods: {
-
-
             async uplaodFile() {
-
                
                 if(this.file === null){
 
@@ -135,6 +132,8 @@
                         let unsuccess = [];
                         const dataFormat256 = response.data[0].detail
 
+                        console.log(dataFormat256);
+
                         for(let i = 0; i<dataFormat256.length; i++){
 
 
@@ -159,6 +158,8 @@
                                 const mapStatusReceiptPath = `/api_gcp/Register/MapStatusReceipt`
 
                                 const response = await axios.post(`${mapStatusReceiptPath}`, data)
+
+                                console.log(response);
 
                                 if(parseInt(response.data[0].SUCCESS) >= 1)
                                 {

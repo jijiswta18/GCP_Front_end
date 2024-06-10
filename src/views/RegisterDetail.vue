@@ -24,7 +24,7 @@
                         <p v-if="data.register_type === '40002'"><span class="text-warning">รหัสไปรษณีย์ : </span> {{ data.postcode }}</p>   
                         <p><span class="text-warning">เบอร์โทรศัพท์มือถือ : </span> {{ data.phone }}</p>   
                         <p><span class="text-warning">เบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้) : </span> {{ data.phone_other }}</p>   
-                        <p v-if="data.register_type === '40002'"><span class="text-warning">อีเมล : </span> {{ data.email }}</p>   
+                        <p><span class="text-warning">อีเมล : </span> {{ data.email }}</p>   
                     </div>
                     
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการทำงาน</div>

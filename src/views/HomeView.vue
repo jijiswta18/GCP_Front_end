@@ -459,6 +459,9 @@ export default {
   } */
 
 
+  .theme--light.v-data-table .v-data-footer {
+    border-top: none!important;
+}
   
 
 </style>
