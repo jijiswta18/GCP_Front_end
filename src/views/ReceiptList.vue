@@ -117,6 +117,9 @@ export default {
           { text: 'สถานะ', align: 'lefts', value: 'statusRegister' },
           { text: 'Reference No 1', align: 'center', value: 'reference_no_1' },
           { text: 'Reference No 2', align: 'center', value: 'reference_no_2' },
+          { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
+            { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
+            { text: 'อีเมล', value: 'email', align: ' d-none' },
       ],
       datas: [],
       dialog: false

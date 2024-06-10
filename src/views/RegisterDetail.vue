@@ -456,6 +456,7 @@ export default{
             
             }
 
+
             try {
                 
                 const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
@@ -467,19 +468,37 @@ export default{
                     timeout: 10000
                 });
 
+                console.log(response);
+
 
                 //true
-                if(!response.data.response){
+                if(!response.data.data.response){
 
                     this.updateStatusReceipt('13002')
+                    
+                        await Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ',
+                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                    })
+                        // this.fechRegisterById(this.dataFrom.id);
+
+                    // return response.data;
+                 
                 }
 
-                    return response.data;
+             
             } catch (error) {
 
+                await Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบข้อมูล',
+                        // text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                    })
+                    this.dialogReceipt = false
                 console.log('========',error.message);
 
-                return error.message;
+                // return error.message;
             }
       
         },

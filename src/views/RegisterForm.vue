@@ -1224,7 +1224,6 @@
                 let idProject           = '0041'
                 let formatPaymentDate   = moment().format('DD-MM-YY')
                 let paymentDate         = formatPaymentDate.replace(/-/g, "");
-
                 var string              = "" + id;
                 var pad1                = "000000";
                 let running_no_1        = pad1.substring(0, pad1.length - string.length) + string;
@@ -1237,11 +1236,12 @@
                 const fd = {
                     "reference_no_1"    : reference_no_1,
                     "reference_no_2"    : reference_no_2,
-                    "cost"              : this.valueCheckboxCourse[0].price,
+                    "cost"              : this.valueCheckboxCourse[0].course_price,
                 }
 
                 const digitPath = `/CRAServices/payment/get_digit`
                 let response =  await axios.post(`${digitPath}`, fd)
+
 
                 if(response.data){
 
@@ -1253,6 +1253,7 @@
                         "reference_no_2"    : reference_no_2,
                         "id"                : id,
                     }
+
 
                     const updateReferencePath = `/api_gcp/Register/updateReferenceRegister`
 
