@@ -52,21 +52,22 @@ export default new Vuex.Store({
     async login ( {commit}, authData){
   
       commit('checkUser', null);
-      // let ldapPath = `/ldap/RestfulWS/username/${authData.username}/password/${authData.password}`
-              
-      // let response = await axios.get(ldapPath);
-
+    
       let adPath = `/active_directory/login`
               
       let response = await axios.post(adPath, authData);
 
 
-      console.log(response);
+      console.log(response.data.result);
    
       // commit('authUser', response.data.result)
-
-
       if(response.data.code === "200"){
+
+        
+
+        // const responseEmployee =  axios.get(`/api_phonebook/phonebook/employee_info/901836`);
+
+        // console.log(responseEmployee);
 
         let fd = response.data.result
 

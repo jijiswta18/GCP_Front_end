@@ -66,7 +66,7 @@
                                         </tr>
                                         <tr>
                                             <td style="text-align: center;">1</td>
-                                            <td style="padding-left: 8%; text-align: left;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
+                                            <td style="padding-left: 8%; text-align: left;">ค่าสมัครการอบรมหลักสูตร " แนวทางปฏิบัติการวิจัยทางคลินิกที่ดี (Good Clinical Practice: GCP)" 2567</td>
                                             <td style="text-align: center;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>
@@ -222,7 +222,7 @@
                                         </tr>
                                         <tr>
                                             <td style="text-align: center;">1</td>
-                                            <td style="padding-left: 8%; text-align: left;">ค่าลงทะเบียนงานประชุมวิชาการด้านการแพทย์ภัยพิบัติและฉุกเฉิน ประจำปี 2567  The First CRA Disasters and Emergencies Management Conference. “Time To Move Forward” ระหว่างวันที่ 29-31 กรกฎาคม 2567</td>
+                                            <td style="padding-left: 8%; text-align: left;">ค่าสมัครการอบรมหลักสูตร " แนวทางปฏิบัติการวิจัยทางคลินิกที่ดี (Good Clinical Practice: GCP)" 2567</td>
                                             <td style="text-align: center;">{{ data.price | formatNumber }}</td>
                                         </tr>
                                         <tr>

@@ -189,7 +189,7 @@
                             label="เลือก"
                             v-model="dataForm.admin_id"
                             :items="receiptEmployees"
-                            item-text="full_name"
+                            item-text="name"
                             item-value="employee_id"
                             solo
                             clearable 
@@ -259,6 +259,14 @@ export default{
             const response = await axios.get(`${EmployeeFinancePath}`)
 
             this.receiptEmployees = response.data.data
+
+            this.receiptEmployees.forEach(employee => {
+                employee.name = `${employee.employee_id} ${employee.first_name} ${employee.last_name}`;
+            });
+
+            console.log('========',this.receiptEmployees);
+
+
 
 
             } catch (error) {

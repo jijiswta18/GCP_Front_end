@@ -15,7 +15,7 @@
                     </div>
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการติดต่อ</div>
                     <div class="box-contact">
-                        <p v-if="data.register_type === '40002'"><span class="text-warning">ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน : </span> {{ data.phone }}</p>   
+                        <p v-if="data.register_type === '40002'"><span class="text-warning">ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน : </span> {{ data.receipt_name }}</p>   
                         <p v-if="data.register_type === '40002'"><span class="text-warning">เลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร : </span> {{ data.id_card_number }}</p>   
                         <p v-if="data.register_type === '40002'"><span class="text-warning">ที่อยู่สถานที่ทำงานเลขที่ : </span> {{ data.company_address }}</p>   
                         <p v-if="data.register_type === '40002'"><span class="text-warning">จังหวัด : </span> {{ data.provinceName }}</p>   
@@ -401,7 +401,7 @@ export default{
 
                 this.dialogApprove = false
 
-                this.$router.push({ name: 'RegisterListView' });
+                // this.$router.push({ name: 'RegisterListView' });
 
                 } catch (error) {
                     console.log('updateStatusRegister', error);

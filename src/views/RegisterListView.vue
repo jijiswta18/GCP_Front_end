@@ -162,17 +162,12 @@ export default {
             
 
             return this.datas.filter(item => {
+
                 return (
                     (this.valueRegisterStatus === null || item.status_register.toLowerCase() === this.valueRegisterStatus.toLowerCase()) &&
                     (this.valueRegiterType === null || item.register_type.toLowerCase() === this.valueRegiterType.toLowerCase()) &&
                     (this.valueCencelOrder === null || item.cancel_order.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
-                    (this.valueCourseType === null || item.course_id.toLowerCase()  === this.valueCourseType.toLowerCase() )
-
-                    
-                    // (this.valueCourseType === null || item.course_id.toString()  === this.valueCourseType.toString() )
-
-                    
-
+                    (this.valueCourseType === null || item.course_id.toLowerCase() === this.valueCourseType.toLowerCase()) 
                 );
             });
         }
@@ -273,6 +268,7 @@ export default {
             this.valueCencelOrder = value;
         },
         updateRegiterType(value) {
+            console.log(value);
             this.valueRegiterType = value;
         },
         updateCourseType(value) {

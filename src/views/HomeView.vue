@@ -21,11 +21,14 @@
           </router-link>
 
           <router-link 
-            class="d-flex align-center menu-link"
+            class="d-flex align-center menu-link "
             active-class="activemenu"
-            :to="{ name: 'registration'}"              >
-          
-            <v-list-item link>
+            :to="{ name: 'registration'}"
+            @click.prevent="handleRegistration"
+          >
+
+            <!-- <v-list-item link> -->
+            <v-list-item link >
             <!-- <v-list-item link v-if="user?.menu_register || checkDate"> -->
                 <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
             </v-list-item>
@@ -59,10 +62,10 @@
             </template>
 
             <v-list>
-              <v-list-item to="/receipt-import">
+              <v-list-item v-if="user?.upload_receipt" to="/receipt-import" >
                 <v-list-item-title>อัพโหลดข้อมูลการชำระเงิน</v-list-item-title>
               </v-list-item>
-              <v-list-item to="/receipt-list">
+              <v-list-item v-if="user?.check_register_receipt" to="/receipt-list" >
                 <v-list-item-title>สำหรับเจ้าหน้าที่การเงิน</v-list-item-title>
               </v-list-item>
             <v-list-item class="cursor-pointer">
@@ -105,8 +108,8 @@
               active-class="activemenu"
               :to="{ name: 'registration'}"              >
             
-              <!-- <v-list-item link v-if="user?.menu_register || checkDate"> -->
-              <v-list-item link >
+              <v-list-item link v-if="user?.menu_register || checkDate">
+              <!-- <v-list-item link > -->
                   <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
               </v-list-item>
             </router-link>
@@ -137,6 +140,8 @@
           </v-row>
         </v-container>
     </v-main>
+
+    
   </v-app>
 </template>
 
@@ -181,12 +186,12 @@ export default {
       // Navigate to the selected link
       window.location.href = item.link;
     },
+
     async getMenuRegisterOpening(){
       const path = '/api_gcp/Register/getMenuRegisterOpening'
       const response = await axios.get(path);
-
       this.checkDate = response.data
-
+      
     },
     async logout() {
 
@@ -462,6 +467,14 @@ export default {
   .theme--light.v-data-table .v-data-footer {
     border-top: none!important;
 }
+.v-input .v-label{
+  display: contents;
+}
+
+input{
+  height: 30px;
+}
+
   
 
 </style>

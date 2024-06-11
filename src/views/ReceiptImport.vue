@@ -30,6 +30,11 @@
             <v-row justify="center" class="box-submit">
                 <v-btn class="btn-success" @click="uplaodFile">ยืนยัน</v-btn>
             </v-row>
+
+            
+            <div  class="button" @click="testSendMail">
+                send mail
+            </div>
         </div>
         <div id="showresult" :class="{ modified: isModified }" style="display: none;">
             <h4 class="mb-3">สำเร็จ</h4> 
@@ -58,6 +63,8 @@
             <div class="btn-import text-center">
                 <div @click="clearClass" class="f-22 bg-gray box-import cursor-pointer">import อีกครั้ง</div>
             </div>
+
+          
         </div>
     </div>
 </template>
@@ -131,8 +138,6 @@
                         let success = [];
                         let unsuccess = [];
                         const dataFormat256 = response.data[0].detail
-
-                        console.log(dataFormat256);
 
                         for(let i = 0; i<dataFormat256.length; i++){
 
@@ -508,8 +513,26 @@
                 this.isImport = false;
                 this.isModified = false;
                 this.file = null;
-            }
-     
+            },
+            
+        async testSendMail(){
+      try {
+        const path = `/api_gcp/Register/sendMailRegister`
+      
+        const data = {
+          "mail" : 'sawitta.sri@cra.ac.th',
+          "name" : 'สวิตตา ศรีจันทร์'
+        }
+        const response = await axios.post(`${path}`, data)
+
+        console.log(response);
+
+      } catch (error) {
+        console.log('testSendMail', error);
+        
+      }
+    
+    }
     
         }
     }

@@ -1,7 +1,7 @@
 <template>
     <div class="select-list">
      
-        {{ selectValue }}
+     
         <v-autocomplete
             label="เลือก"
             v-model="selectOptionValue"
