@@ -4,7 +4,7 @@
 
             <h2 class="mb-3 d-flex">ข้อมูลผู้ลงทะเบียน | <div class="text-warning ml-2 cursor-pointer" @click="editRegister"> แก้ไขข้อมูล</div></h2>
             <v-row>
-               
+            
                 <v-col>
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลรายละเอียดผู้สมัคร </div>
                     <div class="box-profile">
@@ -70,7 +70,7 @@
                         <p><span class="text-warning">รายการที่ต้องการสมัคร : </span>
                             <ul>
                                 <li>{{data.course_name}}</li>
-                                <li>อบรมเชิงปฏิบัติการ หัวข้อ "Data Analysis in Clinical Research Using R Programming  วันที่ 26 กรกฏาคม 2567 </li>
+                                <li v-if="data.check_course_other === 1">อบรมเชิงปฏิบัติการ หัวข้อ "Data Analysis in Clinical Research Using R Programming  วันที่ 26 กรกฏาคม 2567 </li>
                             </ul>
                         </p>   
                         <p><span>เข้าร่วมอบรม : </span>{{ data.course_name }}</p>   
@@ -457,7 +457,7 @@ export default{
 
                 await axios.post(`${updateStatusRegisterPath}`, fd)
 
-                Swal.fire('บันทึกข้อมูลเรีบร้อยเเล้ว', '', 'success')
+                Swal.fire('บันทึกข้อมูลเรียบร้อยเเล้ว', '', 'success')
 
                 this.dialogApprove = false
 
@@ -512,7 +512,7 @@ export default{
 
                 await axios.post(`${updateStatusRegisterPath}`, fd)
 
-                Swal.fire('บันทึกข้อมูลเรีบร้อยเเล้ว', '', 'success')
+                Swal.fire('บันทึกข้อมูลเรียบร้อยเเล้ว', '', 'success')
 
                 this.dialogApprove = false
 

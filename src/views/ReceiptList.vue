@@ -41,10 +41,10 @@
                 :input-value="item.id"
             ></v-checkbox>
             </template>
-            <template v-slot:[`item.statusReceipt`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceipt }}</span></template>
+            <template v-slot:[`item.statusReceiptName`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceiptName }}</span></template>
             <template v-slot:[`item.name`]="{ item }">{{ item.name_th }}  {{  item.lastname_th  }}</template>
             <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
-            <template v-slot:[`item.statusRegister`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegister }}</span></template>
+            <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template>
             <template v-slot:[`item.detail`]="{ item }">
                 <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
             </template>
@@ -109,12 +109,12 @@ export default {
       selectedItems: [],
       selectAll: false,
       headers: [
-          { text: 'สถานะออกใบเสร็จรับเงิน', align: 'left', value: 'statusReceipt' },
+          { text: 'สถานะออกใบเสร็จรับเงิน', align: 'left', value: 'statusReceiptName' },
           { text: '', align: 'center', value: 'detail' },
           { text: 'ID', align: 'center', value: 'id' },
           { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
           { text: 'ชื่อ', align: 'left', value: 'name' },
-          { text: 'สถานะ', align: 'lefts', value: 'statusRegister' },
+          { text: 'สถานะ', align: 'lefts', value: 'statusRegisterName' },
           { text: 'Reference No 1', align: 'center', value: 'reference_no_1' },
           { text: 'Reference No 2', align: 'center', value: 'reference_no_2' },
           { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
@@ -147,13 +147,68 @@ export default {
     },
     methods: {
       exportToExcel() {
+
+        const dataArray = this.datas
+
+        // Extract only name and age from data array
+        const extractedDataArray = dataArray.map(item => {
+            const address               = item.company_address === null || item.company_address === '' ? '' : item.company_address 
+            const subdistrictName       = item.subdistrict_id === null || item.subdistrict_id === '' ? '' : ' แขวง/ตำบล ' + item.subdistrictName 
+            const districtName          = item.district_id === null || item.districtName === '' ? '' :  ' เขต/อำเภอ ' + item.districtName
+            const provinceName          = item.province_id === null || item.province_id === '' ? '' : ' จังหวัด ' + item.provinceName 
+            const postcode              = item.postcode === null || item.postcode === '' ? '' : 'รหัสไปรษณีย์' + item.postcode 
+
+            const company_address       = address + subdistrictName + districtName + provinceName + postcode
+            const check_course_other    = item.check_course_other === 1 ? 'เข้าร่วม' : 'ไม่เข้าร่วม'
+            const name_th               = item.title_name === '10013' ? item.title_name_other : item.titleName + item.name_th + item.lastname_th
+            const job_position          = item.job_position === '20008' ? item.job_position_other : item.jobPositionName
+            const food_allergy          = item.food_allergy === '50001' ? item.food_allergy_detail : item.foodAllergyName
+            const food                  = item.food === '70004' ? item.food_other : item.foodName
+            const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
+
+            
+            return{ 
+                "ID": item.id, 
+                "วันเวลาที่ลงทะเบียน": create_date,
+                "ประเภทผู้สมัคร": item.registerTypeName,
+                "ประเภทหลักสูตร": item.course_name,
+                "ค่าลงทะเบียน": item.course_price,
+                "สนใจเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ Data Analysis in Clinical Research Using R Programming": check_course_other,
+                "ชื่อภาษาไทย": name_th,
+                "คุณวุฒิการศึกษาสูงสุด": item.educationName,
+                "เบอร์โทรศัพท์": item.phone,
+                "เบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้)": item.phone_other,
+                "อีเมล": item.email,
+                "รหัสพนักงาน": item.employee_id,
+                "ตำแหน่งงาน": job_position,
+                "ชื่อหน่วยงาน": item.company_name,
+                "ประสบการณ์ทำงาน (ปี)": item.work_experience,
+                "แพ้อาหาร": food_allergy,
+                "ประเภทอาหาร": food,
+                "ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน": item.receipt_name,
+                "เลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร": item.id_card_number,
+                "ที่อยู่สถานที่ทำงานเลขที่":company_address,
+                "Reference No 1": item.reference_no_1,
+                "Reference No 2": item.reference_no_2,
+                "สถานะ": item.statusRegisterName,
+                "สถานะการออกใบเสร็จรับเงิน": item.statusReceiptName,
+            };
+        });
+
+
+
         const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(this.datas);
+
+
+        const ws = XLSX.utils.json_to_sheet(extractedDataArray);
+
+
         XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
         /* generate XLSX file and send to client */
         XLSX.writeFile(wb, 'รายงานข้อมูลผู้ลงทะเบียน.xlsx');
-      },
+        },
+
       checkDailog(){
 
         if(this.selectedItems.length){
@@ -268,9 +323,9 @@ export default {
 
           const response = await axios.get(`${statusRegisterReceiptPath}`)
 
-
-
           this.datas = response.data.data
+
+          console.log(this.datas);
         
 
 

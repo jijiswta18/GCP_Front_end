@@ -124,6 +124,7 @@ export default {
             { text: 'อีเมล', value: 'email', align: ' d-none' },
         ],
         datas: [],
+        dataExcel: [],
         valueRegisterStatus: null,
         valueCencelOrder: null,
         valueRegiterType: null,
@@ -213,6 +214,7 @@ export default {
 
                this.datas = await response.data.data
 
+             
                this.loader = await false
 
 
