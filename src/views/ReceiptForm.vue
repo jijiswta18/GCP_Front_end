@@ -39,7 +39,7 @@
                 </v-row>
 
                 <v-row  no-gutters>  
-                    <v-col cols="6" class="px-2">
+                    <v-col cols="12" md="6" class="px-2">
                         <p class="style-label">วันที่ออกใบเสร็จ : <span>*</span></p>
                             <v-text-field
                                 v-model="dataForm.receipt_date"
@@ -52,7 +52,7 @@
                                 type="date"
                             ></v-text-field>
                     </v-col>
-                    <v-col cols="6" class="px-2">
+                    <v-col cols="12" md="6" class="px-2">
                         <p class="style-label">เวลาที่ออกใบเสร็จ  : <span>*</span></p>
                             <v-text-field
                                 v-model="dataForm.receipt_time"
@@ -97,7 +97,7 @@
                 </v-row>
 
                 <v-row no-gutters>
-                    <v-col cols="3" class="px-2">
+                    <v-col cols="12" md="3" class="px-2">
                         <p class="style-label">จังหวัด : <span>*</span> </p>
                         <v-autocomplete
                             label="เลือก"
@@ -115,7 +115,7 @@
                         ></v-autocomplete>
                     </v-col>
                     
-                    <v-col cols="3" class="px-2">
+                    <v-col cols="12" md="3" class="px-2">
                         <p class="style-label">เขต/อำเภอ : <span>*</span></p>
                         <v-autocomplete
                             label="เลือก"
@@ -133,7 +133,7 @@
                             :rules="[v => !!v || 'กรุณากรอกข้อมูล']"
                         ></v-autocomplete>
                     </v-col>
-                    <v-col cols="3" class="px-2">
+                    <v-col  cols="12" md="3"  class="px-2">
                         <p class="style-label">แขวง/ตำบล : <span>*</span></p>
                         <v-autocomplete
                             label="เลือก"
@@ -151,7 +151,7 @@
                             class="style-select"
                         ></v-autocomplete>
                     </v-col>
-                    <v-col cols="3" class="px-2">
+                    <v-col  cols="12" md="3" class="px-2">
                         <p class="style-label">รหัสไปรษณีย์ : <span>*</span></p>
                         <v-text-field
                             v-model="postcode"

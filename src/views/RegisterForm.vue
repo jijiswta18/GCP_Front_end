@@ -18,7 +18,7 @@
 
                 <v-row  justify="center" class="mt-3" v-if="register_type">
                   
-                    <v-col cols="10">
+                    <v-col cols="10" >
                         <v-data-table
                             v-model="valueCheckboxCourse"
                             ref="ValueCourseField" 
@@ -61,7 +61,7 @@
     
                     <h4 v-if="checkLimitCourse" class="text-danger text-center mt-3">
                         ขณะนี้ระบบลงทะเบียนหลักสูตร "แนวทางปฏิบัติการวิจัยทางคลินิคที่ดี"2567 แบบ Onsite เต็มจำนวน 
-                        <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน
+                        <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งในวันพุธของสัปดาห์ถัดไป
                     </h4>
                     </v-col>
                 </v-row>
@@ -78,7 +78,7 @@
                             </v-radio-group>
                             <h4 v-if="checkLimitCourseOther" class="text-danger text-center mt-3">
                                 ขณะนี้ระบบลงทะเบียนอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming" เต็มจำนวน 
-                                <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน
+                                <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน สามารถกดลงทะเบียนอีกครั้งในวันพุธของสัปดาห์ถัดไป
                             </h4>
                         </v-card>
                     </v-col>
@@ -120,7 +120,7 @@
                     </v-col>
                 </v-row>
                 <v-row  no-gutters>              
-                    <v-col cols="6" class="px-2">
+                    <v-col cols="12" md="6" class="px-2">
                         <p class="style-label">ชื่อ (ภาษาไทย) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.name_th"
@@ -134,7 +134,7 @@
                                 required
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" class="px-2">
+                    <v-col cols="12" md="6" class="px-2">
                         <p class="style-label">นามสกุล (ภาษาไทย) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.lastname_th"
@@ -150,7 +150,7 @@
                     </v-col>
                 </v-row>
                 <v-row  no-gutters>              
-                    <v-col cols="6" class="px-2">
+                    <v-col cols="12" md="6" class="px-2">
                         <p class="style-label">ชื่อ (ภาษาอังกฤษ) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.name_en"
@@ -164,7 +164,7 @@
                                 required
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" class="px-2">
+                    <v-col cols="12" md="6" class="px-2">
                         <p class="style-label">นามสกุล (ภาษาอังกฤษ) : <span>*</span></p>
                             <v-text-field
                                 v-model="dataFrom.lastname_en"
@@ -935,7 +935,7 @@
             if(this.checkLimitCourse){
                 Swal.fire({
                     icon: 'warning',
-                    html: 'ขณะนี้ระบบลงทะเบียนหลักสูตร "แนวทางปฏิบัติการวิจัยทางคลินิคที่ดี"2567 แบบ Onsite เต็มจำนวน  <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน',  
+                    html: 'ขณะนี้ระบบลงทะเบียนหลักสูตร "แนวทางปฏิบัติการวิจัยทางคลินิคที่ดี"2567 แบบ Onsite เต็มจำนวน  <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน <br/> สามารถกดลงทะเบียนอีกครั้งในวันพุธของสัปดาห์ถัดไป',  
             
                 });
             }

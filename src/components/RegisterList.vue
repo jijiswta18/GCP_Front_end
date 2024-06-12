@@ -72,6 +72,8 @@
 
                     const registerId = { id: value.id};
 
+                    
+
                     const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
 
                     // Encrypt the receipt data
@@ -115,6 +117,8 @@
 
                         const registerId = { id: id};
 
+                        
+
                         const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
 
                         // Encrypt the receipt data
@@ -150,6 +154,8 @@
                 return 'text-success';
                 case '12004':
                 return 'text-success';
+                case '11001':
+                return 'text-danger';
                 default:
                 return '';
             }
@@ -187,14 +193,19 @@
     }
     .table-regislist th {
         border: 1px solid #ddd!important;
-        padding: 8px;
+        /* padding: 8px; */
         font-size: 16px!important;
+        padding: 1rem 0.5rem!important;
+        text-align: center !important;
     }
     .table-regislist td{
         border: 1px solid #ddd!important;
-        padding: 8px;
+        padding: 1rem 0.5rem!important;
         font-size: 16px!important;
         vertical-align: middle;
+    }
+    .table-regislist thead{
+        vertical-align: text-top;
     }
   
   

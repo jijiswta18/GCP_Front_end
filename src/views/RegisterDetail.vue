@@ -79,10 +79,13 @@
                     </div>
                     <v-card v-if="user != null" class="pd-125 mb-6">
                         <h2 class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
-                        <div v-if="user?.approve_employee && data.status_register === '12002'" class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
+                        
+                        
+                        <div v-if="user?.approve_employee && data.status_register === '12002' && data.cancel_order === '11002'"  class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
                         <div v-if="user?.approve_receipt && data.status_register === '12001' && data.register_type === '40002'" class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogConfirmReceipt = true">ยืนยันชำระเงิน</div>
-                        <div v-if="user?.refund_receipt && data.register_type === '40002'&& data.status_register === '12003'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
-                        <div v-if="user?.cancel_register" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
+                        <div v-if="user?.refund_receipt && data.register_type === '40002' && data.status_register === '12003'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
+                        <div v-if="user?.cancel_register && data.cancel_order === '11002'" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
+                        <div v-if="user?.refund_register && data.cancel_order === '11001'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22"  @click="dialogRefundOrder = true">คืนค่าการลงทะเบียน</div>
                     </v-card>
                     <v-card class="pd-125" v-if="user != null && data.register_type === '40002' && data.status_register === '12003'">
                         <h2  class="mb-3 text-center">เมนูข้อมูลใบเสร็จรับเงิน</h2>
@@ -128,7 +131,7 @@
 
                   <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div  class="btn-blue btn-receipt f-22 text-white mr-2" @click="updateStatusRegister('12004')">อนุมัติ</div>
+                  <div  class="btn-blue btn-receipt f-22 text-white mr-2" @click="updateStatusRegister('12004', data.cancel_order)">อนุมัติ</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -165,7 +168,7 @@
 
                   <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div  class="btn-success btn-receipt f-22 text-dark mr-2" @click="updateStatusRegister('12003')">ยืนยันชำระเงิน</div>
+                  <div  class="btn-success btn-receipt f-22 text-dark mr-2" @click="updateStatusRegister('12003', data.cancel_order)">ยืนยันชำระเงิน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -203,7 +206,7 @@
 
                   <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div @click="updateStatusRegister('12001')" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการยืนยันชำระเงิน</div>
+                  <div @click="updateStatusRegister('12001', data.cancel_order)" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการยืนยันชำระเงิน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -278,7 +281,44 @@
 
                   <div @click="dialogCancelOrder = false" class="btn-gray btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div @click="updateStatusRegister('11001')" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div>
+                  <div @click="updateStatusRegister(0 ,'11001', data.register_type)" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+          <!-- คืนค่าการทะเบียน -->
+          <v-dialog
+            v-model="dialogRefundOrder"
+            width="500"
+            class="dialog-search"
+            >
+            <v-card>
+                <v-toolbar class="head-toolbar">
+                    <v-toolbar-title >คืนค่าการลงทะเบียน</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="dialogRefundOrder = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+
+
+                  <v-container>
+                    <v-row>
+                      <v-col>
+                        <h4 class="text-left pt-1 pb-1">ยืนยันคืนค่าการลงทะเบียน</h4>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <div @click="dialogRefundOrder = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
+                
+                  <div @click="updateStatusRegister(0 ,'11002', data.register_type)" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการลงทะเบียน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -340,6 +380,7 @@ export default{
         dialogReceipt: false,
         dialogCancelOrder: false,
         dialogCancelReceipt: false,
+        dialogRefundOrder: false,
         registerId: {},
         loading: false
     }),
@@ -380,18 +421,37 @@ export default{
                 this.loading = false;
             }
          },
-                
-        async updateStatusRegister(status){
+
+         async updateStatusRegister(status, status_cancel, register_type){
+
             try {
-             
+
+                let newStatus = ""
+
+                if(register_type === '40001'){
+                    newStatus = "12002"
+                }else if(register_type === '40002'){
+                    newStatus = "12001"
+                }else{
+                    newStatus = status
+                }
+
+                // const newRegister = register_type === "40001" && register_type !== null ? "12002" : "12001";
+
+                // const newStatus = register_type === null ? status : newRegister
+
+                
                 let currentDate = moment();
             
                 let fd = {
                     "register_id"       : this.data.id,
-                    "status_register"   : status,
+                    "status_register"   : newStatus,
+                    "cancel_order"      : status_cancel,
                     "modified_by"       : this.user.employee_id,
                     "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
                 }
+
+                console.log(fd);
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusRegister`
 
@@ -407,6 +467,34 @@ export default{
                     console.log('updateStatusRegister', error);
                 }
         },
+                
+        //  async updateStatusRegister(status){
+        //     try {
+             
+        //         let currentDate = moment();
+            
+        //         let fd = {
+        //             "register_id"       : this.data.id,
+        //             "status_register"   : status,
+        //             "modified_by"       : this.user.employee_id,
+        //             "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
+        //         }
+
+        //         let updateStatusRegisterPath = `/api_gcp/Register/updateStatusRegister`
+
+        //         await axios.post(`${updateStatusRegisterPath}`, fd)
+
+        //         Swal.fire('บันทึกข้อมูลเรีบร้อยเเล้ว', '', 'success')
+
+        //         this.dialogApprove = false
+
+        //         // this.$router.push({ name: 'RegisterListView' });
+
+        //         } catch (error) {
+        //             console.log('updateStatusRegister', error);
+        //         }
+        // },
+  
 
         async updateStatusReceipt(status){
             try {

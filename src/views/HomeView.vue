@@ -255,6 +255,14 @@ export default {
     .menu-collapse{
       display: block!important;
     }
+    .v-text-field__slot{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    h2{
+      font-size: 22px;
+    }
 }
 
   #app {
@@ -265,7 +273,8 @@ export default {
     text-align: left;
   }
   .banner img{
-    width: 350px
+    max-width: 350px;
+    
   }
   .menu-collapse .v-list{
     background-color: #002f87!important;

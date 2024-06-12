@@ -5,7 +5,7 @@
 
             <h2 class="mb-3">อัพโหลดข้อมูลการชำระเงิน</h2> 
             <v-row justify="center">
-                <v-col cols="10">
+                <v-col cols="12" md="10">
                     <p class="style-label">อัพโหลด</p>
 
                     <v-file-input
@@ -32,9 +32,9 @@
             </v-row>
 
             
-            <div  class="button" @click="testSendMail">
+            <!-- <div  class="button" @click="testSendMail">
                 send mail
-            </div>
+            </div> -->
         </div>
         <div id="showresult" :class="{ modified: isModified }" style="display: none;">
             <h4 class="mb-3">สำเร็จ</h4> 
@@ -515,24 +515,24 @@
                 this.file = null;
             },
             
-        async testSendMail(){
-      try {
-        const path = `/api_gcp/Register/sendMailRegister`
-      
-        const data = {
-          "mail" : 'sawitta.sri@cra.ac.th',
-          "name" : 'สวิตตา ศรีจันทร์'
-        }
-        const response = await axios.post(`${path}`, data)
+        // async testSendMail(){
+        //     try {
+        //         const path = `/api_gcp/Register/sendMail`
+            
+        //         const data = {
+        //         "mail" : 'sawitta.sri@cra.ac.th',
+        //         "name" : 'สวิตตา ศรีจันทร์'
+        //         }
+        //         const response = await axios.post(`${path}`, data)
 
-        console.log(response);
+        //         console.log(response);
 
-      } catch (error) {
-        console.log('testSendMail', error);
+        //     } catch (error) {
+        //         console.log('testSendMail', error);
+                
+        //     }
         
-      }
-    
-    }
+        // }
     
         }
     }

@@ -4,11 +4,11 @@
 
         <!-- สิทธิ์ Admin -->
         <v-row no-gutters v-if="user">
-            <v-col cols="6" class="px-2">
+            <v-col cols="12" md="6" class="px-2">
                 <p>สถานะการลงทะเบียน</p>
                 <SelectOption :options="filteredRegiterStatus" @selected="updateRegisterStatus" item-value="select_code"/>
             </v-col>
-            <v-col cols="6" class="px-2">
+            <v-col cols="12" md="6"  class="px-2">
                 <p>การยกเลิก</p>
                 <SelectOption :options="filteredCancelOrder" @selected="updateCencelOrder"  item-value="select_code"/>
             </v-col>
@@ -16,11 +16,11 @@
 
  
         <v-row no-gutters v-if="user">
-            <v-col cols="6" class="px-2">
+            <v-col cols="12" md="6"  class="px-2">
                 <p>ประเภทผู้สมัคร</p>
                 <SelectOption :options="filteredRegiterType" @selected="updateRegiterType" item-value="select_code"/>
             </v-col>
-            <v-col cols="6" class="px-2">
+            <v-col  cols="12" md="6" class="px-2">
              
                 <p>รายการที่ต้องการสมัคร</p>
                 <SelectOption :options="filteredOptionCourses" @selected="updateCourseType" item-value="select_code"/>
@@ -291,21 +291,7 @@ export default {
         formatDate(value) {
             return moment(value).format("YYYY-MM-DD HH:mm:ss")
         },
-        getColorClass (value) {
-
-            switch (value) {
-                case '12001':
-                return 'text-gray';
-                case '12002':
-                return 'text-gray';
-                case '12003':
-                return 'text-success';
-                case '12004':
-                return 'text-success';
-                default:
-                return '';
-            }
-        },
+       
       
     } 
 }

@@ -4,7 +4,7 @@
   <div class="main-view">
     <v-row>
       <v-col cols="2"></v-col>
-      <v-col cols="8">
+      <v-col cols="12" md="8">
         <p class="text-center mb-0 text-dark">โครงการจัดอบรม</p>
         <p class="text-center mb-0 text-dark">หลักสูตร " แนวทางปฏิบัติการวิจัยทางคลินิกที่ดี (Good Clinical Practice: GCP) " 2567</p>
         <p class="text-center mb-0 text-dark">ฝ่ายพัฒนางานวิจัยทางคลินิก</p>
@@ -19,14 +19,14 @@
     </v-row>
     <v-row>
       <v-col cols="3"></v-col>
-      <v-col cols="6" class="main-image text-center">
+      <v-col  cols="12" md="6" class="main-image text-center">
         <img src="@/assets/images/GCP03.png"/>
       </v-col>
       <v-col cols="3"></v-col>
     </v-row>
     <v-row>
       <v-col cols="2"></v-col>
-      <v-col cols="8">
+      <v-col cols="12" md="8">
         <p class="mb-0 text-dark">📆 กำหนดการอบรม</p>
         <p class="text-dark">ในวันที่ 24-26 กรกฏาคม 2567 เวลา 08.00 – 16.00 น.</p>
         <!-- <br> -->
@@ -71,14 +71,14 @@
     
     <v-row>
       <v-col cols="3"></v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <img src="@/assets/images/GCP01.png"/>
       </v-col>
       <v-col cols="3"></v-col>
     </v-row>
     <v-row>
       <v-col cols="3"></v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <img src="@/assets/images/GCP02.png"/>
       </v-col>
       <v-col cols="3"></v-col>
@@ -125,7 +125,7 @@ export default {
   mounted() {}
 }
 </script>
-<style>
+<style scoped>
     img{
       width: 100%;
     }
