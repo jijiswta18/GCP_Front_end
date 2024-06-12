@@ -886,20 +886,22 @@
                 try {
                     const countRegisterPath          = `/api_gcp/Register/CounterRegister`
                     const response                  = await axios.get(`${countRegisterPath}`)
+
+                    console.log(response);
         
                     // let full = false;
 
                  
 
-            if(response.data.sum_check_course_other >= parseInt(this.limitCourseOther)){
-                //เต็ม
-                this.checkLimitCourseOther = true;
-                console.log("onsite_other ==== <", this.limitCourseOther)
-            }else{ 
-                //สามารถสมัครได้
-                this.checkLimitCourseOther = false;
-                console.log("onsite_other ==== >", this.limitCourseOther)
-            }
+            // if(response.data.sum_check_course_other >= parseInt(this.limitCourseOther)){
+            //     //เต็ม
+            //     this.checkLimitCourseOther = true;
+            //     console.log("onsite_other ==== <", this.limitCourseOther)
+            // }else{ 
+            //     //สามารถสมัครได้
+            //     this.checkLimitCourseOther = false;
+            //     console.log("onsite_other ==== >", this.limitCourseOther)
+            // }
             
          
 
@@ -907,12 +909,26 @@
                  //เต็ม
                 // full = true;
                 this.checkLimitCourse = true;
-                console.log("onsite ==== <", this.limitCourse)
+                this.checkLimitCourseOther = true;
+                console.log("onsite_other ==== <", this.limitCourseOther)
+
             }else{
                  //สามารถสมัครได้
                 // full = false;    
                 this.checkLimitCourse = false;           
                 console.log("onsite ==== >", this.limitCourse)
+
+                if(response.data.sum_check_course_other >= parseInt(this.limitCourseOther)){
+                    //เต็ม
+                    this.checkLimitCourseOther = true;
+                    console.log("onsite_other ==== <", this.limitCourseOther)
+
+                }else{ 
+                    //สามารถสมัครได้
+                    this.checkLimitCourseOther = false;
+                    console.log("onsite_other ==== >", this.limitCourseOther)
+                    
+                }
             }
 
 
@@ -1126,16 +1142,16 @@
                             
                             this.getDigit(response.data.data)
 
-                            // const dataEmail = {
+                            const dataEmail = {
 
-                            // "register_type"         : this.register_type,
-                            // "course_name"           : this.valueCheckboxCourse[0].name,
-                            // "check_course_other"    : this.dataFrom.check_course_other,
+                            "register_type"         : this.register_type,
+                            "course_type"           : this.valueCheckboxCourse[0].course_type,
+                            "check_course_other"    : this.dataFrom.check_course_other,
+                            "email"                 : this.dataFrom.email1,
+                            }
 
-                            // }
+                             axios.post('/api_gcp/Register/sendMailRegister', dataEmail)
 
-
-                            // const responseEmail = await axios.post('/api_gcp/Register/sendMailRegister', dataEmail)
 
                             // console.log(responseEmail);
                         }
