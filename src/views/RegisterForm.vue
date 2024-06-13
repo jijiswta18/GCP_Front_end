@@ -132,6 +132,8 @@
                                 clearable 
                                 class="style-input"
                                 required
+                       
+                                @keyup="validateInput('name_th')"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6" class="px-2">
@@ -146,6 +148,9 @@
                                 clearable 
                                 class="style-input"
                                 required
+                              
+                                @keyup="validateInput('lastname_th')"
+                                
                             ></v-text-field>
                     </v-col>
                 </v-row>
@@ -267,7 +272,7 @@
 
                 <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
-                        <p class="style-label">ที่อยู่สถานที่ทำงานเลขที่ : <span>*</span></p>
+                        <p class="style-label">ที่อยู่สถานที่ทำงานเลขที่ : <span>* (โปรดระบุชื่อองค์กร / สังกัด /หน่วยงาน)</span></p>
                         <v-text-field
                             v-model="dataFrom.company_address"
                             ref="CompanyAddressField"
@@ -627,7 +632,7 @@
 
             </div>
 
-            <div class="box-receipt mt-5" v-if="register_type === '40002'" >
+            <!-- <div class="box-receipt mt-5" v-if="register_type === '40002'" >
                 <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลใบเสร็จรับเงิน</div>
                 <v-row no-gutters>
                     <v-col cols="12">
@@ -639,7 +644,7 @@
                         
                     </v-col>
                 </v-row>  
-            </div>
+            </div> -->
             
             <div class="box-coment">
                     
@@ -727,6 +732,9 @@
             emailRules: [
                 v => /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(v) || 'รูปแบบอีเมล์ไม่ถูกต้อง'
             ],
+            // nameThRules: [
+            //     v => /^[\u0E00-\u0E7F\s]+$/.test(v) || 'กรอกเป็นภาษาไทยเท่านั้น'
+            // ],
             limitCourse: '',
             limitCourseOther: '',
             checkLimitCourseOther: false,
@@ -734,6 +742,7 @@
             emailErrors: [],
             emailType: 'text',
             showPassword: false,
+            isValidThaiText: true,
         }),
         watch: {
             'register_type': function(newValue) {
@@ -774,6 +783,7 @@
             }
         },
         computed: {
+         
             handleEnter: function() {
                 return this.dataFrom.email1 === this.dataFrom.email2;
             },
@@ -835,7 +845,7 @@
             this.isEdit = true;
             this.isHidden = !this.isHidden;
             const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
-            const key               = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
+            const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
             const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
             const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
             const registerEditId    = JSON.parse(decryptedData);
@@ -846,7 +856,21 @@
         methods: {
             handleInput(field) {
             // Replace non-numeric characters with an empty string
-            this.dataFrom[field] = this.dataFrom[field].replace(/[^0-9]/g, '');
+                    this.dataFrom[field] = this.dataFrom[field].replace(/[^0-9]/g, '');
+            },
+            validateInput(field) {
+                // ใช้ regex เพื่อตรวจสอบว่าข้อความประกอบด้วยตัวอักษรภาษาไทยเท่านั้น
+                const thaiTextPattern = /^[\u0E00-\u0E7F\s]+$/;
+                this.isValidThaiText = thaiTextPattern.test(this.dataFrom[field]);
+              
+                // หากไม่ใช่ภาษาไทยให้ทำการ replace อักษรภาษาอังกฤษด้วย ''
+                if (!this.isValidThaiText) {
+                    this.dataFrom[field] = this.dataFrom[field].replace(/[a-zA-Z^0-9*!@#$%^&*()_+{}:;<>,.?~`-]/g, '');
+
+               
+                }
+
+                // .replace(/[^a-zA-Z0-9*!@#$%^&*()_+{}\[\]:;<>,.?/~`|\\\-]+/g, '')
             },
 
             async checkEmployee (){
@@ -1107,7 +1131,7 @@
                         "confirm_register"          : this.dataFrom.confirm_register,
                         "create_date"               : start_date,
                         "status_register"           : this.register_type === "40001" ? "12002" : "12001",
-                        "status_receipt"           : this.register_type === "40001" ? null : "13001",
+                        "status_receipt"           : this.register_type === "40002" && this.dataFrom.receipt_order === "90001" ? "13001" : null,
                         "end_date"                  : end_date,
                         "cancel_order"              : 11002,
                     }
@@ -1132,7 +1156,8 @@
 
                         const registerId = { id: response.data.data };
                         
-                        const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+                        // const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
+                           const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                         // Encrypt the receipt data
                         const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
@@ -1171,6 +1196,7 @@
 
                     } catch (error) {
                         console.error('Error Insert register:', error);
+                        this.$router.push({ name: 'mainView'})
                     }
                 }else{
                     try {

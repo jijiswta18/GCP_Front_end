@@ -41,13 +41,17 @@
             <div class="box-success">
                 <p>สำเร็จ {{ success }} รายการ</p>
 
+                <pre>{{ data_receipt }}</pre>
+
                 <v-row>
                     <v-col
                         v-for="(item, index) in data_success" :key="index" cols="12">
                     <div>
                         <span>{{index+1}}.</span>
+                        <!-- <span> {{ item.name_th }} {{ item.lastname_th }}</span> -->
                         <span> {{ item.customer_name }}</span>
                        
+                        <!-- <span>ราคา {{  item.course_price | formatNumber}} บาท</span> -->
                         <span>ราคา {{  item.amount | formatNumber}} บาท</span>
                     </div>
                     </v-col>
@@ -83,7 +87,8 @@
             unsuccess: null,
             isModified: false,
             isImport: false,
-            data_success : []
+            data_success : [],
+            data_receipt : []
         }),
         filters: {
         formatNumber(value) {
@@ -136,6 +141,7 @@
                         })
 
                         let success = [];
+                        let data_receipt_success = [];
                         let unsuccess = [];
                         const dataFormat256 = response.data[0].detail
 
@@ -164,11 +170,14 @@
 
                                 const response = await axios.post(`${mapStatusReceiptPath}`, data)
 
-                                console.log(response);
+                            
 
-                                if(parseInt(response.data[0].SUCCESS) >= 1)
+                                console.log(response.data.receiptData[0]);
+
+                                if(parseInt(response.data.dataSUCCESS.SUCCESS) >= 1)
                                 {
                                     success.push(dataFormat256[i]);
+                                    data_receipt_success.push( response.data.receiptData[0]);
                                 }else {
                                     unsuccess.push(dataFormat256[i]);
                                 }
@@ -183,6 +192,9 @@
                         }
                         await new Promise(resolve => setTimeout(resolve, 2000));
                         // After data is loaded
+                        this.data_receipt = data_receipt_success
+
+                        console.log('data_receipt============>',this.data_receipt);
                         this.data_success = success
                         this.success = success.length
                         this.unsuccess = unsuccess.length

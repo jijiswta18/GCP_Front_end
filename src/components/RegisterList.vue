@@ -22,10 +22,10 @@
             <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
 
             <template v-slot:[`item.statusRegisterName`]="{ item }" >
-                <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
+                <!-- <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
                     {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
-                </span>
-                <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
+                </span> -->
+                <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span>
             </template>
             <template v-slot:[`item.detail`]="{ item }">
                 <div @click="checkRegister(item, type)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
@@ -56,15 +56,14 @@
         },
     },
     watch: {
-          datas(){
-            this.datasExcel = this.datas
-            console.log('==========>',this.datasExcel);
-          }
+       
         },
     methods: {
         exportToExcel() {
 
             const dataArray = this.datas
+
+         
 
             // Extract only name and age from data array
             const extractedDataArray = dataArray.map(item => {
@@ -107,6 +106,7 @@
                     "Reference No 1": item.reference_no_1,
                     "Reference No 2": item.reference_no_2,
                     "สถานะ": item.statusRegisterName,
+                    "ประเภทข้อมูลใบเสร็จรับเงิน": item.receiptOrderName,
                     "สถานะการออกใบเสร็จรับเงิน": item.statusReceiptName,
                 };
             });
@@ -140,7 +140,7 @@
                     const registerId = { id: value.id};
 
                     
-                    const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+                    const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                     // Encrypt the receipt data
                     const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
@@ -185,7 +185,7 @@
 
                         
 
-                        const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+                        const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                         // Encrypt the receipt data
                         const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();

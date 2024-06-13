@@ -28,8 +28,8 @@
           >
 
             <!-- <v-list-item link> -->
-            <v-list-item link >
-            <!-- <v-list-item link v-if="user?.menu_register || checkDate"> -->
+            <!-- <v-list-item link > -->
+            <v-list-item link v-if="user?.menu_register || checkDate">
                 <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
             </v-list-item>
           </router-link>
@@ -191,6 +191,7 @@ export default {
       const path = '/api_gcp/Register/getMenuRegisterOpening'
       const response = await axios.get(path);
       this.checkDate = response.data
+
       
     },
     async logout() {

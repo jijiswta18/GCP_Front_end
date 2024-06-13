@@ -42,27 +42,28 @@
                         <p><span class="text-warning">ประเภทอาหาร : </span> {{ data.foodName }}</p>  
                     </div>
 
-                    <div v-if="data.register_type === '40002'" class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลใบเสร็จรับเงิน</div>
+                    <!-- <div v-if="data.register_type === '40002'" class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลใบเสร็จรับเงิน</div>
                     <div v-if="data.register_type === '40002'" class="box-invoice">
                         <p><span class="text-warning">ประเภทข้อมูลใบเสร็จรับเงิน :</span></p>  
                         <div class="d-flex align-items-center">
-                            <img v-if="data.confirm_receipt" class="w-30 pr-2" src="@/assets/images/checkbox-checked.svg"/>
+                            <img v-if="data.receipt_order === '90001'" class="w-30 pr-2" src="@/assets/images/checkbox-checked.svg"/>
                             <img v-else  class="w-30 pr-2" src="@/assets/images/checkbox-unchecked.svg"/>
                             
                             <span>มีความประสงค์ต้องการใบเสร็จรับเงิน</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <img v-if="data.confirm_receipt" class="w-30 pr-2" src="@/assets/images/checkbox-unchecked.svg"/>
-                            <img v-else class="w-30 pr-2" src="@/assets/images/checkbox-checked.svg"/>
+                            <img v-if="data.receipt_order === '90002'" class="w-30 pr-2" src="@/assets/images/checkbox-checked.svg"/>
+                            <img v-else class="w-30 pr-2" src="@/assets/images/checkbox-unchecked.svg"/>
+                          
                             <span>ไม่ต้องการใบเสร็จรับเงิน</span>
                         </div>
-                    </div>
+                    </div> -->
                 </v-col>
 
                 <v-col>
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการชำระเงิน</div>
                     <div class="box-receipt">
-                        <div class="d-flex" v-if="data.register_type !== '40001'"><h1>พิมพ์ใบชำระเงิน : <img class="w-60" src="@/assets/images/pdf.png" @click="printPayment"/></h1></div>
+                        <div class="d-flex" v-if="data.register_type !== '40001' && data.cancel_order !== '11001' && data.status_register !== '12003'"><h1>พิมพ์ใบชำระเงิน : <img class="w-60" src="@/assets/images/pdf.png" @click="printPayment"/></h1></div>
                         <p><span>สถานะ : </span><span :class="getColorClass(data.status_register)">{{ data.statusRegisterName }}</span></p>   
                         <p  v-if="data.register_type === '40002'"><span class="text-warning">ค่าลงทะเบียน : </span> {{  data.course_price | formatNumber}} บาท</p> 
                         <p  v-else><span class="text-warning">ค่าลงทะเบียน : </span>{{  data.course_price }}</p>   
@@ -281,7 +282,8 @@
 
                   <div @click="dialogCancelOrder = false" class="btn-gray btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div @click="updateStatusRegister(0 ,'11001', data.register_type)" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div>
+                  <div @click="updateStatusRegister('11001' ,'11001')" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div>
+                  <!-- <div @click="updateStatusRegister(0 ,'11001', data.register_type)" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div> -->
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -391,7 +393,7 @@ export default{
     },
     mounted(){
         const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
-        const key               = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
+        const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
         const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
         const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
         this.registerId        = JSON.parse(decryptedData);
@@ -422,36 +424,34 @@ export default{
             }
          },
 
-         async updateStatusRegister(status, status_cancel, register_type){
+         async updateStatusRegister(status, status_cancel){
 
             try {
 
-                let newStatus = ""
+                // let newStatus = ""
 
-                if(register_type === '40001'){
-                    newStatus = "12002"
-                }else if(register_type === '40002'){
-                    newStatus = "12001"
-                }else{
-                    newStatus = status
-                }
+                // if(register_type === '40001'){
+                //     newStatus = "12002"
+                // }else if(register_type === '40002'){
+                //     newStatus = "12001"
+                // }else{
+                //     newStatus = status
+                // }
 
-                // const newRegister = register_type === "40001" && register_type !== null ? "12002" : "12001";
-
-                // const newStatus = register_type === null ? status : newRegister
-
-                
+        
                 let currentDate = moment();
             
                 let fd = {
-                    "register_id"       : this.data.id,
-                    "status_register"   : newStatus,
-                    "cancel_order"      : status_cancel,
-                    "modified_by"       : this.user.employee_id,
-                    "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
+                    "register_id"           : this.data.id,
+                    "email"                 : this.data.email,
+                    "register_type"         : this.data.register_type,
+                    "course_type"           : this.data.course_type,
+                    "check_course_other"    : this.data.check_course_other,
+                    "status_register"       : status,
+                    "cancel_order"          : status_cancel,
+                    "modified_by"           : this.user.employee_id,
+                    "modified_date"         : currentDate.format('YYYY-MM-DD HH:mm:ss')
                 }
-
-                console.log(fd);
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusRegister`
 
@@ -461,44 +461,18 @@ export default{
 
                 this.dialogApprove = false
 
-                // this.$router.push({ name: 'RegisterListView' });
+                this.$router.push({ name: 'RegisterListView' });
 
                 } catch (error) {
                     console.log('updateStatusRegister', error);
                 }
         },
-                
-        //  async updateStatusRegister(status){
-        //     try {
-             
-        //         let currentDate = moment();
             
-        //         let fd = {
-        //             "register_id"       : this.data.id,
-        //             "status_register"   : status,
-        //             "modified_by"       : this.user.employee_id,
-        //             "modified_date"     : currentDate.format('YYYY-MM-DD HH:mm:ss')
-        //         }
-
-        //         let updateStatusRegisterPath = `/api_gcp/Register/updateStatusRegister`
-
-        //         await axios.post(`${updateStatusRegisterPath}`, fd)
-
-        //         Swal.fire('บันทึกข้อมูลเรีบร้อยเเล้ว', '', 'success')
-
-        //         this.dialogApprove = false
-
-        //         // this.$router.push({ name: 'RegisterListView' });
-
-        //         } catch (error) {
-        //             console.log('updateStatusRegister', error);
-        //         }
-        // },
-  
 
         async updateStatusReceipt(status){
             try {
              
+                console.log(status);
                 let currentDate = moment();
             
                 let fd = {
@@ -510,13 +484,9 @@ export default{
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusReceipt`
 
-                await axios.post(`${updateStatusRegisterPath}`, fd)
+                const response = await axios.post(`${updateStatusRegisterPath}`, fd)
 
-                Swal.fire('บันทึกข้อมูลเรียบร้อยเเล้ว', '', 'success')
-
-                this.dialogApprove = false
-
-                this.$router.push({ name: 'RegisterListView' });
+                return response
 
                 } catch (error) {
                     console.log('updateStatusRegister', error);
@@ -544,6 +514,8 @@ export default{
             
             }
 
+            console.log(fdCreateReceipt);
+
 
             try {
                 
@@ -553,7 +525,7 @@ export default{
                         'accept-language': 'en-US,en;q=0.8',
                         'content-type': 'application/json'
                     },
-                    timeout: 10000
+                    // timeout: 10000
                 });
 
                 console.log(response);
@@ -565,13 +537,14 @@ export default{
                     this.updateStatusReceipt('13002')
                     
                         await Swal.fire({
-                        icon: 'success',
-                        title: 'บันทึกสำเร็จ',
-                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-                    })
-                        // this.fechRegisterById(this.dataFrom.id);
+                            icon: 'success',
+                            title: 'บันทึกสำเร็จ',
+                            text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                        })
 
-                    // return response.data;
+                    this.dialogReceipt = false
+
+                    this.$router.push({ name: 'receiptList' });
                  
                 }
 
@@ -611,18 +584,32 @@ export default{
                         'accept-language': 'en-US,en;q=0.8',
                         'content-type': 'application/json'
                     },
-                    timeout: 10000
+                    // timeout: 10000
                 });
 
-
-             
             // true
-            if(!response.data.response){
-                this.updateStatusReceipt('13001')
+            if(response.data.response){
+
+              this.updateStatusReceipt('13001')
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'บันทึกสำเร็จ',
+                    text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+                }).then( function(){
+                });
+
             }
+
+                this.dialogCancelReceipt = false
+
+                this.$router.push({ name: 'receiptList' });
+
+            
 
             } catch (error) {
                 console.log('cacelReceipt', error);
+
             }
         },
 
@@ -636,7 +623,7 @@ export default{
 
             const registerEditId = { id: this.registerId.id};
 
-            const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+            const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
             // Encrypt the receipt data
             const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerEditId), key).toString();
@@ -680,7 +667,7 @@ export default{
                 payment_type_code: "01",  
             };
 
-            const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+            const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
             // Encrypt the receipt data
             const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(receiptData), key).toString();

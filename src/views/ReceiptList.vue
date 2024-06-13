@@ -214,7 +214,6 @@ export default {
         if(this.selectedItems.length){
           this.dialog = true
         }else{
-          console.log('=========');
             Swal.fire({
               icon: 'warning',
               title: "กรุณาเลือกข้อมูล",
@@ -230,71 +229,68 @@ export default {
 
       async createReceipt(){
 
-        for(let i = 0; i < this.selectedItems.length; i++){
-          
-          const fdCreateReceipt = {
+        try {
 
-            master_id             : this.selectedItems[i].id,
-            project_code          : "0041",
-            payment_type_code     : "01",
-            price                 : this.selectedItems[i].course_price,
-            reference_1           : this.selectedItems[i].reference_no_1,
-            reference_2           : this.selectedItems[i].reference_no_2,
-            name                  : this.selectedItems[i].receipt_name,    
-            id_card_number        : this.selectedItems[i].id_card_number,
-            address               : this.selectedItems[i].company_address,  
-            province              : this.selectedItems[i].province_id,
-            district              : this.selectedItems[i].district_id,
-            sub_district          : this.selectedItems[i].subdistrict_id,
-            zip_code              : this.selectedItems[i].postcode,
-            admin_id              : this.user.employee_id
+          for(let i = 0; i < this.selectedItems.length; i++){
+          
+            const fdCreateReceipt = {
+
+              master_id             : this.selectedItems[i].id,
+              project_code          : "0041",
+              payment_type_code     : "01",
+              price                 : this.selectedItems[i].course_price,
+              reference_1           : this.selectedItems[i].reference_no_1,
+              reference_2           : this.selectedItems[i].reference_no_2,
+              name                  : this.selectedItems[i].receipt_name,    
+              id_card_number        : this.selectedItems[i].id_card_number,
+              address               : this.selectedItems[i].company_address,  
+              province              : this.selectedItems[i].province_id,
+              district              : this.selectedItems[i].district_id,
+              sub_district          : this.selectedItems[i].subdistrict_id,
+              zip_code              : this.selectedItems[i].postcode,
+              admin_id              : this.user.employee_id
 
             }
 
-            try {
-
-              const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
+            const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
               headers: {
                   'accept': '*/*',
                   'accept-language': 'en-US,en;q=0.8',
                   'content-type': 'application/json'
               },
-              timeout: 10000
-              });
+              // timeout: 10000
+            });
 
-
-              console.log('========',response);
+            console.log('response',response);
 
 
             if(!response.data.data.response){
               this.updateStatusReceipt(this.selectedItems[i],'13002')
             }
+                console.log('response',this.selectedItems[i]);
 
-            await Swal.fire({
-                        icon: 'success',
-                        title: 'บันทึกสำเร็จ',
-                        text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-                    }).then( function(){
-              });
+          }
+
+          await Swal.fire({
+            icon: 'success',
+            title: 'บันทึกสำเร็จ',
+            text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
+          }).then( function(){
+          });
           
-              this.dialog = false
+          this.dialog = await false
 
-              this.selectedItems = []
+          this.selectedItems = await []
 
+          await this.fechstatusRegisterReceipt()
 
-            } catch (error) {
-
-            console.log('========',error.message);
-
-            }
-
+        } catch (error) {
+          console.log('========',error.message);
         }
 
-
-
-
       },
-      
+
+
       async updateStatusReceipt(data,status){
             try {
              
@@ -325,10 +321,6 @@ export default {
 
           this.datas = response.data.data
 
-          console.log(this.datas);
-        
-
-
         } catch (error) {
             console.log('register', error);
         }
@@ -338,7 +330,7 @@ export default {
 
         const registerId = { id: value.id};
 
-        const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+        const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
         // Encrypt the receipt data
         const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();

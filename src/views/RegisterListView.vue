@@ -167,7 +167,7 @@ export default {
                 return (
                     (this.valueRegisterStatus === null || item.status_register.toLowerCase() === this.valueRegisterStatus.toLowerCase()) &&
                     (this.valueRegiterType === null || item.register_type.toLowerCase() === this.valueRegiterType.toLowerCase()) &&
-                    (this.valueCencelOrder === null || item.cancel_order.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
+                    (this.valueCencelOrder === null || item.status_register.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
                     (this.valueCourseType === null || item.course_id.toLowerCase() === this.valueCourseType.toLowerCase()) 
                 );
             });
@@ -213,7 +213,6 @@ export default {
                const response = await axios.get(`${registerPath}`)
 
                this.datas = await response.data.data
-
              
                this.loader = await false
 
@@ -283,7 +282,7 @@ export default {
         detailRegister(value){
             const registerId = { id: value.id };
 
-            const key = 'yourSecretKey'; // คีย์สำหรับการเข้ารหัส
+            const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
             // Encrypt the receipt data
             const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();

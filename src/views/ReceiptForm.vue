@@ -240,7 +240,7 @@ export default{
     },
     created(){
         const encryptedData     = this.$route.params.receiptData; // รับค่า receiptData จากพารามิเตอร์ใน URL
-        const key               = 'yourSecretKey'; // คีย์สำหรับถอดรหัส 
+        const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
         const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
         const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
         this.receiptData        = JSON.parse(decryptedData);
@@ -264,7 +264,7 @@ export default{
                 employee.name = `${employee.employee_id} ${employee.first_name} ${employee.last_name}`;
             });
 
-            console.log('========',this.receiptEmployees);
+            console.log('========',response.data.data);
 
 
 

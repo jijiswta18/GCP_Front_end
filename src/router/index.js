@@ -29,7 +29,7 @@ const routes = [
     path: '/',
     component: Layout,
     children: [
-      { path: '', component: Main },
+      { path: '',  name: 'mainView', component: Main },
       { path: 'login', component: Login },
       {
         path: '/registration',
@@ -49,7 +49,7 @@ const routes = [
       { path: 'registration-detail/:id', name: 'registration-detail', component: RegisDetail },
       // { path: 'document', component: DocumentView },
       { path: 'receipt/:receiptData',   name: 'receipt', component: Receipt },
-      { path: 'receipt-list', component: ReceiptList },
+      { path: 'receipt-list',  name: 'receiptList', component: ReceiptList },
       { path: 'receipt-import', name: 'ReceiptImport', component: ReceiptImport },
       { path: 'import_list_view', name: 'ImportListView', component: ImportListView },
       { path: 'manage-employee', component: ManageEmployee },
