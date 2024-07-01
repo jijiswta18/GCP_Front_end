@@ -113,13 +113,13 @@ export default {
 
                     console.log(this.user);
                 if(this.user.checkUser === "204")
-                {
-                    await Swal.fire({
-                    title: 'Error!',
-                    text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                })
+                    {
+                        await Swal.fire({
+                        title: 'Error!',
+                        text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    })
                 }
                 else{
                     await this.$router.push({ path: '/registration-list' });
@@ -134,7 +134,7 @@ export default {
                 }
              
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console('Error fetching data:', error);
                 await Swal.fire({
                     title: 'Error!',
                     text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',

@@ -180,7 +180,6 @@ export default {
     },
     selectMenuItem(item) {
       // Handle menu item selection
-      console.log('Selected item:', item);
       // Close the menu
       this.menuOpen = false;
       // Navigate to the selected link
@@ -191,6 +190,7 @@ export default {
       const path = '/api_gcp/Register/getMenuRegisterOpening'
       const response = await axios.get(path);
       this.checkDate = response.data
+
 
       
     },
@@ -225,24 +225,32 @@ export default {
     font-family: "chulabhornlikittext";
     src: url("@/assets/fonts/Chulabhorn_Likit/chulabhornlikittext-light.woff") format("woff");
     font-weight: 200;
+    font-style: normal;
+    font-display: block;
   }
 
   @font-face {
     font-family: "chulabhornlikittext";
     src: url("@/assets/fonts/Chulabhorn_Likit/chulabhornlikittext-regular.woff") format("woff");
     font-weight: 500;
+    font-style: normal;
+    font-display: block;
   }
 
   @font-face {
     font-family: "chulabhornlikittext";
     src: url("@/assets/fonts/Chulabhorn_Likit/chulabhornlikittext-medium.woff") format("woff");
     font-weight: 400;
+    font-style: normal;
+    font-display: block;
   }
 
   @font-face {
     font-family: "chulabhornlikittext";
     src: url("@/assets/fonts/Chulabhorn_Likit/chulabhornlikittext-bold.woff") format("woff");
     font-weight: 700;
+    font-style: normal;
+    font-display: block;
   }
 
   @media only screen and (max-width: 767px) {
@@ -269,6 +277,8 @@ export default {
   #app {
     font-size: 18px;
     font-family: 'chulabhornlikittext', sans-serif;
+    font-style: normal;
+    font-display: block;
   }
   .banner{
     text-align: left;
@@ -466,6 +476,8 @@ export default {
 
   .swal2-container{
     font-family: 'chulabhornlikittext', sans-serif;
+    font-style: normal;
+    font-display: block;
   }
   /* .swal2-title{
 

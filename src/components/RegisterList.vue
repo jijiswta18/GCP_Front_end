@@ -18,14 +18,14 @@
             class="table-regislist"
         >
        
-            <template v-slot:[`item.name`]="{ item }">{{ item.name_th }}  {{  item.lastname_th  }}</template>
+            <template v-slot:[`item.name`]="{ item }">{{item.title_name === '10013' ? item.title_name_other : item.titleName }} {{ item.name_th }}  {{  item.lastname_th  }}</template>
             <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
 
             <template v-slot:[`item.statusRegisterName`]="{ item }" >
-                <!-- <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
+                <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
                     {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
-                </span> -->
-                <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span>
+                </span>
+                <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
             </template>
             <template v-slot:[`item.detail`]="{ item }">
                 <div @click="checkRegister(item, type)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
@@ -63,13 +63,12 @@
 
             const dataArray = this.datas
 
-         
 
             // Extract only name and age from data array
             const extractedDataArray = dataArray.map(item => {
                 const address               = item.company_address === null || item.company_address === '' ? '' : item.company_address 
                 const subdistrictName       = item.subdistrict_id === null || item.subdistrict_id === '' ? '' : ' แขวง/ตำบล ' + item.subdistrictName 
-                const districtName          = item.district_id === null || item.districtName === '' ? '' :  ' เขต/อำเภอ ' + item.districtName
+                const districtName          = item.district_id === null || item.district_id === '' ? '' :  ' เขต/อำเภอ ' + item.districtName
                 const provinceName          = item.province_id === null || item.province_id === '' ? '' : ' จังหวัด ' + item.provinceName 
                 const postcode              = item.postcode === null || item.postcode === '' ? '' : 'รหัสไปรษณีย์' + item.postcode 
           
@@ -80,6 +79,11 @@
                 const food_allergy          = item.food_allergy === '50001' ? item.food_allergy_detail : item.foodAllergyName
                 const food                  = item.food === '70004' ? item.food_other : item.foodName
                 const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
+
+                const statusRegister        = item.statusRegisterName + '(' + item.cancelOrderName + ')'
+
+                const reference_no_1        = item.reference_no_1 === null ? '' : item.reference_no_1
+                const reference_no_2        = item.reference_no_2 === null ? '' : item.reference_no_2
  
                 
                 return{ 
@@ -103,15 +107,16 @@
                     "ชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน": item.receipt_name,
                     "เลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร": item.id_card_number,
                     "ที่อยู่สถานที่ทำงานเลขที่":company_address,
-                    "Reference No 1": item.reference_no_1,
-                    "Reference No 2": item.reference_no_2,
-                    "สถานะ": item.statusRegisterName,
-                    "ประเภทข้อมูลใบเสร็จรับเงิน": item.receiptOrderName,
+                    "Reference No 1": reference_no_1,
+                    "Reference No 2": reference_no_2,
+                    "สถานะ": statusRegister,
+                    // "ประเภทข้อมูลใบเสร็จรับเงิน": item.receiptOrderName,
                     "สถานะการออกใบเสร็จรับเงิน": item.statusReceiptName,
                 };
             });
 
-        
+            // console.log(extractedDataArray);
+
 
             const wb = XLSX.utils.book_new();
 

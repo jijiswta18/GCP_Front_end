@@ -42,9 +42,15 @@
             ></v-checkbox>
             </template>
             <template v-slot:[`item.statusReceiptName`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceiptName }}</span></template>
-            <template v-slot:[`item.name`]="{ item }">{{ item.name_th }}  {{  item.lastname_th  }}</template>
+            <template v-slot:[`item.name`]="{ item }">{{item.title_name === '10013' ? item.title_name_other : item.titleName }} {{ item.name_th }}  {{  item.lastname_th  }}</template>
             <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
-            <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template>
+            <template v-slot:[`item.statusRegisterName`]="{ item }" >
+                <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
+                    {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
+                </span>
+                <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
+            </template>
+            <!-- <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template> -->
             <template v-slot:[`item.detail`]="{ item }">
                 <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
             </template>
@@ -109,20 +115,21 @@ export default {
       selectedItems: [],
       selectAll: false,
       headers: [
-          { text: 'สถานะออกใบเสร็จรับเงิน', align: 'left', value: 'statusReceiptName' },
+          { text: 'สถานะออกใบเสร็จรับเงิน', align: 'left', value: 'statusReceiptName', width: '12%' },
           { text: '', align: 'center', value: 'detail' },
           { text: 'ID', align: 'center', value: 'id' },
           { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
           { text: 'ชื่อ', align: 'left', value: 'name' },
-          { text: 'สถานะ', align: 'lefts', value: 'statusRegisterName' },
-          { text: 'Reference No 1', align: 'center', value: 'reference_no_1' },
-          { text: 'Reference No 2', align: 'center', value: 'reference_no_2' },
+          { text: 'สถานะ', align: 'lefts', value: 'statusRegisterName', width: '9%' },
+          { text: 'Reference No 1', align: 'center', value: 'reference_no_1', width: '15%' },
+          { text: 'Reference No 2', align: 'center', value: 'reference_no_2', width: '15%' },
           { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
             { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
             { text: 'อีเมล', value: 'email', align: ' d-none' },
       ],
       datas: [],
-      dialog: false
+      dialog: false,
+      receipt_no: ""
     }),
     watch: {
     selectAll(value) {
@@ -166,6 +173,8 @@ export default {
             const food                  = item.food === '70004' ? item.food_other : item.foodName
             const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
 
+            const statusRegister        = item.statusRegisterName + '(' + item.cancelOrderName + ')'
+
             
             return{ 
                 "ID": item.id, 
@@ -190,7 +199,7 @@ export default {
                 "ที่อยู่สถานที่ทำงานเลขที่":company_address,
                 "Reference No 1": item.reference_no_1,
                 "Reference No 2": item.reference_no_2,
-                "สถานะ": item.statusRegisterName,
+                "สถานะ": statusRegister,
                 "สถานะการออกใบเสร็จรับเงิน": item.statusReceiptName,
             };
         });
@@ -252,6 +261,8 @@ export default {
 
             }
 
+            // console.log(fdCreateReceipt);
+
             const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
               headers: {
                   'accept': '*/*',
@@ -261,13 +272,11 @@ export default {
               // timeout: 10000
             });
 
-            console.log('response',response);
-
 
             if(!response.data.data.response){
               this.updateStatusReceipt(this.selectedItems[i],'13002')
             }
-                console.log('response',this.selectedItems[i]);
+
 
           }
 
@@ -321,6 +330,35 @@ export default {
 
           this.datas = response.data.data
 
+          for(let i = 0; i < this.datas.length; i++){
+
+            const reference_no_1        = this.datas[i].reference_no_1
+            const reference_no_2        = this.datas[i].reference_no_2
+            const payment_type_code     = "01"
+
+            let get_receipt_no          = ""
+
+            // ออกใบเสร็จรับเงินแล้ว
+            if(this.datas[i].status_receipt === '13002'){
+
+              const receiptDetailPath     = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
+
+              const detailReceipt         =  await axios.get(`${receiptDetailPath}`)
+
+              get_receipt_no             = detailReceipt.data.data.receipt_no
+
+            
+            }
+
+            this.receipt_no           = get_receipt_no
+
+            this.datas[i].statusReceiptName = `${this.datas[i].statusReceiptName} ${this.receipt_no}`
+
+        
+          }
+
+          
+
         } catch (error) {
             console.log('register', error);
         }
@@ -356,6 +394,8 @@ export default {
                 return 'text-gray';
                 case '13002':
                 return 'text-success';
+                case '11001':
+                return 'text-danger';
                 default:
                 return '';
             }

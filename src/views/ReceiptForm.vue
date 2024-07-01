@@ -264,9 +264,6 @@ export default{
                 employee.name = `${employee.employee_id} ${employee.first_name} ${employee.last_name}`;
             });
 
-            console.log('========',response.data.data);
-
-
 
 
             } catch (error) {

@@ -22,7 +22,8 @@ module.exports = {
         target: 'http://172.20.22.45:8080'
       },
       "^/api" :{
-        target: 'http://172.19.103.55:9203'
+        target: 'http://172.19.103.55:9093'
+        // target: 'http://172.19.103.55:9203'
       },
       // "^/api_phonebook" :{
       //   target: 'http://172.19.107.54:8080'

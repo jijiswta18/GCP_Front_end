@@ -4,7 +4,8 @@
 
             <h2 class="mb-3 d-flex">ข้อมูลผู้ลงทะเบียน | <div class="text-warning ml-2 cursor-pointer" @click="editRegister"> แก้ไขข้อมูล</div></h2>
             <v-row>
-            
+
+              
                 <v-col>
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลรายละเอียดผู้สมัคร </div>
                     <div class="box-profile">
@@ -64,13 +65,20 @@
                     <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลการชำระเงิน</div>
                     <div class="box-receipt">
                         <div class="d-flex" v-if="data.register_type !== '40001' && data.cancel_order !== '11001' && data.status_register !== '12003'"><h1>พิมพ์ใบชำระเงิน : <img class="w-60" src="@/assets/images/pdf.png" @click="printPayment"/></h1></div>
-                        <p><span>สถานะ : </span><span :class="getColorClass(data.status_register)">{{ data.statusRegisterName }}</span></p>   
+                        <p>
+                            <span>สถานะ : </span>
+                            <span :class="getColorClass(data.status_register)">{{ data.statusRegisterName }}</span> 
+                            <!-- สถานะยกเลิกการลงทะเบียน -->
+                            <span v-if="data.cancel_order === '11001'" :class="getColorClass(data.cancel_order)"> ({{ data.cancelOrderName }}) </span>
+                        </p>   
+                         <!-- ราคา -->
                         <p  v-if="data.register_type === '40002'"><span class="text-warning">ค่าลงทะเบียน : </span> {{  data.course_price | formatNumber}} บาท</p> 
                         <p  v-else><span class="text-warning">ค่าลงทะเบียน : </span>{{  data.course_price }}</p>   
                         <p><span class="text-warning">ประเภทผู้สมัคร : </span>{{ data.registerTypeName }}</p>   
                         <p><span class="text-warning">รายการที่ต้องการสมัคร : </span>
                             <ul>
                                 <li>{{data.course_name}}</li>
+                                <!-- หลักสูตรเพิ่มเติม -->
                                 <li v-if="data.check_course_other === 1">อบรมเชิงปฏิบัติการ หัวข้อ "Data Analysis in Clinical Research Using R Programming  วันที่ 26 กรกฏาคม 2567 </li>
                             </ul>
                         </p>   
@@ -78,13 +86,11 @@
                         <p v-if="data.register_type === '40002'"><span>กำหนดชำระเงินภายใน : </span><span class="text-danger">{{ data.end_date }}</span></p>     
                         <p v-if="data.register_type === '40002'"><span>สถานะออกใบเสร็จรับเงิน : </span><span :class="getColorClass(data.status_receipt)">{{ data.statusReceiptName }}</span></p>   
                     </div>
-                    <v-card v-if="user != null" class="pd-125 mb-6">
-                        <h2 class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
-                        
-                        
+                    <v-card class="pd-125 mb-6">
+                        <h2  v-if="user != null" class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
                         <div v-if="user?.approve_employee && data.status_register === '12002' && data.cancel_order === '11002'"  class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
                         <div v-if="user?.approve_receipt && data.status_register === '12001' && data.register_type === '40002'" class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogConfirmReceipt = true">ยืนยันชำระเงิน</div>
-                        <div v-if="user?.refund_receipt && data.register_type === '40002' && data.status_register === '12003'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
+                        <div v-if="user?.refund_receipt || !user && data.register_type === '40002' && data.status_register === '12003' && data.cancel_order === '11001'"  class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogRefund = true">คืนค่าการยืนยันชำระเงิน</div>
                         <div v-if="user?.cancel_register && data.cancel_order === '11002'" class="btn-danger text-white text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogCancelOrder = true">ยกเลิกการลงทะเบียน</div>
                         <div v-if="user?.refund_register && data.cancel_order === '11001'" class="border-gray text-center py-3 px-3 mb-3 cursor-pointer f-22"  @click="dialogRefundOrder = true">คืนค่าการลงทะเบียน</div>
                     </v-card>
@@ -130,7 +136,7 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
 
-                  <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
+                  <div @click="dialogApprove = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
                   <div  class="btn-blue btn-receipt f-22 text-white mr-2" @click="updateStatusRegister('12004', data.cancel_order)">อนุมัติ</div>
                 </v-card-actions>
@@ -167,7 +173,7 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
 
-                  <div @click="dialogRefund = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
+                  <div @click="dialogConfirmReceipt = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
                   <div  class="btn-success btn-receipt f-22 text-dark mr-2" @click="updateStatusRegister('12003', data.cancel_order)">ยืนยันชำระเงิน</div>
                 </v-card-actions>
@@ -282,8 +288,8 @@
 
                   <div @click="dialogCancelOrder = false" class="btn-gray btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div @click="updateStatusRegister('11001' ,'11001')" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div>
-                  <!-- <div @click="updateStatusRegister(0 ,'11001', data.register_type)" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div> -->
+                  <!-- <div @click="updateStatusRegister('11001' ,'11001')" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div> -->
+                  <div @click="updateStatusRegister(data.status_register ,'11001', data.register_type)" class="btn-danger btn-receipt f-22 text-white mr-2">ยกเลิกลงทะเบียน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -320,7 +326,8 @@
 
                   <div @click="dialogRefundOrder = false" class="btn-gray  btn-receipt f-22 text-white mr-2">ปิด</div>
                 
-                  <div @click="updateStatusRegister(0 ,'11002', data.register_type)" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการลงทะเบียน</div>
+                  <!-- <div @click="updateStatusRegister(0 ,'11002', data.register_type)" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการลงทะเบียน</div> -->
+                  <div @click="updateStatusRegister('12002' ,'11002')" class="border-gray btn-receipt f-22 text-drak mr-2">คืนค่าการลงทะเบียน</div>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -424,21 +431,21 @@ export default{
             }
          },
 
-         async updateStatusRegister(status, status_cancel){
+         async updateStatusRegister(status, status_cancel, register_type){
 
             try {
 
-                // let newStatus = ""
+                let newStatus = ""
 
-                // if(register_type === '40001'){
-                //     newStatus = "12002"
-                // }else if(register_type === '40002'){
-                //     newStatus = "12001"
-                // }else{
-                //     newStatus = status
-                // }
+                if(register_type === '40001'){
+                    newStatus = "12002"
+                }else if(register_type === '40002'){
+                    newStatus = status
+                }else{
+                    newStatus = status
+                }
 
-        
+
                 let currentDate = moment();
             
                 let fd = {
@@ -447,7 +454,8 @@ export default{
                     "register_type"         : this.data.register_type,
                     "course_type"           : this.data.course_type,
                     "check_course_other"    : this.data.check_course_other,
-                    "status_register"       : status,
+                    "status_register"       : newStatus,
+                    // "status_register"       : status,
                     "cancel_order"          : status_cancel,
                     "modified_by"           : this.user.employee_id,
                     "modified_date"         : currentDate.format('YYYY-MM-DD HH:mm:ss')
@@ -472,7 +480,6 @@ export default{
         async updateStatusReceipt(status){
             try {
              
-                console.log(status);
                 let currentDate = moment();
             
                 let fd = {
@@ -514,8 +521,6 @@ export default{
             
             }
 
-            console.log(fdCreateReceipt);
-
 
             try {
                 
@@ -528,7 +533,6 @@ export default{
                     // timeout: 10000
                 });
 
-                console.log(response);
 
 
                 //true

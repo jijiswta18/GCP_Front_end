@@ -43,6 +43,7 @@
             </v-text-field>
             <div class="loader" v-if="loader"></div>
             <div v-else>
+
                 <RegisterList :headers="headers" :datas="customFilter" type="employee" :search="search"/>
             </div>
             
@@ -117,8 +118,8 @@ export default {
             { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
             { text: 'ชื่อ', align: 'left', value: 'name' },
             { text: 'สถานะ', align: 'left', value: 'statusRegisterName' },
-            { text: 'Reference No 1', align: 'center', value: 'reference_no_1' },
-            { text: 'Reference No 2', align: 'center', value: 'reference_no_2' },
+            { text: 'Reference No 1', align: 'center', value: 'reference_no_1', width: '15%' },
+            { text: 'Reference No 2', align: 'center', value: 'reference_no_2', width: '15%' },
             { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
             { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
             { text: 'อีเมล', value: 'email', align: ' d-none' },
@@ -167,7 +168,7 @@ export default {
                 return (
                     (this.valueRegisterStatus === null || item.status_register.toLowerCase() === this.valueRegisterStatus.toLowerCase()) &&
                     (this.valueRegiterType === null || item.register_type.toLowerCase() === this.valueRegiterType.toLowerCase()) &&
-                    (this.valueCencelOrder === null || item.status_register.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
+                    (this.valueCencelOrder === null || item.cancel_order.toLowerCase() === this.valueCencelOrder.toLowerCase()) &&
                     (this.valueCourseType === null || item.course_id.toLowerCase() === this.valueCourseType.toLowerCase()) 
                 );
             });
@@ -269,11 +270,9 @@ export default {
             this.valueCencelOrder = value;
         },
         updateRegiterType(value) {
-            console.log(value);
             this.valueRegiterType = value;
         },
         updateCourseType(value) {
-            console.log(value);
             this.valueCourseType = value;
         },
         updateFood(value) {

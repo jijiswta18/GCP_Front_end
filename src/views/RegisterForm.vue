@@ -911,7 +911,7 @@
                     const countRegisterPath          = `/api_gcp/Register/CounterRegister`
                     const response                  = await axios.get(`${countRegisterPath}`)
 
-                    console.log(response);
+              
         
                     // let full = false;
 
@@ -940,17 +940,17 @@
                  //สามารถสมัครได้
                 // full = false;    
                 this.checkLimitCourse = false;           
-                console.log("onsite ==== >", this.limitCourse)
+                // console.log("onsite ==== >", this.limitCourse)
 
                 if(response.data.sum_check_course_other >= parseInt(this.limitCourseOther)){
                     //เต็ม
                     this.checkLimitCourseOther = true;
-                    console.log("onsite_other ==== <", this.limitCourseOther)
+                    // console.log("onsite_other ==== <", this.limitCourseOther)
 
                 }else{ 
                     //สามารถสมัครได้
                     this.checkLimitCourseOther = false;
-                    console.log("onsite_other ==== >", this.limitCourseOther)
+                    // console.log("onsite_other ==== >", this.limitCourseOther)
                     
                 }
             }
@@ -1020,7 +1020,7 @@
                     receipt_name, id_card_number,  company_address, 
                     phone, phone_other, email1, email2, confirm_receipt,
                     employee_id, job_position, job_position_other, work_experience,
-                    food_allergy, food_allergy_detail, food, food_other, receipt_order,
+                    food_allergy, food_allergy_detail, food, food_other,
                     confirm_register
                  } = this.dataFrom;
 
@@ -1057,7 +1057,7 @@
                  if (food_allergy === '50001' && !food_allergy_detail) return this.showError('กรุณาระบุรายละเอียดอาหารที่มีอาการแพ้', this.$refs.FoodAllergyDetailField);
                  if (!food) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodField);
                  if (food === '70004' && !food_other) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodOtherField);
-                 if (this.register_type === '40002' && !receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
+                //  if (this.register_type === '40002' && !receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
                  if (!confirm_register) return this.showError('กรุณายืนยันว่าข้อมูลการลงทะเบียนถูกต้อง', this.$refs.ConfirmRegisterField);
               
 
@@ -1127,11 +1127,11 @@
                         "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
                         "food"                      : this.dataFrom.food,
                         "food_other"                : this.dataFrom.food_other,
-                        "receipt_order"             : this.dataFrom.receipt_order, 
+                        // "receipt_order"             : this.dataFrom.receipt_order, 
                         "confirm_register"          : this.dataFrom.confirm_register,
                         "create_date"               : start_date,
                         "status_register"           : this.register_type === "40001" ? "12002" : "12001",
-                        "status_receipt"           : this.register_type === "40002" && this.dataFrom.receipt_order === "90001" ? "13001" : null,
+                        "status_receipt"           : this.register_type === "40002" ? "13001" : null,
                         "end_date"                  : end_date,
                         "cancel_order"              : 11002,
                     }
@@ -1233,7 +1233,7 @@
                             "food_allergy_detail"       : this.dataFrom.food_allergy !== "50001" ?  null : this.dataFrom.food_allergy_detail,
                             "food"                      : this.dataFrom.food,
                             "food_other"                : this.dataFrom.food !== "70004" ? null : this.dataFrom.food_other,
-                            "receipt_order"           : this.dataFrom.receipt_order, 
+                            // "receipt_order"           : this.dataFrom.receipt_order, 
                             "confirm_register"          : this.dataFrom.confirm_register,
                             "modified_by"               : this.dataFrom.id,
                             "modified_date"             : formattedDate
