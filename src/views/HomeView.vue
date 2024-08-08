@@ -1,91 +1,86 @@
 <template>
   <v-app>
     <div class="banner">
-        <img src="@/assets/images/logo.webp"/>
-      </div>
+      <img src="@/assets/images/logo.webp"/>
+    </div>
     <v-app-bar app color="#002f87" class="custom-header d-flex">
-      <!-- <v-list class="d-flex navbar"> -->
-       
-          <v-btn icon @click.stop="toggleMenu" class="display-none responsive-block">
-            <v-icon v-text="menuOpen ? 'mdi-chevron-up' : 'mdi-menu'"></v-icon>
-          </v-btn> 
-        <div class="box-left">
-          <router-link 
-            class="d-flex align-center menu-link"
-            active-class="activemenu"
-            to="/"
-          >
-            <v-list-item link>
-                <v-list-item-title class="menu-text">หน้าหลัก</v-list-item-title>
+      <v-btn icon @click.stop="toggleMenu" class="display-none responsive-block">
+        <v-icon v-text="menuOpen ? 'mdi-chevron-up' : 'mdi-menu'"></v-icon>
+      </v-btn> 
+
+      <div class="box-left">
+        <router-link 
+          class="d-flex align-center menu-link"
+          active-class="activemenu"
+          to="/"
+        >
+          <v-list-item link>
+              <v-list-item-title class="menu-text">หน้าหลัก</v-list-item-title>
+          </v-list-item>
+        </router-link>
+
+        <router-link 
+          class="d-flex align-center menu-link "
+          active-class="activemenu"
+          :to="{ name: 'registration'}"
+          @click.prevent="handleRegistration"
+        >
+
+          <v-list-item link >
+
+              <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
+          </v-list-item>
+        </router-link>
+        
+        <router-link 
+          class="d-flex align-center menu-link"
+          active-class="activemenu"
+          to="/registration-list"
+        >
+          <v-list-item link>
+              <v-list-item-title class="menu-text">ตรวจสอบการลงทะเบียน</v-list-item-title>
+          </v-list-item>
+        </router-link>
+      </div>
+
+      <div class="box-right">
+        <v-menu v-if="user != null"
+          v-model="menu"
+          offset-y
+          :close-on-content-click="false"
+          :active-class="menuActiveClass"
+          class="header-menu"
+        >
+          <template v-slot:activator="{ on }">
+            <v-btn v-on="on" class="btn-profile h-48">
+              {{user.employee_id}}
+              <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item v-if="user?.upload_receipt" to="/receipt-import" >
+              <v-list-item-title>อัพโหลดข้อมูลการชำระเงิน</v-list-item-title>
             </v-list-item>
-          </router-link>
-
-          <router-link 
-            class="d-flex align-center menu-link "
-            active-class="activemenu"
-            :to="{ name: 'registration'}"
-            @click.prevent="handleRegistration"
-          >
-
-            <!-- <v-list-item link> -->
-            <!-- <v-list-item link > -->
-            <v-list-item link v-if="user?.menu_register || checkDate">
-                <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
+            <v-list-item v-if="user?.check_register_receipt" to="/receipt-list" >
+              <v-list-item-title>สำหรับเจ้าหน้าที่การเงิน</v-list-item-title>
             </v-list-item>
-          </router-link>
-          
-          <router-link 
-            class="d-flex align-center menu-link"
-            active-class="activemenu"
-            to="/registration-list"
-          >
-            <v-list-item link>
-                <v-list-item-title class="menu-text">ตรวจสอบการลงทะเบียน</v-list-item-title>
-            </v-list-item>
-          </router-link>
-        </div>
+          <v-list-item class="cursor-pointer">
+            <v-list-item-title @click="logout">ออกจากระบบ</v-list-item-title>
+          </v-list-item>
+          </v-list>
+        </v-menu>
 
-        <div class="box-right">
-
-          <v-menu v-if="user != null"
-            v-model="menu"
-            offset-y
-            :close-on-content-click="false"
-            :active-class="menuActiveClass"
-            class="header-menu"
-          >
-            <template v-slot:activator="{ on }">
-              <v-btn v-on="on" class="btn-profile h-48">
-                {{user.employee_id}}
-                <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
-              </v-btn>
-            </template>
-
-            <v-list>
-              <v-list-item v-if="user?.upload_receipt" to="/receipt-import" >
-                <v-list-item-title>อัพโหลดข้อมูลการชำระเงิน</v-list-item-title>
-              </v-list-item>
-              <v-list-item v-if="user?.check_register_receipt" to="/receipt-list" >
-                <v-list-item-title>สำหรับเจ้าหน้าที่การเงิน</v-list-item-title>
-              </v-list-item>
-            <v-list-item class="cursor-pointer">
-              <v-list-item-title @click="logout">ออกจากระบบ</v-list-item-title>
-            </v-list-item>
-            </v-list>
-          </v-menu>
-
-          <router-link v-else
-            class="align-center menu-link"
-            active-class="activemenu"
-            to="/login"
-          >
-            <v-list-item link class="text-right">
-                <v-list-item-title class="menu-text">สำหรับเจ้าหน้าที่</v-list-item-title>
-            </v-list-item>
-          </router-link>
-
-        </div>
-      <!-- </v-list> -->
+        <router-link v-else
+          class="align-center menu-link"
+          active-class="activemenu"
+          to="/login"
+        >
+          <v-list-item link class="text-right">
+              <v-list-item-title class="menu-text">สำหรับเจ้าหน้าที่</v-list-item-title>
+          </v-list-item>
+        </router-link>
+      </div>
 
     </v-app-bar>
 
@@ -108,7 +103,8 @@
               active-class="activemenu"
               :to="{ name: 'registration'}"              >
             
-              <v-list-item link v-if="user?.menu_register || checkDate">
+              <v-list-item link>
+              <!-- <v-list-item link v-if="user?.menu_register || checkDate"> -->
               <!-- <v-list-item link > -->
                   <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
               </v-list-item>
@@ -147,9 +143,7 @@
 
 <script>
 import store from '../store/index.js';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import { mapGetters } from 'vuex';
+
 export default {
   data() {
     return {
@@ -169,34 +163,22 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['isAuthenticated'])
+    // ...mapGetters(['isAuthenticated'])
   },
   mounted(){
-    this.getMenuRegisterOpening()
   },
   methods: {
     toggleMenu() {
       this.menuOpen = !this.menuOpen;
     },
     selectMenuItem(item) {
-      // Handle menu item selection
-      // Close the menu
       this.menuOpen = false;
-      // Navigate to the selected link
       window.location.href = item.link;
     },
 
-    async getMenuRegisterOpening(){
-      const path = '/api_gcp/Register/getMenuRegisterOpening'
-      const response = await axios.get(path);
-      this.checkDate = response.data
-
-
-      
-    },
     async logout() {
 
-      Swal.fire({
+      this.$swal.fire({
         icon: "warning",
         title: "คุณต้องการออกจากระบบ",
         showDenyButton: false,
@@ -204,7 +186,6 @@ export default {
         confirmButtonText: "ยืนยัน",
         cancelButtonText: `ยกเลิก`
       }).then(async (result) => {
-        /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           await store.dispatch("logout");
         
@@ -212,7 +193,7 @@ export default {
           await location.reload();
 
         } else if (result.isDenied) {
-          Swal.fire("Changes are not saved", "", "info");
+          this.$swal.fire("Changes are not saved", "", "info");
         }
       });
     }
@@ -488,14 +469,15 @@ export default {
 
   .theme--light.v-data-table .v-data-footer {
     border-top: none!important;
-}
-.v-input .v-label{
-  display: contents;
-}
+  }
 
-input{
-  height: 30px;
-}
+  .v-input .v-label{
+    display: contents;
+  }
+
+  input{
+    height: 30px;
+  }
 
   
 

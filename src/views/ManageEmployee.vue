@@ -1,6 +1,5 @@
 <template>
     <div class="manageemployee">
-
         <h2 class="mb-3">จัดการข้อมูลผู้ใช้งาน</h2> 
         <v-form ref="formEmployee" v-model="valid" lazy-validation>
             <v-row  no-gutters>
@@ -41,53 +40,50 @@
     </div>
 </template>
 <script>
+    import store from '../store/index.js'
 
-import axios from 'axios';
-import moment from 'moment';
-import store from '../store/index.js'
+    export default {
+        data: () => ({
 
-export default {
-    data: () => ({
+            valid: true,
+            employee : {},
+            selectRoles: [
+                {value: 'admin', id: "admin"},
+                {value: 'finance', id: "finance"},
+                {value: 'officer', id: "officer"},
+                {value: 'general', id: "general"}
+            ], 
+            check_roles: store.getters.user,
 
-        valid: true,
-        employee : {},
-        selectRoles: [
-            {value: 'admin', id: "admin"},
-            {value: 'finance', id: "finance"},
-            {value: 'officer', id: "officer"},
-            {value: 'general', id: "general"}
-        ], 
-        check_roles: store.getters.user,
+        }),
+        
+        methods:{
+            async saveDataEmployee(){
+                if(this.$refs.formEmployee.validate()){
+                    try {
 
-    }),
-    
-    methods:{
-        async saveDataEmployee(){
-            if(this.$refs.formEmployee.validate()){
-                try {
+                        let fd =  {
+                                "employee_id"            : this.employee.employee_id,
+                                "roles"                  : this.employee.employee_roles,
+                                "create_by"              : this.check_roles.employee_id,
+                                "create_date"            : this.$moment().format('YYYY-MM-DD HH:mm:ss'),
+                                "modified_by"            : this.check_roles.employee_id,
+                                "modified_date"          : this.$moment().format('YYYY-MM-DD HH:mm:ss'),
+                        }
 
-                    let fd =  {
-                            "employee_id"            : this.employee.employee_id,
-                            "roles"                  : this.employee.employee_roles,
-                            "create_by"              : this.check_roles.employee_id,
-                            "create_date"            : moment().format('YYYY-MM-DD HH:mm:ss'),
-                            "modified_by"            : this.check_roles.employee_id,
-                            "modified_date"          : moment().format('YYYY-MM-DD HH:mm:ss'),
+
+                        let createEmployeePath = `/api_gcp/ManageEmployee/createEmployee`
+
+                        await this.$axios.post(`${createEmployeePath}`, fd)
+
+
+                    } catch (error) {
+                        console.log('createEmployee', error);
                     }
-
-
-                    let createEmployeePath = `/api_gcp/ManageEmployee/createEmployee`
-
-                    await axios.post(`${createEmployeePath}`, fd)
-
-
-                } catch (error) {
-                    console.log('createEmployee', error);
                 }
             }
+
+
         }
-
-
     }
-}
 </script>

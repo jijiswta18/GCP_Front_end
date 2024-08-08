@@ -1,6 +1,9 @@
 <template>
      <div class="receiptlist">
-  
+      <v-dialog v-if="loading" v-model="loading">
+        <LoaderData />
+      </v-dialog>
+      <div v-else>
         <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
         <div>
           <v-text-field
@@ -48,9 +51,7 @@
                 <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
                     {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
                 </span>
-                <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
             </template>
-            <!-- <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template> -->
             <template v-slot:[`item.detail`]="{ item }">
                 <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
             </template>
@@ -94,21 +95,18 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
-     </div>
+      </div>
+    </div>
     
 </template>
 <script>
 
-import axios from 'axios';
-import moment from 'moment';
-import Swal from 'sweetalert2';
 import store from '@/store';
-import CryptoJS from 'crypto-js';
 import * as XLSX from 'xlsx';
+import LoaderData from '@/components/LoaderData.vue';
 
 export default {
-
+  components: {LoaderData},
     data: () => ({
       user: store.getters.user,
       search: '',
@@ -129,30 +127,31 @@ export default {
       ],
       datas: [],
       dialog: false,
-      receipt_no: ""
+      receipt_no: "",
+      loading: true
     }),
     watch: {
-    selectAll(value) {
-     
-      if (value) {
-        this.selectedItems = [...this.datas];
-      } else {
-        this.selectedItems = [];
-      }
+      selectAll(value) {
+      
+        if (value) {
+          this.selectedItems = [...this.datas];
+        } else {
+          this.selectedItems = [];
+        }
+      },
+      selectedItems() {
+        if (this.selectedItems.length === this.datas.length) {
+          this.selectAll = true;
+        } else {
+          this.selectAll = false;
+        }
+      },
     },
-    selectedItems() {
-      if (this.selectedItems.length === this.datas.length) {
-        this.selectAll = true;
-      } else {
-        this.selectAll = false;
-      }
-    },
-  },
     mounted(){
       this.fechstatusRegisterReceipt()
-     
     },
     methods: {
+
       exportToExcel() {
 
         const dataArray = this.datas
@@ -171,7 +170,7 @@ export default {
             const job_position          = item.job_position === '20008' ? item.job_position_other : item.jobPositionName
             const food_allergy          = item.food_allergy === '50001' ? item.food_allergy_detail : item.foodAllergyName
             const food                  = item.food === '70004' ? item.food_other : item.foodName
-            const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
+            const create_date           = this.$moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
 
             const statusRegister        = item.statusRegisterName + '(' + item.cancelOrderName + ')'
 
@@ -216,14 +215,14 @@ export default {
 
         /* generate XLSX file and send to client */
         XLSX.writeFile(wb, 'รายงานข้อมูลผู้ลงทะเบียน.xlsx');
-        },
+      },
 
       checkDailog(){
 
         if(this.selectedItems.length){
           this.dialog = true
         }else{
-            Swal.fire({
+            this.$swal.fire({
               icon: 'warning',
               title: "กรุณาเลือกข้อมูล",
               // text: message
@@ -235,7 +234,6 @@ export default {
 
       },
     
-
       async createReceipt(){
 
         try {
@@ -245,7 +243,7 @@ export default {
             const fdCreateReceipt = {
 
               master_id             : this.selectedItems[i].id,
-              project_code          : "0041",
+              project_code          : this.project_code,
               payment_type_code     : "01",
               price                 : this.selectedItems[i].course_price,
               reference_1           : this.selectedItems[i].reference_no_1,
@@ -263,7 +261,7 @@ export default {
 
             // console.log(fdCreateReceipt);
 
-            const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
+            const response = await this.$axios.post('/api/create_receipt', fdCreateReceipt, {
               headers: {
                   'accept': '*/*',
                   'accept-language': 'en-US,en;q=0.8',
@@ -280,7 +278,7 @@ export default {
 
           }
 
-          await Swal.fire({
+          await this.$swal.fire({
             icon: 'success',
             title: 'บันทึกสำเร็จ',
             text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
@@ -299,11 +297,10 @@ export default {
 
       },
 
-
       async updateStatusReceipt(data,status){
             try {
              
-                let currentDate = moment();
+                let currentDate = this.$moment();
             
                 let fd = {
                     "register_id"       : data.id,
@@ -314,19 +311,19 @@ export default {
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusReceipt`
 
-                await axios.post(`${updateStatusRegisterPath}`, fd)
+                await this.$axios.post(`${updateStatusRegisterPath}`, fd)
 
                 } catch (error) {
                     console.log('updateStatusRegister', error);
                 }
-        },
+      },
 
       async fechstatusRegisterReceipt(){
 
         try {
           const statusRegisterReceiptPath = `/api_gcp/Register/statusRegisterReceipt`
 
-          const response = await axios.get(`${statusRegisterReceiptPath}`)
+          const response = await this.$axios.get(`${statusRegisterReceiptPath}`)
 
           this.datas = response.data.data
 
@@ -343,7 +340,7 @@ export default {
 
               const receiptDetailPath     = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
 
-              const detailReceipt         =  await axios.get(`${receiptDetailPath}`)
+              const detailReceipt         =  await this.$axios.get(`${receiptDetailPath}`)
 
               get_receipt_no             = detailReceipt.data.data.receipt_no
 
@@ -360,10 +357,14 @@ export default {
           
 
         } catch (error) {
-            console.log('register', error);
+          this.loading = false;
+          console.log('register', error);
+        }finally {
+          this.loading = false;
         }
 
       },
+
       detailRegister(value){
 
         const registerId = { id: value.id};
@@ -371,103 +372,83 @@ export default {
         const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
         // Encrypt the receipt data
-        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+        const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
         this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
 
-        },
-        formatDate(value) {
-            return moment(value).format("YYYY-MM-DD HH:mm:ss")
-        },
-        getColorClass (value) {
+      },
 
-            switch (value) {
-                case '12001':
-                return 'text-gray';
-                case '12002':
-                return 'text-gray';
-                case '12003':
-                return 'text-success';
-                case '12004':
-                return 'text-success';
-                case '13001':
-                return 'text-gray';
-                case '13002':
-                return 'text-success';
-                case '11001':
-                return 'text-danger';
-                default:
-                return '';
-            }
-        },
-        dialogReceipt(){
-          this.dialog = true
-        }
+      formatDate(value) {
+            return this.$moment(value).format("YYYY-MM-DD HH:mm:ss")
+      },   
+      dialogReceipt(){
+        this.dialog = true
+      }
     }
 }
 
 </script>
 
 <style>
- .style-input-search .v-input__slot {
-  padding-left: 0!important;
-  height: 42px;
-  background: transparent;
-  box-shadow: none!important;
-  border: 1px solid #ced4da;
-}
-.style-input-search .v-input__slot .v-input__prepend-inner{
-    margin-top: 0!important;
-    height: 40px;
-    align-items: center;
-    color: #495057;
-    text-align: center;
-    white-space: nowrap;
-    background-color: #e9ecef;
-    margin-right: .375rem;
-    padding: .375rem .75rem;
-}
-.table-regislist th {
-    border: 1px solid #ddd!important;
-    padding: 8px;
-    font-size: 16px!important;
-}
-.table-regislist th span{
-  color: #000;
-}
-.table-regislist td{
-    border: 1px solid #ddd!important;
-    padding: 8px;
-    font-size: 16px!important;
-    vertical-align: middle;
+  .style-input-search .v-input__slot {
+    padding-left: 0!important;
+    height: 42px;
+    background: transparent;
+    box-shadow: none!important;
+    border: 1px solid #ced4da;
+  }
+  .style-input-search .v-input__slot .v-input__prepend-inner{
+      margin-top: 0!important;
+      height: 40px;
+      align-items: center;
+      color: #495057;
+      text-align: center;
+      white-space: nowrap;
+      background-color: #e9ecef;
+      margin-right: .375rem;
+      padding: .375rem .75rem;
+  }
+  .table-regislist th {
+      border: 1px solid #ddd!important;
+      padding: 8px;
+      font-size: 16px!important;
+  }
+  .table-regislist th span{
+    color: #000;
+  }
+  .table-regislist td{
+      border: 1px solid #ddd!important;
+      padding: 8px;
+      font-size: 16px!important;
+      vertical-align: middle;
 
-}
+  }
 
 
-.table-regislist tr:hover {background-color: #ddd;}
+  .table-regislist tr:hover {background-color: #ddd;}
 
-.table-regislist th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #f8f9fa;
-    color: white;
-}
-.receiptlist  button span{
-font-size: 18px;
-}
-.head-toolbar{
-  box-shadow: none!important;
-  border-bottom: 1px solid #cccccc!important;
-}
-.btn-receipt{
-    border-radius: 3px;
-    padding: 0.25rem 1rem;
-    cursor: pointer;
-}
-.box-excel img{
-    display: inline-block;
-    width: 40px;
-}
+  .table-regislist th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #f8f9fa;
+      color: white;
+  }
+  .receiptlist  button span{
+    font-size: 18px;
+  }
+  .head-toolbar{
+    box-shadow: none!important;
+    border-bottom: 1px solid #cccccc!important;
+  }
+  .btn-receipt{
+      border-radius: 3px;
+      padding: 0.25rem 1rem;
+      cursor: pointer;
+  }
+  .box-excel img{
+      display: inline-block;
+      width: 40px;
+  }
 
 </style>

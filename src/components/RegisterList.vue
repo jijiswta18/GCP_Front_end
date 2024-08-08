@@ -25,7 +25,6 @@
                 <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
                     {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
                 </span>
-                <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
             </template>
             <template v-slot:[`item.detail`]="{ item }">
                 <div @click="checkRegister(item, type)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
@@ -35,10 +34,7 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import Swal from 'sweetalert2';
-    import moment from 'moment';
-    import CryptoJS from 'crypto-js';
+
     import * as XLSX from 'xlsx';
     export default {
     props: ['headers', 'datas', 'type', 'search'],
@@ -62,8 +58,6 @@
         exportToExcel() {
 
             const dataArray = this.datas
-
-
             // Extract only name and age from data array
             const extractedDataArray = dataArray.map(item => {
                 const address               = item.company_address === null || item.company_address === '' ? '' : item.company_address 
@@ -78,7 +72,7 @@
                 const job_position          = item.job_position === '20008' ? item.job_position_other : item.jobPositionName
                 const food_allergy          = item.food_allergy === '50001' ? item.food_allergy_detail : item.foodAllergyName
                 const food                  = item.food === '70004' ? item.food_other : item.foodName
-                const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
+                const create_date           = this.$moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
 
                 const statusRegister        = item.statusRegisterName + '(' + item.cancelOrderName + ')'
 
@@ -115,9 +109,6 @@
                 };
             });
 
-            // console.log(extractedDataArray);
-
-
             const wb = XLSX.utils.book_new();
 
          
@@ -148,12 +139,12 @@
                     const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                     // Encrypt the receipt data
-                    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+                    const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
                     this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
             }else{
                 try {
-                    const { value: checkPhone } = await Swal.fire({
+                    const { value: checkPhone } = await this.$swal.fire({
                         title: "ยืนยันเบอร์โทรศัพท์มือถือ",
                         input: "text",
                         inputAttributes: {
@@ -166,12 +157,12 @@
                         preConfirm: async (checkPhone) => {
                             try {
                                 const CheckPhonepath = `/api_gcp/Register/checkPhone`;
-                                const response = await axios.get(CheckPhonepath, { params: { phone: checkPhone, email : check } });
+                                const response = await this.$axios.get(CheckPhonepath, { params: { phone: checkPhone, email : check } });
                                 
                             
                                 // console.log(response.exists.success);
                                 if (!response.data.success) {
-                                    return Swal.showValidationMessage("ข้อมูลไม่ถูกต้อง");
+                                    return this.$swal.showValidationMessage("ข้อมูลไม่ถูกต้อง");
                                 }
                                 
                                 return response.data;
@@ -179,7 +170,7 @@
                                 throw new Error(`Request failed: ${error}`);
                             }
                         },
-                        allowOutsideClick: () => !Swal.isLoading()
+                        allowOutsideClick: () => !this.$swal.isLoading()
                     });
 
                     if (checkPhone) {
@@ -193,7 +184,7 @@
                         const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                         // Encrypt the receipt data
-                        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+                        const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
                         this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
                         
@@ -202,7 +193,7 @@
                 
                     }
                 } catch (error) {
-                    Swal.fire({
+                    this.$swal.fire({
                         icon: 'error',
                         title: 'เกิดข้อผิดพลาด',
                         text: error.message
@@ -211,26 +202,8 @@
             }
        
         },
-        formatDate(value) {
-            return moment(value).format("YYYY-MM-DD HH:mm:ss")
-        },
-        getColorClass (value) {
-
-            switch (value) {
-                case '12001':
-                return 'text-gray';
-                case '12002':
-                return 'text-gray';
-                case '12003':
-                return 'text-success';
-                case '12004':
-                return 'text-success';
-                case '11001':
-                return 'text-danger';
-                default:
-                return '';
-            }
-        },
+       
+       
     },
     
 }

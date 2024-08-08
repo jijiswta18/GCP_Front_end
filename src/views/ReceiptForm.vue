@@ -210,25 +210,11 @@
     </div>
 </template>
 <script>
-   import axios from 'axios';
-   import Swal from 'sweetalert2';
-   import CryptoJS from 'crypto-js';
-//    import store from '../store/index.js';
-
 export default{
     data: () => ({
         valid: true,
-        // dataRegister: {},
         dataForm: {},
-        provinces: [],
-        districts: [],
-        subdistricts: [],
-        postcode: '',
-        selectedProvince: null,
-        selectedDistrict: null,
-        selectedSubdistrict: null,
         optionsReceiptRegister: [],
-        // user: store.getters.user,
         receiptData: {},
         decryptedData: {},
         receiptEmployees: []
@@ -241,8 +227,8 @@ export default{
     created(){
         const encryptedData     = this.$route.params.receiptData; // รับค่า receiptData จากพารามิเตอร์ใน URL
         const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
-        const bytes             = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
-        const decryptedData     = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
+        const bytes             = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
+        const decryptedData     = bytes.toString(this.$cryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
         this.receiptData        = JSON.parse(decryptedData);
     },
     mounted(){
@@ -256,15 +242,13 @@ export default{
             try {
             const EmployeeFinancePath = `/api_gcp/ManageEmployee/EmployeeFinance`
 
-            const response = await axios.get(`${EmployeeFinancePath}`)
+            const response = await this.$axios.get(`${EmployeeFinancePath}`)
 
             this.receiptEmployees = response.data.data
 
             this.receiptEmployees.forEach(employee => {
                 employee.name = `${employee.employee_id} ${employee.first_name} ${employee.last_name}`;
             });
-
-
 
             } catch (error) {
                 console.log('EmployeeFinancegister', error);
@@ -295,9 +279,9 @@ export default{
 
                     const updateReceiptPath = `/api/update_receipt`
 
-                    await axios.put(`${updateReceiptPath}`, fdReceipt)
+                    await this.$axios.put(`${updateReceiptPath}`, fdReceipt)
 
-                    await Swal.fire({
+                    await this.$swal.fire({
                             icon: 'success',
                             title: 'บันทึกสำเร็จ',
                             text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
@@ -314,7 +298,6 @@ export default{
             }
             
         },
-
         async fetchReceiptById(){
             try {
                 const reference_no_1        = this.receiptData.reference_no_1;
@@ -323,7 +306,7 @@ export default{
 
                 const receiptDetailPath = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
                 
-                const response          =  await axios.get(`${receiptDetailPath}`)
+                const response          =  await this.$axios.get(`${receiptDetailPath}`)
 
                 const data              = response.data.data
 
@@ -350,59 +333,6 @@ export default{
 
             } catch (error) {
                 console.log("fechReceiptById", error);   
-            }
-        },
-
-
-        async fetchProvinces() {
-                try {
-                    const response = await axios.get('/api_gcp/getProvince');
-                    this.provinces = response.data.data;
-                } catch (error) {
-                    console.error('Error fetching provinces:', error);
-                }
-        },
-        async fetchDistricts(provinceId) {
-            try {
-                const response = await axios.get(`/api_gcp/getDistricts?provinceId=${provinceId}`);
-                const districts = response.data.data; // Adjust this according to your API response structure
-                this.districts = Array.isArray(districts) ? districts : []; 
-            } catch (error) {
-                console.error('Error fetching districts:', error);
-            }
-        },
-        async fetchSubdistricts(provinceId,districtId) {
-            try {
-                const response = await axios.get(`/api_gcp/getSubdistricts?provinceId=${provinceId}&districtId=${districtId}`);
-                const subdistricts = response.data.data; // Adjust this according to your API response structure
-                this.subdistricts = Array.isArray(subdistricts) ? subdistricts : []; 
-            } catch (error) {
-                console.error('Error fetching subdistricts:', error);
-            }
-        },
-        onProvinceChange() {
-            this.selectedDistrict = null;
-            this.selectedSubdistrict = null;
-            this.selectedPostcode = null;
-            this.postcode = '';
-            if (this.selectedProvince) {
-                this.fetchDistricts(this.selectedProvince.province_code);
-    
-            }
-        },
-        onDistrictChange() {
-            this.selectedSubdistrict = null;
-            this.selectedPostcode = null;
-            this.postcode = '';
-            if (this.selectedDistrict) {
-                this.fetchSubdistricts(this.selectedProvince.province_code, this.selectedDistrict.district_code);
-            }
-        },
-        onSubdistrictChange() {
-            this.selectedPostcode = null;
-            this.postcode = '';
-            if (this.selectedSubdistrict) {
-                this.postcode = this.selectedSubdistrict.zip_code
             }
         },
     }

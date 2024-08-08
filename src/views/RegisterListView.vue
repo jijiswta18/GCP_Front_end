@@ -3,52 +3,56 @@
         <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
 
         <!-- สิทธิ์ Admin -->
-        <v-row no-gutters v-if="user">
-            <v-col cols="12" md="6" class="px-2">
-                <p>สถานะการลงทะเบียน</p>
-                <SelectOption :options="filteredRegiterStatus" @selected="updateRegisterStatus" item-value="select_code"/>
-            </v-col>
-            <v-col cols="12" md="6"  class="px-2">
-                <p>การยกเลิก</p>
-                <SelectOption :options="filteredCancelOrder" @selected="updateCencelOrder"  item-value="select_code"/>
-            </v-col>
-        </v-row>
-
- 
-        <v-row no-gutters v-if="user">
-            <v-col cols="12" md="6"  class="px-2">
-                <p>ประเภทผู้สมัคร</p>
-                <SelectOption :options="filteredRegiterType" @selected="updateRegiterType" item-value="select_code"/>
-            </v-col>
-            <v-col  cols="12" md="6" class="px-2">
-             
-                <p>รายการที่ต้องการสมัคร</p>
-                <SelectOption :options="filteredOptionCourses" @selected="updateCourseType" item-value="select_code"/>
-            </v-col>
-        </v-row>
-
-       
         <div v-if="user">
-            <v-text-field
-                v-model="search"
-                label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
-                solo
-                class="style-input-search"
-                single-line
-                hide-details="auto"
-                clearable 
-                dense
-            >
-                <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-            </v-text-field>
-            <div class="loader" v-if="loader"></div>
+            <v-dialog v-if="loading" v-model="loading">
+                <LoaderData />
+            </v-dialog>
             <div v-else>
+                <v-row no-gutters>
+                    <v-col cols="12" md="6" class="px-2">
+                        <p>สถานะการลงทะเบียน</p>
+                        <SelectOption :options="filteredRegiterStatus" @selected="updateRegisterStatus" item-value="select_code"/>
+                    </v-col>
+                    <v-col cols="12" md="6"  class="px-2">
+                        <p>การยกเลิก</p>
+                        <SelectOption :options="filteredCancelOrder" @selected="updateCencelOrder"  item-value="select_code"/>
+                    </v-col>
+                </v-row>
 
-                <RegisterList :headers="headers" :datas="customFilter" type="employee" :search="search"/>
+                <v-row no-gutters >
+                    <v-col cols="12" md="6"  class="px-2">
+                        <p>ประเภทผู้สมัคร</p>
+                        <SelectOption :options="filteredRegiterType" @selected="updateRegiterType" item-value="select_code"/>
+                    </v-col>
+                    <v-col  cols="12" md="6" class="px-2">
+                    
+                        <p>รายการที่ต้องการสมัคร</p>
+                        <SelectOption :options="filteredOptionCourses" @selected="updateCourseType" item-value="select_code"/>
+                    </v-col>
+                </v-row>
+
+                <div>
+
+                    <v-text-field
+                        v-model="search"
+                        label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
+                        solo
+                        class="style-input-search"
+                        single-line
+                        hide-details="auto"
+                        clearable 
+                        dense
+                    >
+                        <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+                    </v-text-field>
+                   
+                        <RegisterList :headers="headers" :datas="customFilter" type="employee" :search="search"/>
+
+                </div>
+
             </div>
-            
         </div>
-
+            
         <div v-else>
             <v-row no-gutters>
                 <v-col cols="10" class="px-2">
@@ -70,33 +74,26 @@
                     </div>
                 </v-col>
             </v-row>
-            <!-- <div class="loader" v-if="loader"></div>
-            <div v-else> -->
-                <div v-if="dataProfile.length  > 0">
-                    <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
-                </div>
-            <!-- </div> -->
-            
+            <div v-if="dataProfile.length  > 0">
+                <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+            </div>
         </div>
-
+        
     </div>
-
-
 
 </template>
 <script>
-import axios from 'axios';
-import moment from 'moment';
+
 import store from '../store/index.js';
-import Swal from 'sweetalert2';
-import CryptoJS from 'crypto-js';
 import RegisterList from '@/components/RegisterList.vue';
 import SelectOption from '@/components/SelectOption.vue';
+import LoaderData from '@/components/LoaderData.vue';
 
 export default {
-    components: { RegisterList, SelectOption},
+
+    components: { RegisterList, SelectOption, LoaderData},
     data: () => ({
-        loader : true,
+        loading : true,
         user: store.getters.user,
         searchEmail: '',
         search: '',
@@ -109,7 +106,7 @@ export default {
             { text: 'ID', align: 'center', value: 'id' },
             { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
             { text: 'ชื่อ', align: 'left', value: 'name' },
-            // { text: 'สถานะ', align: 'center', value: 'statusRegisterName' },
+
         ],
         dataProfile: [],
         headers: [
@@ -132,14 +129,16 @@ export default {
         valueCourseType: null,
         valueFood: null,
     }),
+
     mounted(){
         if(this.user){
             this.fetchSelectList();
-            // this.fetchCoursetList();
-            this.fechRegister();
+            setTimeout(() => {
+                this.fechRegister();
+            }, 500);
         }
-       
     },
+
     computed: {
         filteredCancelOrder() {
             return this.options.filter(option => option.select_catagory === 11);
@@ -157,12 +156,8 @@ export default {
             
             return this.options.filter(option => option.select_catagory === 17);
         },
-        
-        
+          
         customFilter() {
-
-            
-
             return this.datas.filter(item => {
 
                 return (
@@ -175,51 +170,21 @@ export default {
         }
     },
     methods: {
-        async fetchSelectList(){
-            try {
-                const response = await axios.get('/api_gcp/getSelectList');
 
-                const selectList = await response.data.data
-
-                this.options = selectList;
-
-                this.selectedOption = this.options.length > 0 ? this.options[0].id : null;
-
-            } catch (error) {
-                console.error('Error fetching provinces:', error);
-            }
-        },
-        // async fetchCoursetList(){
-        //     try {
-        //         const response = await axios.get('/api_gcp/getSelectCourses');
-
-        //         const selectCourseList = await response.data.data
-
-        //         this.courseOptions = selectCourseList;
-
-            
-
-        //         // this.selectedOption = this.courseOptions.length > 0 ? this.courseOptions[0].id : null;
-
-        //     } catch (error) {
-        //         console.error('Error fetching provinces:', error);
-        //     }
-        // },
         async fechRegister(){
 
             try {
 
                const registerPath = `/api_gcp/Register/getRegister`
 
-               const response = await axios.get(`${registerPath}`)
+               const response = await this.$axios.get(`${registerPath}`)
 
                this.datas = await response.data.data
-             
-               this.loader = await false
-
 
             } catch (error) {
-                console.log('register', error);
+                this.loading = false;
+            }finally {
+                this.loading = false;
             }
 
         },
@@ -227,7 +192,7 @@ export default {
         async checkEmail(){
 
             if(!this.searchEmail){
-                Swal.fire({
+                this.$swal.fire({
                     title: "กรุณากรอกข้อมูล",
                     icon: "warning"
                 });
@@ -236,7 +201,7 @@ export default {
             try {
                 const registerIdPath = `/api_gcp/Register/checkEmail`
 
-                const response = await axios.get(`${registerIdPath}`,{ params: {email: this.searchEmail}})
+                const response = await this.$axios.get(`${registerIdPath}`,{ params: {email: this.searchEmail}})
 
 
                 if(response.data.exists){
@@ -244,7 +209,7 @@ export default {
 
                 }else{
                     
-                      Swal.fire({
+                      this.$swal.fire({
                         title: "ไม่พบข้อมูล",
                         icon: "warning"
                     });
@@ -253,7 +218,7 @@ export default {
 
             } catch (error) {
 
-                Swal.fire({
+                this.$swal.fire({
                     title: "กรุณากรอกข้อมูล",
                     icon: "warning"
                 });
@@ -262,38 +227,40 @@ export default {
 
         },
 
-    
         updateRegisterStatus(value) {
             this.valueRegisterStatus = value;
         },
+
         updateCencelOrder(value) {
             this.valueCencelOrder = value;
         },
+
         updateRegiterType(value) {
             this.valueRegiterType = value;
         },
+
         updateCourseType(value) {
             this.valueCourseType = value;
         },
+
         updateFood(value) {
             this.valueFood = value;
         },
+
         detailRegister(value){
             const registerId = { id: value.id };
 
             const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
             // Encrypt the receipt data
-            const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+            const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
             this.$router.push({ name: 'registration-detail', params: { encryptedData }})
         },
-        formatDate(value) {
-            return moment(value).format("YYYY-MM-DD HH:mm:ss")
-        },
-       
+        
       
     } 
+
 }
 </script>
 <style>

@@ -59,95 +59,78 @@
 
             </v-form>
         </v-container>
-        
-    </div>
-
-
-    
+    </div>    
 </template>
 
 <script>
 
-// import axios from "axios";
-import Swal from 'sweetalert2';
-import store  from '../store/index.js';
+    import store  from '../store/index.js';
 
+    export default {
 
+        data: () => ({
+            dialog: false,
+            valid: true,
+            showPassword: false,
+            disabled: false,
+            check: false,
+            check_user : false,
+            errorMessage:'',
+            username: '',
+            usernameRules: [v => !!v || 'กรุณากรอกข้อมูล'],
+            password: '',
+            passwordRules: [ v => !!v || 'กรุณากรอกข้อมูล'],
+            user: store.getters,
+        }),
+        computed: {},     
+        methods: {
+            encodeBase64(str) {
+            return btoa(str);
+            },
 
-export default {
+            async login(){
+                if( this.$refs.form.validate()){
+                    try {
+                    await store.dispatch('login',{
+                            username: this.username,
+                            password: this.password,
+                        })
 
-    data: () => ({
-        dialog: false,
-        valid: true,
-        showPassword: false,
-        disabled: false,
-        check: false,
-        check_user : false,
-        errorMessage:'',
-        username: '',
-        usernameRules: [
-            v => !!v || 'กรุณากรอกข้อมูล',
-            // v => v.length >= 8 || 'ชื่อผู้ใช้ต้องมีอักษรอย่างน้อย 8 ตัว'
-        ],
-        password: '',
-        passwordRules: [
-            v => !!v || 'กรุณากรอกข้อมูล',
-        ],
-        user: store.getters,
-    }),
-        computed: {},
-        
-        
-    methods: {
-        encodeBase64(str) {
-           return btoa(str);
-        },
-
-        async login(){
-            if( this.$refs.form.validate()){
-                try {
-                await store.dispatch('login',{
-                        username: this.username,
-                        password: this.password,
-                    })
-
-                    console.log(this.user);
-                if(this.user.checkUser === "204")
-                    {
-                        await Swal.fire({
+                    if(this.user.checkUser === "204")
+                        {
+                            await this.$swal.fire({
+                            title: 'Error!',
+                            text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        })
+                    }
+                    else{
+                        await this.$router.push({ path: '/registration-list' });
+                        location.reload();
+                        await this.$swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'เข้าสู่ระบบสำเร็จ',
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                
+                } catch (error) {
+                    await this.$swal.fire({
                         title: 'Error!',
                         text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
                         icon: 'error',
                         confirmButtonText: 'Ok'
                     })
                 }
-                else{
-                    await this.$router.push({ path: '/registration-list' });
-                    location.reload();
-                    await Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'เข้าสู่ระบบสำเร็จ',
-                        showConfirmButton: false,
-                        timer: 1000
-                    })
                 }
-             
-            } catch (error) {
-                console('Error fetching data:', error);
-                await Swal.fire({
-                    title: 'Error!',
-                    text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                })
-            }
-            }
 
-          
-        }
-    },
-}
+            
+            }
+        },
+    }
 </script>
 
 <style scoped>
