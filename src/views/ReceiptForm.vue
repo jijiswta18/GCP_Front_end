@@ -311,6 +311,7 @@ export default{
                 const data              = response.data.data
 
                 const receipt_date      = data.create_datetime
+                
                 var dateParts           = receipt_date.split(" ")
 
                 this.dataForm           = data
@@ -335,6 +336,10 @@ export default{
                 console.log("fechReceiptById", error);   
             }
         },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2f7a631c6f5ee632fcb60fdac1c04d5f8750f900
     }
 }
 </script>

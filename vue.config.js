@@ -16,7 +16,7 @@ module.exports = {
 
       },
       "^/api_gcp" :{
-        target: 'http://localhost:3000'
+        target: 'http://localhost:5000'
       },
       "^/CRAServices" :{
         target: 'http://172.20.22.45:8080'

@@ -3,6 +3,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+import axios from "axios";
+import Swal from 'sweetalert2';
+import CryptoJS from 'crypto-js';
+import moment from 'moment';
+
+import './globalMixin'; // เรียกใช้ Global Mixin
 
 import axios from "axios";
 import Swal from 'sweetalert2';

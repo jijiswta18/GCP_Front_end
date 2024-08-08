@@ -1,102 +1,107 @@
 <template>
      <div class="receiptlist">
-      <v-dialog v-if="loading" v-model="loading">
-        <LoaderData />
-      </v-dialog>
-      <div v-else>
-        <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
-        <div>
-          <v-text-field
-            v-model="search"
-            label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
-            solo
-            class="style-input-search"
-            single-line
-            hide-details="auto"
-            clearable 
-            dense
-          
-        >
-            <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-        </v-text-field>
-
-        <div class="box-excel d-flex mt-3">
-          <h3>ทั้งหมด {{ datas.length }} รายการ | </h3>
-          <div class="ml-2"  @click="exportToExcel"><img src="@/assets/images/excel.webp"/></div>
-        </div>
-        <br>
-  
-        <v-data-table
-          :headers="headers"
-          :items="datas"
-          item-key="id"
-          v-model="selectedItems"
-          show-select
-          :search="search"
-          :footer-props="{itemsPerPageOptions: [5, 10, 20]}"
-          class="table-regislist"
-        >
-     
-        <template v-slot:[`item.select`]="{ item }">
-            <v-checkbox
-                v-model="selectedItems"
-                :value="item"
-                :input-value="item.id"
-            ></v-checkbox>
-            </template>
-            <template v-slot:[`item.statusReceiptName`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceiptName }}</span></template>
-            <template v-slot:[`item.name`]="{ item }">{{item.title_name === '10013' ? item.title_name_other : item.titleName }} {{ item.name_th }}  {{  item.lastname_th  }}</template>
-            <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
-            <template v-slot:[`item.statusRegisterName`]="{ item }" >
-                <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
-                    {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
-                </span>
-            </template>
-            <template v-slot:[`item.detail`]="{ item }">
-                <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
-            </template>
-        </v-data-table>
-        </div>
-        <v-row justify="center">
-            <v-btn class="bg-green" @click="checkDailog">ออกใบเสร็จรับเงิน</v-btn>
-        </v-row>
-
-        <v-dialog
-            v-model="dialog"
-            width="500"
-            class="dialog-search"
-            >
-            <v-card>
-                <v-toolbar class="head-toolbar">
-                    <v-toolbar-title >ออกใบเสร็จรับเงิน</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-btn icon @click="dialog = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </v-toolbar>
-
-
-                  <v-container>
-                    <v-row>
-                      <v-col>
-                        <h4 class="text-left pt-1 pb-1">ยืนยันออกใบเสร็จรับเงิน</h4>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                
-
-                <v-divider></v-divider>
-
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-
-                  <div @click="dialog = false" class="btn-gray border-gray btn-receipt f-22 text-white mr-2">ปิด</div>
-                  <div @click="createReceipt" class="btn-success btn-receipt f-22 text-gray mr-2">ออกใบเสร็จรับเงิน</div>
-                </v-card-actions>
-            </v-card>
+        <v-dialog v-if="loading" v-model="loading">
+          <LoaderData />
         </v-dialog>
+        <div v-else>
+            
+          <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
+          <div>
+            <v-text-field
+              v-model="search"
+              label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
+              solo
+              class="style-input-search"
+              single-line
+              hide-details="auto"
+              clearable 
+              dense
+            
+            >
+              <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+            </v-text-field>
+
+            <div class="box-excel d-flex mt-3">
+              <h3>ทั้งหมด {{ datas.length }} รายการ | </h3>
+              <div class="ml-2"  @click="exportToExcel"><img src="@/assets/images/excel.webp"/></div>
+            </div>
+            <br>
+    
+            <v-data-table
+              :headers="headers"
+              :items="datas"
+              item-key="id"
+              v-model="selectedItems"
+              show-select
+              :search="search"
+              :footer-props="{itemsPerPageOptions: [5, 10, 20]}"
+              class="table-regislist"
+            >
+      
+            <template v-slot:[`item.select`]="{ item }">
+                <v-checkbox
+                    v-model="selectedItems"
+                    :value="item"
+                    :input-value="item.id"
+                ></v-checkbox>
+                </template>
+                <template v-slot:[`item.statusReceiptName`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceiptName }}</span></template>
+                <template v-slot:[`item.name`]="{ item }">{{item.title_name === '10013' ? item.title_name_other : item.titleName }} {{ item.name_th }}  {{  item.lastname_th  }}</template>
+                <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
+                <template v-slot:[`item.statusRegisterName`]="{ item }" >
+                    <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
+                        {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
+                    </span>
+                    <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
+                </template>
+                <!-- <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template> -->
+                <template v-slot:[`item.detail`]="{ item }">
+                    <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
+                </template>
+            </v-data-table>
+          </div>
+          <v-row justify="center">
+              <v-btn class="bg-green" @click="checkDailog">ออกใบเสร็จรับเงิน</v-btn>
+          </v-row>
+
+          <v-dialog
+              v-model="dialog"
+              width="500"
+              class="dialog-search"
+              >
+              <v-card>
+                  <v-toolbar class="head-toolbar">
+                      <v-toolbar-title >ออกใบเสร็จรับเงิน</v-toolbar-title>
+                      <v-spacer></v-spacer>
+                      <v-btn icon @click="dialog = false">
+                          <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                  </v-toolbar>
+
+
+                    <v-container>
+                      <v-row>
+                        <v-col>
+                          <h4 class="text-left pt-1 pb-1">ยืนยันออกใบเสร็จรับเงิน</h4>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  
+
+                  <v-divider></v-divider>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <div @click="dialog = false" class="btn-gray border-gray btn-receipt f-22 text-white mr-2">ปิด</div>
+                    <div @click="createReceipt" class="btn-success btn-receipt f-22 text-gray mr-2">ออกใบเสร็จรับเงิน</div>
+                  </v-card-actions>
+              </v-card>
+          </v-dialog>
+
+        </div>
+
       </div>
-    </div>
     
 </template>
 <script>
@@ -122,8 +127,8 @@ export default {
           { text: 'Reference No 1', align: 'center', value: 'reference_no_1', width: '15%' },
           { text: 'Reference No 2', align: 'center', value: 'reference_no_2', width: '15%' },
           { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
-            { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
-            { text: 'อีเมล', value: 'email', align: ' d-none' },
+          { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
+          { text: 'อีเมล', value: 'email', align: ' d-none' },
       ],
       datas: [],
       dialog: false,
@@ -148,7 +153,12 @@ export default {
       },
     },
     mounted(){
-      this.fechstatusRegisterReceipt()
+      setTimeout(() => {
+        this.fechstatusRegisterReceipt()
+        this.fetchSelectList()
+        }, 500);
+
+     
     },
     methods: {
 
@@ -376,14 +386,11 @@ export default {
 
         this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
 
-      },
-
-      formatDate(value) {
-            return this.$moment(value).format("YYYY-MM-DD HH:mm:ss")
-      },   
-      dialogReceipt(){
-        this.dialog = true
-      }
+        },
+    
+        dialogReceipt(){
+          this.dialog = true
+        }
     }
 }
 

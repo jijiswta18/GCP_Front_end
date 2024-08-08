@@ -130,6 +130,7 @@
           <v-row  justify="center">
             <v-col cols="11">
               <br>
+            
               <router-view></router-view>
               <br>
             </v-col>
@@ -143,7 +144,6 @@
 
 <script>
 import store from '../store/index.js';
-
 export default {
   data() {
     return {
@@ -157,7 +157,8 @@ export default {
       menuActiveClass: 'my-dropdown-active', // Custom class for dropdown when active
       activeItemClass: 'my-list-item-active', // Custom class for active list item
       collapsed: true,
-      user: store.getters.user,
+      // users: store.getters,
+      user: store.getters,
       checkDate: false,
       menu: false,
     };
@@ -176,6 +177,16 @@ export default {
       window.location.href = item.link;
     },
 
+    async getMenuRegisterOpening(){
+      const path = '/api_gcp/Register/getMenuRegisterOpening'
+      const response = await this.$axios.get(path);
+      this.checkDate = response.data
+
+      console.log(this.checkDate );
+
+
+      
+    },
     async logout() {
 
       this.$swal.fire({

@@ -315,18 +315,21 @@
 
 <script>
     export default{
+
         data: () => ({
            data: {},
            receiptData: {},
            admin_name: '',
         }),
+
         created(){
             const encryptedData         = this.$route.params.receiptData; // รับค่า receiptData จากพารามิเตอร์ใน URL
             const key                   = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
             const bytes                 = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
             const decryptedData         = bytes.toString(this.$cryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
-            this.receiptData         = JSON.parse(decryptedData);
+            this.receiptData            = JSON.parse(decryptedData);
         },
+
         mounted(){
             this.fechReceiptById()
 
@@ -336,8 +339,9 @@
              
                 
         },
+
          methods:{
-        
+          
             async fechReceiptById(){
                 try {
 
@@ -372,6 +376,8 @@
              
             },
 
+               
+     
         }
     }
 </script>

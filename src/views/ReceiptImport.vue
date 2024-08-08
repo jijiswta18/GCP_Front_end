@@ -181,8 +181,6 @@
                         this.data_success = success
                         this.success = success.length
                         this.unsuccess = unsuccess.length
-                        console.log("SUCCESS ====> " + this.success);
-                        console.log("UNSUCCESS ====> " + unsuccess.length);
                         this.dataLoaded = true;
                     } catch (error) {
                         console.error('Error loading data:', error);
@@ -202,7 +200,6 @@
                     }
                 },
 
-                    
                 await reader.readAsText(file);
 
                 }

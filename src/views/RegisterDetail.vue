@@ -3,13 +3,14 @@
         <v-dialog v-if="loading" v-model="loading">
             <LoaderData />
         </v-dialog>
+ 
         <div v-else>
             <v-card class="pd-125">
 
                 <h2 class="mb-3 d-flex">ข้อมูลผู้ลงทะเบียน | <div class="text-warning ml-2 cursor-pointer" @click="editRegister"> แก้ไขข้อมูล</div></h2>
                 <v-row>
 
-    
+                
                     <v-col>
                         <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลรายละเอียดผู้สมัคร </div>
                         <div class="box-profile">
@@ -90,7 +91,7 @@
                             <p v-if="data.register_type === '40002'"><span>กำหนดชำระเงินภายใน : </span><span class="text-danger">{{ data.end_date }}</span></p>     
                             <p v-if="data.register_type === '40002'"><span>สถานะออกใบเสร็จรับเงิน : </span><span :class="getColorClass(data.status_receipt)">{{ data.statusReceiptName }}</span></p>   
                         </div>
-                        <v-card  v-if="user != null" class="pd-125 mb-6">
+                        <v-card v-if="user != null" class="pd-125 mb-6">
                             <h2  class="mb-3 text-center">เมนูอัพเดทสถานะ</h2>
                             <div v-if="user?.approve_employee && data.status_register === '12002' && data.cancel_order === '11002'"  class="btn-blue text-white text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogApprove = true">อนุมัติ</div>
                             <div v-if="user?.approve_receipt && data.status_register === '12001' && data.register_type === '40002'" class="btn-success text-center py-3 px-3 mb-3 f-22 cursor-pointer" @click="dialogConfirmReceipt = true">ยืนยันชำระเงิน</div>
@@ -106,15 +107,15 @@
                             <div v-if="user?.receive_receipt && data.status_register === '12003' && data.status_receipt === '13001'" class="btn-success text-center py-3 px-3 mb-3 cursor-pointer f-22" @click="dialogReceipt = true">ออกใบเสร็จรับเงิน</div>
                         </v-card>
                     </v-col>
-    
+                    
                 </v-row>
             </v-card>   
 
             <!-- อนุมัติ -->
             <v-dialog
-                v-model="dialogApprove"
-                width="500"
-                class="dialog-search"
+            v-model="dialogApprove"
+            width="500"
+            class="dialog-search"
             >
                 <v-card>
                     <v-toolbar class="head-toolbar">
@@ -144,14 +145,14 @@
                 
                 <div  class="btn-blue btn-receipt f-22 text-white mr-2" @click="updateStatusRegister('12004', data.cancel_order)">อนุมัติ</div>
                 </v-card-actions>
-                </v-card>
+            </v-card>
             </v-dialog>
 
             <!-- ยืนยันชำระเงิน -->
             <v-dialog
-                v-model="dialogConfirmReceipt"
-                width="500"
-                class="dialog-search"
+            v-model="dialogConfirmReceipt"
+            width="500"
+            class="dialog-search"
             >
                 <v-card>
                     <v-toolbar class="head-toolbar">
@@ -375,6 +376,7 @@
 
         </div>
 
+      
     </div>
 </template>
 <script>
@@ -399,6 +401,7 @@ export default{
     }),
    
     mounted(){
+
         const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
         const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
         const bytes             = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
@@ -409,16 +412,16 @@ export default{
             this.fechRegisterById();
             this.fetchSelectList()
         }, 500);
-
     },
     methods:{
+        
         async fechRegisterById(){
-
             try {
 
                 const registerByIdPath          = `/api_gcp/Register/getRegisterById`
                 const response                  = await this.$axios.get(`${registerByIdPath}/` + this.registerId.id)
-                const datas                     = response.data.data[0]
+
+                const datas                     = response.data.data
                 const formattedEndDate          = this.$moment(datas.end_date).format('DD-MM-YYYY');
                 this.data                       = datas
                 this.data.name_th               = `${datas.name_th} ` + `${datas.lastname_th}`  
@@ -430,12 +433,13 @@ export default{
 
             } catch (error) {
                 this.loading = false;
+                console.log('fechRegisterById', error);
             }finally {
                 this.loading = false;
             }
         },
 
-         async updateStatusRegister(status, status_cancel, register_type){
+        async updateStatusRegister(status, status_cancel, register_type){
 
             try {
 
@@ -714,7 +718,8 @@ export default{
     }
 
     .v-dialog{
-        box-shadow: none!important;
-    }
+    box-shadow: none!important;
+  }
+
 
 </style>

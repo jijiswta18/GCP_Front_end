@@ -2,6 +2,8 @@
     <div class="registrationlist">
         <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
 
+
+
         <!-- สิทธิ์ Admin -->
         <div v-if="user">
             <v-dialog v-if="loading" v-model="loading">
@@ -19,7 +21,8 @@
                     </v-col>
                 </v-row>
 
-                <v-row no-gutters >
+ 
+                <v-row no-gutters>
                     <v-col cols="12" md="6"  class="px-2">
                         <p>ประเภทผู้สมัคร</p>
                         <SelectOption :options="filteredRegiterType" @selected="updateRegiterType" item-value="select_code"/>
@@ -31,8 +34,8 @@
                     </v-col>
                 </v-row>
 
+       
                 <div>
-
                     <v-text-field
                         v-model="search"
                         label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
@@ -45,12 +48,16 @@
                     >
                         <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
                     </v-text-field>
-                   
-                        <RegisterList :headers="headers" :datas="customFilter" type="employee" :search="search"/>
+                
+                    <!-- <div class="loader" v-if="loader"></div> -->
+                    <!-- <div v-else> -->
 
+                        <RegisterList :headers="headers" :datas="customFilter" type="employee" :search="search"/>
+                    <!-- </div> -->
                 </div>
 
             </div>
+        
         </div>
             
         <div v-else>
@@ -74,23 +81,32 @@
                     </div>
                 </v-col>
             </v-row>
-            <div v-if="dataProfile.length  > 0">
-                <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
-            </div>
+
+                <v-dialog v-if="loading" v-model="loading">
+                    <LoaderData />
+                </v-dialog>
+                <div v-else>
+                    <div v-if="dataProfile.length  > 0">
+                        <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+                    </div>
+                </div>
+
+                
+
+            
         </div>
         
     </div>
 
 </template>
 <script>
-
 import store from '../store/index.js';
 import RegisterList from '@/components/RegisterList.vue';
 import SelectOption from '@/components/SelectOption.vue';
 import LoaderData from '@/components/LoaderData.vue';
 
-export default {
 
+export default {
     components: { RegisterList, SelectOption, LoaderData},
     data: () => ({
         loading : true,
@@ -106,7 +122,6 @@ export default {
             { text: 'ID', align: 'center', value: 'id' },
             { text: 'วันเวลาที่ลงทะเบียน', align: 'center', value: 'create_date' },
             { text: 'ชื่อ', align: 'left', value: 'name' },
-
         ],
         dataProfile: [],
         headers: [
@@ -133,9 +148,12 @@ export default {
     mounted(){
         if(this.user){
             this.fetchSelectList();
+            // this.fetchCoursetList();
+
             setTimeout(() => {
                 this.fechRegister();
             }, 500);
+       
         }
     },
 
@@ -170,7 +188,6 @@ export default {
         }
     },
     methods: {
-
         async fechRegister(){
 
             try {
@@ -178,14 +195,16 @@ export default {
                const registerPath = `/api_gcp/Register/getRegister`
 
                const response = await this.$axios.get(`${registerPath}`)
-
+               
                this.datas = await response.data.data
 
             } catch (error) {
                 this.loading = false;
+                console.log('register', error);
             }finally {
                 this.loading = false;
             }
+
 
         },
 
@@ -205,11 +224,19 @@ export default {
 
 
                 if(response.data.exists){
-                    this.dataProfile = response.data.data
+
+
+                    this.loading = true;
+                    setTimeout(() => {
+                        this.dataProfile = response.data.data
+                        this.loading = false;
+                    }, 300);
+                    
+                    // this.dataProfile = response.data.data
 
                 }else{
                     
-                      this.$swal.fire({
+                    this.$swal.fire({
                         title: "ไม่พบข้อมูล",
                         icon: "warning"
                     });
@@ -246,7 +273,7 @@ export default {
         updateFood(value) {
             this.valueFood = value;
         },
-
+        
         detailRegister(value){
             const registerId = { id: value.id };
 
@@ -257,7 +284,6 @@ export default {
 
             this.$router.push({ name: 'registration-detail', params: { encryptedData }})
         },
-        
       
     } 
 

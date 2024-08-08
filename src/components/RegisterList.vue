@@ -34,7 +34,6 @@
 </template>
 
 <script>
-
     import * as XLSX from 'xlsx';
     export default {
     props: ['headers', 'datas', 'type', 'search'],
@@ -159,15 +158,18 @@
                                 const CheckPhonepath = `/api_gcp/Register/checkPhone`;
                                 const response = await this.$axios.get(CheckPhonepath, { params: { phone: checkPhone, email : check } });
                                 
-                            
-                                // console.log(response.exists.success);
+                                
                                 if (!response.data.success) {
                                     return this.$swal.showValidationMessage("ข้อมูลไม่ถูกต้อง");
                                 }
                                 
                                 return response.data;
                             } catch (error) {
-                                throw new Error(`Request failed: ${error}`);
+
+                                console.log(`Request failed: ${error}`);
+                                
+                                // throw new Error(`Request failed: ${error}`);
+                            
                             }
                         },
                         allowOutsideClick: () => !this.$swal.isLoading()
