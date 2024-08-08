@@ -68,8 +68,7 @@
 
 <script>
 
-// import axios from "axios";
-import Swal from 'sweetalert2';
+
 import store  from '../store/index.js';
 
 
@@ -95,9 +94,9 @@ export default {
         ],
         user: store.getters,
     }),
-        computed: {},
+    computed: {},
         
-        
+ 
     methods: {
         encodeBase64(str) {
            return btoa(str);
@@ -111,10 +110,9 @@ export default {
                         password: this.password,
                     })
 
-                    console.log(this.user);
                 if(this.user.checkUser === "204")
                     {
-                        await Swal.fire({
+                        await this.$swal.fire({
                         title: 'Error!',
                         text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
                         icon: 'error',
@@ -124,18 +122,20 @@ export default {
                 else{
                     await this.$router.push({ path: '/registration-list' });
                     location.reload();
-                    await Swal.fire({
+                    await this.$swal.fire({
                         position: 'center',
                         icon: 'success',
                         title: 'เข้าสู่ระบบสำเร็จ',
                         showConfirmButton: false,
                         timer: 1000
                     })
+
+                  
                 }
              
             } catch (error) {
                 console('Error fetching data:', error);
-                await Swal.fire({
+                await this.$swal.fire({
                     title: 'Error!',
                     text: 'รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
                     icon: 'error',

@@ -37,8 +37,8 @@
 <script>
     import axios from 'axios';
     import Swal from 'sweetalert2';
-    import moment from 'moment';
-    import CryptoJS from 'crypto-js';
+    // import moment from 'moment';
+    // import CryptoJS from 'crypto-js';
     import * as XLSX from 'xlsx';
     export default {
     props: ['headers', 'datas', 'type', 'search'],
@@ -78,7 +78,7 @@
                 const job_position          = item.job_position === '20008' ? item.job_position_other : item.jobPositionName
                 const food_allergy          = item.food_allergy === '50001' ? item.food_allergy_detail : item.foodAllergyName
                 const food                  = item.food === '70004' ? item.food_other : item.foodName
-                const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
+                const create_date           = this.$moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
 
                 const statusRegister        = item.statusRegisterName + '(' + item.cancelOrderName + ')'
 
@@ -115,9 +115,6 @@
                 };
             });
 
-            // console.log(extractedDataArray);
-
-
             const wb = XLSX.utils.book_new();
 
          
@@ -148,7 +145,7 @@
                     const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                     // Encrypt the receipt data
-                    const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+                    const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
                     this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
             }else{
@@ -168,15 +165,18 @@
                                 const CheckPhonepath = `/api_gcp/Register/checkPhone`;
                                 const response = await axios.get(CheckPhonepath, { params: { phone: checkPhone, email : check } });
                                 
-                            
-                                // console.log(response.exists.success);
+                                
                                 if (!response.data.success) {
                                     return Swal.showValidationMessage("ข้อมูลไม่ถูกต้อง");
                                 }
                                 
                                 return response.data;
                             } catch (error) {
-                                throw new Error(`Request failed: ${error}`);
+
+                                console.log(`Request failed: ${error}`);
+                                
+                                // throw new Error(`Request failed: ${error}`);
+                            
                             }
                         },
                         allowOutsideClick: () => !Swal.isLoading()
@@ -193,7 +193,7 @@
                         const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
                         // Encrypt the receipt data
-                        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+                        const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
                         this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
                         
@@ -211,26 +211,8 @@
             }
        
         },
-        formatDate(value) {
-            return moment(value).format("YYYY-MM-DD HH:mm:ss")
-        },
-        getColorClass (value) {
-
-            switch (value) {
-                case '12001':
-                return 'text-gray';
-                case '12002':
-                return 'text-gray';
-                case '12003':
-                return 'text-success';
-                case '12004':
-                return 'text-success';
-                case '11001':
-                return 'text-danger';
-                default:
-                return '';
-            }
-        },
+      
+       
     },
     
 }

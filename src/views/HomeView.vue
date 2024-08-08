@@ -20,6 +20,8 @@
             </v-list-item>
           </router-link>
 
+
+        
           <router-link 
             class="d-flex align-center menu-link "
             active-class="activemenu"
@@ -27,9 +29,7 @@
             @click.prevent="handleRegistration"
           >
 
-            <!-- <v-list-item link> -->
-            <!-- <v-list-item link > -->
-            <v-list-item link v-if="user?.menu_register || checkDate">
+            <v-list-item link v-if="user.user?.menu_register || checkDate">
                 <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
             </v-list-item>
           </router-link>
@@ -47,7 +47,9 @@
 
         <div class="box-right">
 
-          <v-menu v-if="user != null"
+         
+         
+          <v-menu v-if="user.user != null"
             v-model="menu"
             offset-y
             :close-on-content-click="false"
@@ -56,16 +58,16 @@
           >
             <template v-slot:activator="{ on }">
               <v-btn v-on="on" class="btn-profile h-48">
-                {{user.employee_id}}
+                {{user.user.employee_id}}
                 <v-icon>{{ menuOpen ? 'mdi-menu-up' : 'mdi-menu-down' }}</v-icon>
               </v-btn>
             </template>
 
             <v-list>
-              <v-list-item v-if="user?.upload_receipt" to="/receipt-import" >
+              <v-list-item v-if="user.user?.upload_receipt" to="/receipt-import" >
                 <v-list-item-title>อัพโหลดข้อมูลการชำระเงิน</v-list-item-title>
               </v-list-item>
-              <v-list-item v-if="user?.check_register_receipt" to="/receipt-list" >
+              <v-list-item v-if="user.user?.check_register_receipt" to="/receipt-list" >
                 <v-list-item-title>สำหรับเจ้าหน้าที่การเงิน</v-list-item-title>
               </v-list-item>
             <v-list-item class="cursor-pointer">
@@ -108,7 +110,7 @@
               active-class="activemenu"
               :to="{ name: 'registration'}"              >
             
-              <v-list-item link v-if="user?.menu_register || checkDate">
+              <v-list-item link v-if="user.user?.menu_register || checkDate">
               <!-- <v-list-item link > -->
                   <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
               </v-list-item>
@@ -134,6 +136,7 @@
           <v-row  justify="center">
             <v-col cols="11">
               <br>
+            
               <router-view></router-view>
               <br>
             </v-col>
@@ -147,9 +150,9 @@
 
 <script>
 import store from '../store/index.js';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import { mapGetters } from 'vuex';
+// import axios from 'axios';
+// import Swal from 'sweetalert2';
+// import { mapGetters } from 'vuex';
 export default {
   data() {
     return {
@@ -163,13 +166,14 @@ export default {
       menuActiveClass: 'my-dropdown-active', // Custom class for dropdown when active
       activeItemClass: 'my-list-item-active', // Custom class for active list item
       collapsed: true,
-      user: store.getters.user,
+      // users: store.getters,
+      user: store.getters,
       checkDate: false,
       menu: false,
     };
   },
   computed: {
-    ...mapGetters(['isAuthenticated'])
+    // ...mapGetters(['isAuthenticated'])
   },
   mounted(){
     this.getMenuRegisterOpening()
@@ -188,15 +192,17 @@ export default {
 
     async getMenuRegisterOpening(){
       const path = '/api_gcp/Register/getMenuRegisterOpening'
-      const response = await axios.get(path);
+      const response = await this.$axios.get(path);
       this.checkDate = response.data
+
+      console.log(this.checkDate );
 
 
       
     },
     async logout() {
 
-      Swal.fire({
+      this.$swal.fire({
         icon: "warning",
         title: "คุณต้องการออกจากระบบ",
         showDenyButton: false,
@@ -212,7 +218,7 @@ export default {
           await location.reload();
 
         } else if (result.isDenied) {
-          Swal.fire("Changes are not saved", "", "info");
+          this.$swal.fire("Changes are not saved", "", "info");
         }
       });
     }

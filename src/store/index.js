@@ -11,11 +11,13 @@ const getDefaultState = () => {
   return {
     user: null,
     checkUser: null,
-    isLoggedIn: !!localStorage.getItem('isLoggedIn')
+    isLoggedIn: !!localStorage.getItem('isLoggedIn'),
+    expiryDate: null
+    
   }
 }
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
 
   plugins: [new VuexPersistence().plugin],
   state: getDefaultState(),
@@ -31,11 +33,15 @@ export default new Vuex.Store({
     },
     isLoggedIn(state){
       return state.isLoggedIn
-    }
+    },
+    expiryDate(state){
+      return state.expiryDate
+    },
+    // isAdmin: state => state.user === null && state.user.roles.includes('user'),
 
   },
   mutations: {
-    authUser (state, data) {
+    setUser (state, data) {
       state.user = data
       state.isLoggedIn = true;
       localStorage.setItem('isLoggedIn', true); // Set isLoggedIn in localStorage
@@ -43,15 +49,16 @@ export default new Vuex.Store({
     checkUser (state, data) {
       state.checkUser = data
     },
-    
-    clearAuthUser (state){
+    checkExpiryDate (state, expiryDate) {
+      state.expiryDate = expiryDate;
+    },
+    clearUser (state){
 
-      state.user = null
-      state.checkUser = null
-      localStorage.removeItem('expirationDate')
+      state.user = null;
+      state.checkUser = null;
       state.isLoggedIn = false;
       localStorage.removeItem('isLoggedIn'); // Clear isLoggedIn from localStorage
-
+      state.expiryDate = null
     }
   },
   actions: {
@@ -59,63 +66,68 @@ export default new Vuex.Store({
   
     async login ( {commit}, authData){
   
-      commit('checkUser', null);
+      // commit('checkUser', null);
     
       let adPath = `/active_directory/login`
               
       let response = await axios.post(adPath, authData);
 
-   
-      // commit('authUser', response.data.result)
       if(response.data.code === "200"){
 
+        const fd = response.data.result
+
+        const checkEmployeePath = `/api_gcp/ManageEmployee/updateEmployee`
+
+        const responseCheck = await axios.post(`${checkEmployeePath}`, fd);
+
+
+
+        
+        const user = responseCheck.data.result
+
         
 
-        // const responseEmployee =  axios.get(`/api_phonebook/phonebook/employee_info/901836`);
-
-        // console.log(responseEmployee);
-
-        let fd = response.data.result
-
-        let checkEmployeePath = `/api_gcp/ManageEmployee/updateEmployee`
-
-        let responseCheck = await axios.post(`${checkEmployeePath}`, fd);
+        console.log(user);
         
-
-        const expirationTime = await 1000 * 60 * 60; // 1 hour
-
-        const now = await Date.now();
         commit('checkUser', "200");
-        commit('authUser', responseCheck.data.result)
+        commit('setUser', user)
+
+       
 
         // commit('setSessionTimeout',  now + expirationTime)
  
-        localStorage.setItem("expirationDate", now + expirationTime);
+        const expiryDate = new Date().getTime() + (60 * 60 * 1000); // 5 minutes from now
+        commit('checkExpiryDate', expiryDate);
+        localStorage.setItem('loginExpiryDate', expiryDate); // Save expiry date in local storage
 
       }
       else if(response.data.code === "204"){
         commit('checkUser', "204");
-        commit('authUser', null)
+        commit('setUser', null)
       }
     },
 
     async logout({commit}){
 
-      commit('clearAuthUser')
+      commit('clearUser')
     },
 
-    checkLogin({ commit }){
+    checkLogin({ commit }) {
 
-      const expiration = localStorage.getItem('expirationDate');
+      const expiryDate = localStorage.getItem('loginExpiryDate');
 
-      if(expiration < Date.now()){
-        console.log('expire','now')
-        commit('clearAuthUser')
-        return
+      if (expiryDate && parseInt(expiryDate) > new Date().getTime()) {
+        commit('checkExpiryDate', expiryDate);
+      } else {
+
+        commit('clearUser');
+        localStorage.removeItem('loginExpiryDate');
       }
-
     },
 
   },
 
-})
+});
+
+export default store;
+

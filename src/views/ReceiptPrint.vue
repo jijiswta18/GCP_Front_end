@@ -322,21 +322,23 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import CryptoJS from 'crypto-js';
+
     export default{
+
         data: () => ({
            data: {},
            receiptData: {},
            admin_name: '',
         }),
+
         created(){
             const encryptedData         = this.$route.params.receiptData; // รับค่า receiptData จากพารามิเตอร์ใน URL
             const key                   = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
-            const bytes                 = CryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
-            const decryptedData         = bytes.toString(CryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
-            this.receiptData         = JSON.parse(decryptedData);
+            const bytes                 = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
+            const decryptedData         = bytes.toString(this.$cryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
+            this.receiptData            = JSON.parse(decryptedData);
         },
+
         mounted(){
             this.fechReceiptById()
 
@@ -347,22 +349,8 @@
                 
         },
 
-        filters: {
-            formatNumber(value) {
-                return new Intl.NumberFormat().format(value)
-            },
-        },
-
          methods:{
-            getThaiDate(item){
-
-                if (item){
-                var d = new Date(item);
-                return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
-                }else{
-                return "";
-                }            
-            },
+          
             async fechReceiptById(){
                 try {
 
@@ -373,7 +361,7 @@
 
                     const receiptDetailPath = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
                     
-                    const response          =  await axios.get(`${receiptDetailPath}`)
+                    const response          =  await this.$axios.get(`${receiptDetailPath}`)
 
                     this.data               = await response.data.data
 
@@ -398,113 +386,7 @@
             },
 
                
-        DecimalText(txt, unitName) {
-            if(txt == undefined)
-            {
-                return;
-            }
-
-            var thaiBathText = "";
-
-            var valueText = txt.toString(); //.split(".")
-            var unitOrder = 1;
-    
-            
-            // Manage Full Value
-            for (var i = valueText.length; i >= 1; i--) {
-                if (i !== 1) {                    
-                    thaiBathText = this.GetValueName(unitOrder, parseInt(valueText.charAt(i - 1))) + this.GetUnitName(unitOrder, parseInt(valueText.charAt(i - 1))) + thaiBathText;
-                } else {
-                    thaiBathText = this.GetValueName(unitOrder, parseInt(valueText.charAt(i - 1)), true) + this.GetUnitName(unitOrder, parseInt(valueText.charAt(i - 1)), true) + thaiBathText;
-                }
-
-                if (unitOrder === 7) unitOrder = 1;
-                unitOrder += 1;
-            }
-
-           
-
-            return thaiBathText  + unitName;
-        },
-
-        GetUnitName(unitOrder, value) {
-            var unitName = "";
-            if (value === 0 && unitOrder < 7) return unitName;
-            switch (unitOrder) {
-                case 1:
-                    break;
-                case 2:
-                    unitName = "สิบ";
-                    break;
-                case 3:
-                    unitName = "ร้อย";
-                    break;
-                case 4:
-                    unitName = "พัน";
-                    break;
-                case 5:
-                    unitName = "หมื่น";
-                    break;
-                case 6:
-                    unitName = "แสน";
-                    break;
-                case 7:
-                    unitName = "ล้าน";
-                    break;
-            }
-
-            return unitName;
-        },
-
-        GetValueName(unitOrder, value, lastOrder = false, isDecimal = false) {
-            var valueName = "";
-            switch (value) {
-                case 0:
-                    if (lastOrder || isDecimal) {
-                        valueName = "ศูนย์";
-                    }
-                    break;
-                case 1:
-                    if (isDecimal) valueName = "หนึ่ง";
-                    else {
-                        if ((lastOrder && unitOrder !== 2) || (unitOrder > 2 && unitOrder < 7)) {
-                            valueName = "หนึ่ง";
-                        } else if (unitOrder !== 2) {
-                            valueName = "เอ็ด";
-                        }
-                    }
-                    break;
-                case 2:
-                    if (unitOrder === 2 && !isDecimal) {
-                        valueName = "ยี่";
-                    } else valueName = "สอง";
-                    break;
-                case 3:
-                    valueName = "สาม";
-                    break;
-                case 4:
-                    valueName = "สี่";
-                    break;
-                case 5:
-                    valueName = "ห้า";
-                    break;
-                case 6:
-                    valueName = "หก";
-                    break;
-                case 7:
-                    valueName = "เจ็ด";
-                    break;
-                case 8:
-                    valueName = "แปด";
-                    break;
-                case 9:
-                    valueName = "เก้า";
-                    break;
-            }
-
-            return valueName;
-        }
-
+     
         }
     }
 </script>

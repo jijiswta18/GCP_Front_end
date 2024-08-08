@@ -42,8 +42,6 @@
 </template>
 <script>
 
-import axios from 'axios';
-import moment from 'moment';
 import store from '../store/index.js'
 
 export default {
@@ -70,15 +68,15 @@ export default {
                             "employee_id"            : this.employee.employee_id,
                             "roles"                  : this.employee.employee_roles,
                             "create_by"              : this.check_roles.employee_id,
-                            "create_date"            : moment().format('YYYY-MM-DD HH:mm:ss'),
+                            "create_date"            : this.$moment().format('YYYY-MM-DD HH:mm:ss'),
                             "modified_by"            : this.check_roles.employee_id,
-                            "modified_date"          : moment().format('YYYY-MM-DD HH:mm:ss'),
+                            "modified_date"          : this.$moment().format('YYYY-MM-DD HH:mm:ss'),
                     }
 
 
                     let createEmployeePath = `/api_gcp/ManageEmployee/createEmployee`
 
-                    await axios.post(`${createEmployeePath}`, fd)
+                    await this.$axios.post(`${createEmployeePath}`, fd)
 
 
                 } catch (error) {

@@ -1,114 +1,117 @@
 <template>
      <div class="receiptlist">
-  
-        <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
-        <div>
-          <v-text-field
-            v-model="search"
-            label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
-            solo
-            class="style-input-search"
-            single-line
-            hide-details="auto"
-            clearable 
-            dense
-          
-        >
-            <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
-        </v-text-field>
-
-        <div class="box-excel d-flex mt-3">
-          <h3>ทั้งหมด {{ datas.length }} รายการ | </h3>
-          <div class="ml-2"  @click="exportToExcel"><img src="@/assets/images/excel.webp"/></div>
-        </div>
-        <br>
-  
-        <v-data-table
-          :headers="headers"
-          :items="datas"
-          item-key="id"
-          v-model="selectedItems"
-          show-select
-          :search="search"
-          :footer-props="{itemsPerPageOptions: [5, 10, 20]}"
-          class="table-regislist"
-        >
-     
-        <template v-slot:[`item.select`]="{ item }">
-            <v-checkbox
-                v-model="selectedItems"
-                :value="item"
-                :input-value="item.id"
-            ></v-checkbox>
-            </template>
-            <template v-slot:[`item.statusReceiptName`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceiptName }}</span></template>
-            <template v-slot:[`item.name`]="{ item }">{{item.title_name === '10013' ? item.title_name_other : item.titleName }} {{ item.name_th }}  {{  item.lastname_th  }}</template>
-            <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
-            <template v-slot:[`item.statusRegisterName`]="{ item }" >
-                <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
-                    {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
-                </span>
-                <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
-            </template>
-            <!-- <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template> -->
-            <template v-slot:[`item.detail`]="{ item }">
-                <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
-            </template>
-        </v-data-table>
-        </div>
-        <v-row justify="center">
-            <v-btn class="bg-green" @click="checkDailog">ออกใบเสร็จรับเงิน</v-btn>
-        </v-row>
-
-        <v-dialog
-            v-model="dialog"
-            width="500"
-            class="dialog-search"
-            >
-            <v-card>
-                <v-toolbar class="head-toolbar">
-                    <v-toolbar-title >ออกใบเสร็จรับเงิน</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-btn icon @click="dialog = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </v-toolbar>
-
-
-                  <v-container>
-                    <v-row>
-                      <v-col>
-                        <h4 class="text-left pt-1 pb-1">ยืนยันออกใบเสร็จรับเงิน</h4>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                
-
-                <v-divider></v-divider>
-
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-
-                  <div @click="dialog = false" class="btn-gray border-gray btn-receipt f-22 text-white mr-2">ปิด</div>
-                  <div @click="createReceipt" class="btn-success btn-receipt f-22 text-gray mr-2">ออกใบเสร็จรับเงิน</div>
-                </v-card-actions>
-            </v-card>
+        <v-dialog v-if="loading" v-model="loading">
+          <LoaderData />
         </v-dialog>
+        <div v-else>
+            
+          <h2 class="mb-3">ตรวจสอบการลงทะเบียน</h2>
+          <div>
+            <v-text-field
+              v-model="search"
+              label="อีเมล (ไม่ต้องเว้นวรรค), ชื่อ, นามสกุล, Reference N0 1, Reference N0 2"
+              solo
+              class="style-input-search"
+              single-line
+              hide-details="auto"
+              clearable 
+              dense
+            
+            >
+              <template v-slot:prepend-inner>คำค้นหา / Keyword</template>
+            </v-text-field>
 
-     </div>
+            <div class="box-excel d-flex mt-3">
+              <h3>ทั้งหมด {{ datas.length }} รายการ | </h3>
+              <div class="ml-2"  @click="exportToExcel"><img src="@/assets/images/excel.webp"/></div>
+            </div>
+            <br>
+    
+            <v-data-table
+              :headers="headers"
+              :items="datas"
+              item-key="id"
+              v-model="selectedItems"
+              show-select
+              :search="search"
+              :footer-props="{itemsPerPageOptions: [5, 10, 20]}"
+              class="table-regislist"
+            >
+      
+            <template v-slot:[`item.select`]="{ item }">
+                <v-checkbox
+                    v-model="selectedItems"
+                    :value="item"
+                    :input-value="item.id"
+                ></v-checkbox>
+                </template>
+                <template v-slot:[`item.statusReceiptName`]="{ item }" ><span :class="getColorClass(item.status_receipt)">{{ item.statusReceiptName }}</span></template>
+                <template v-slot:[`item.name`]="{ item }">{{item.title_name === '10013' ? item.title_name_other : item.titleName }} {{ item.name_th }}  {{  item.lastname_th  }}</template>
+                <template v-slot:[`item.create_date`]="{ item }">{{ formatDate(item.create_date) }}</template>
+                <template v-slot:[`item.statusRegisterName`]="{ item }" >
+                    <span :class="getColorClass(item.cancel_order === '11001' ? item.cancel_order : item.status_register)">
+                        {{ item.cancel_order === '11001' ? item.cancelOrderName : item.statusRegisterName }}
+                    </span>
+                    <!-- <span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span> -->
+                </template>
+                <!-- <template v-slot:[`item.statusRegisterName`]="{ item }" ><span :class="getColorClass(item.status_register)">{{ item.statusRegisterName }}</span></template> -->
+                <template v-slot:[`item.detail`]="{ item }">
+                    <div @click="detailRegister(item)" class="btn-detail">ข้อมูลการลงทะเบียน</div>
+                </template>
+            </v-data-table>
+          </div>
+          <v-row justify="center">
+              <v-btn class="bg-green" @click="checkDailog">ออกใบเสร็จรับเงิน</v-btn>
+          </v-row>
+
+          <v-dialog
+              v-model="dialog"
+              width="500"
+              class="dialog-search"
+              >
+              <v-card>
+                  <v-toolbar class="head-toolbar">
+                      <v-toolbar-title >ออกใบเสร็จรับเงิน</v-toolbar-title>
+                      <v-spacer></v-spacer>
+                      <v-btn icon @click="dialog = false">
+                          <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                  </v-toolbar>
+
+
+                    <v-container>
+                      <v-row>
+                        <v-col>
+                          <h4 class="text-left pt-1 pb-1">ยืนยันออกใบเสร็จรับเงิน</h4>
+                        </v-col>
+                      </v-row>
+                    </v-container>
+                  
+
+                  <v-divider></v-divider>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <div @click="dialog = false" class="btn-gray border-gray btn-receipt f-22 text-white mr-2">ปิด</div>
+                    <div @click="createReceipt" class="btn-success btn-receipt f-22 text-gray mr-2">ออกใบเสร็จรับเงิน</div>
+                  </v-card-actions>
+              </v-card>
+          </v-dialog>
+
+        </div>
+
+      </div>
     
 </template>
 <script>
 
-import axios from 'axios';
-import moment from 'moment';
-import Swal from 'sweetalert2';
 import store from '@/store';
-import CryptoJS from 'crypto-js';
 import * as XLSX from 'xlsx';
+import LoaderData from '@/components/LoaderData.vue';
 
 export default {
-
+  components: {LoaderData},
     data: () => ({
       user: store.getters.user,
       search: '',
@@ -124,12 +127,13 @@ export default {
           { text: 'Reference No 1', align: 'center', value: 'reference_no_1', width: '15%' },
           { text: 'Reference No 2', align: 'center', value: 'reference_no_2', width: '15%' },
           { text: 'ชื่อ', value: 'name_th',  align: ' d-none' },
-            { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
-            { text: 'อีเมล', value: 'email', align: ' d-none' },
+          { text: 'นามสกุล', value: 'lastname_th', align: ' d-none'},
+          { text: 'อีเมล', value: 'email', align: ' d-none' },
       ],
       datas: [],
       dialog: false,
-      receipt_no: ""
+      receipt_no: "",
+      loading: true
     }),
     watch: {
     selectAll(value) {
@@ -149,7 +153,11 @@ export default {
     },
   },
     mounted(){
-      this.fechstatusRegisterReceipt()
+      setTimeout(() => {
+        this.fechstatusRegisterReceipt()
+        this.fetchSelectList()
+        }, 500);
+
      
     },
     methods: {
@@ -171,7 +179,7 @@ export default {
             const job_position          = item.job_position === '20008' ? item.job_position_other : item.jobPositionName
             const food_allergy          = item.food_allergy === '50001' ? item.food_allergy_detail : item.foodAllergyName
             const food                  = item.food === '70004' ? item.food_other : item.foodName
-            const create_date           = moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
+            const create_date           = this.$moment(item.create_date).format("YYYY-MM-DD HH:mm:ss")
 
             const statusRegister        = item.statusRegisterName + '(' + item.cancelOrderName + ')'
 
@@ -223,7 +231,7 @@ export default {
         if(this.selectedItems.length){
           this.dialog = true
         }else{
-            Swal.fire({
+            this.$swal.fire({
               icon: 'warning',
               title: "กรุณาเลือกข้อมูล",
               // text: message
@@ -245,7 +253,7 @@ export default {
             const fdCreateReceipt = {
 
               master_id             : this.selectedItems[i].id,
-              project_code          : "0041",
+              project_code          : this.project_code,
               payment_type_code     : "01",
               price                 : this.selectedItems[i].course_price,
               reference_1           : this.selectedItems[i].reference_no_1,
@@ -263,7 +271,7 @@ export default {
 
             // console.log(fdCreateReceipt);
 
-            const response = await axios.post('/api/create_receipt', fdCreateReceipt, {
+            const response = await this.$axios.post('/api/create_receipt', fdCreateReceipt, {
               headers: {
                   'accept': '*/*',
                   'accept-language': 'en-US,en;q=0.8',
@@ -280,7 +288,7 @@ export default {
 
           }
 
-          await Swal.fire({
+          await this.$swal.fire({
             icon: 'success',
             title: 'บันทึกสำเร็จ',
             text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
@@ -303,7 +311,7 @@ export default {
       async updateStatusReceipt(data,status){
             try {
              
-                let currentDate = moment();
+                let currentDate = this.$moment();
             
                 let fd = {
                     "register_id"       : data.id,
@@ -314,7 +322,7 @@ export default {
 
                 let updateStatusRegisterPath = `/api_gcp/Register/updateStatusReceipt`
 
-                await axios.post(`${updateStatusRegisterPath}`, fd)
+                await this.$axios.post(`${updateStatusRegisterPath}`, fd)
 
                 } catch (error) {
                     console.log('updateStatusRegister', error);
@@ -326,7 +334,7 @@ export default {
         try {
           const statusRegisterReceiptPath = `/api_gcp/Register/statusRegisterReceipt`
 
-          const response = await axios.get(`${statusRegisterReceiptPath}`)
+          const response = await this.$axios.get(`${statusRegisterReceiptPath}`)
 
           this.datas = response.data.data
 
@@ -343,7 +351,7 @@ export default {
 
               const receiptDetailPath     = `/api/detail_receipt/${reference_no_1}/${reference_no_2}/${payment_type_code}`
 
-              const detailReceipt         =  await axios.get(`${receiptDetailPath}`)
+              const detailReceipt         =  await this.$axios.get(`${receiptDetailPath}`)
 
               get_receipt_no             = detailReceipt.data.data.receipt_no
 
@@ -360,7 +368,10 @@ export default {
           
 
         } catch (error) {
+          this.loading = false;
             console.log('register', error);
+        }finally {
+          this.loading = false;
         }
 
       },
@@ -371,35 +382,12 @@ export default {
         const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
 
         // Encrypt the receipt data
-        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
+        const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
 
         this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
 
         },
-        formatDate(value) {
-            return moment(value).format("YYYY-MM-DD HH:mm:ss")
-        },
-        getColorClass (value) {
-
-            switch (value) {
-                case '12001':
-                return 'text-gray';
-                case '12002':
-                return 'text-gray';
-                case '12003':
-                return 'text-success';
-                case '12004':
-                return 'text-success';
-                case '13001':
-                return 'text-gray';
-                case '13002':
-                return 'text-success';
-                case '11001':
-                return 'text-danger';
-                default:
-                return '';
-            }
-        },
+    
         dialogReceipt(){
           this.dialog = true
         }
