@@ -336,10 +336,6 @@ export default{
                 console.log("fechReceiptById", error);   
             }
         },
-<<<<<<< HEAD
-=======
-
->>>>>>> 2f7a631c6f5ee632fcb60fdac1c04d5f8750f900
     }
 }
 </script>
