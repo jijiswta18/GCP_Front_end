@@ -82,14 +82,23 @@
                 </v-col>
             </v-row>
 
+            <div v-if="dataProfile.length  > 0">
                 <v-dialog v-if="loading" v-model="loading">
+                    <LoaderData />
+                </v-dialog>
+                <div v-else>
+                    <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
+                </div>
+                
+            </div>
+                <!-- <v-dialog v-if="loading" v-model="loading">
                     <LoaderData />
                 </v-dialog>
                 <div v-else>
                     <div v-if="dataProfile.length  > 0">
                         <RegisterList :headers="headersProfile" :datas="dataProfile" type="user"/>
                     </div>
-                </div>
+                </div> -->
 
                 
 

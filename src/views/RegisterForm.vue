@@ -3,6 +3,7 @@
         <h2 class="mb-3">{{ formTitle  }}</h2> 
         <p class="text-required">* จำเป็นต้องระบุ / Required Fields</p>
         <v-form  ref="form" lazy-validation>
+        <!-- <v-form  ref="form"  v-model="valid" lazy-validation> -->
             <div class="box-seminar">
                 <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ลงทะเบียนเข้ารับการอบรม</div> 
                 <v-row no-gutters>
@@ -252,6 +253,23 @@
                  
                 </v-row>
             
+
+                <!-- <v-row no-gutters v-if="register_type === '40002'" >
+                    <v-col cols="12" class="px-2">
+                        <p class="style-label">ชื่อสถานที่ปฏิบัติงาน : <span>*</span></p>
+                        <v-text-field
+                            v-model="dataFrom.company_name"
+                            ref="CompanyNameField"
+                            label="ชื่อสถานที่ปฏิบัติงาน"
+                            dense
+                            solo
+                            single-line
+                            clearable 
+                            class="style-input"
+                        ></v-text-field>
+                    </v-col>
+                </v-row> -->
+
                 <v-row no-gutters v-if="register_type === '40002'">
                     <v-col cols="12" class="px-2">
                         <p class="style-label">ที่อยู่สถานที่ทำงานเลขที่ : <span>* (โปรดระบุชื่อองค์กร / สังกัด /หน่วยงาน)</span></p>
@@ -614,6 +632,20 @@
 
             </div>
 
+            <!-- <div class="box-receipt mt-5" v-if="register_type === '40002'" >
+                <div class="mb-3 h5 bg-blue py-4 px-4 text-white">ข้อมูลใบเสร็จรับเงิน</div>
+                <v-row no-gutters>
+                    <v-col cols="12">
+                        <p class="style-label"> เลือกประเภทข้อมูลใบเสร็จรับเงิน : <span>*</span></p>
+                        <v-radio-group v-model="dataFrom.receipt_order"  ref="SelectReceiptField">
+                            <v-radio v-for="option in filteredOptionReceipt" :key="option.id" :label="option.name" :value="option.select_code">
+                            </v-radio>
+                        </v-radio-group>
+                        
+                    </v-col>
+                </v-row>  
+            </div> -->
+            
             <div class="box-coment">
                     
                 <v-row no-gutters>
@@ -658,6 +690,7 @@
             </div>
                 
         </v-form>
+
     </div>
 </template>
 
@@ -671,6 +704,7 @@
             dataFrom: {},
            
             options: [],
+            // optionsCourses: [],
             valueCheckboxCourse: [],
             selectedItems: [],
           
@@ -686,7 +720,9 @@
             emailRules: [
                 v => /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(v) || 'รูปแบบอีเมล์ไม่ถูกต้อง'
             ],
-       
+            // nameThRules: [
+            //     v => /^[\u0E00-\u0E7F\s]+$/.test(v) || 'กรอกเป็นภาษาไทยเท่านั้น'
+            // ],
             limitCourse: '',
             limitCourseOther: '',
             checkLimitCourseOther: false,
@@ -695,8 +731,6 @@
             emailType: 'text',
             showPassword: false,
             isValidThaiText: true,
-            checkDate: false,
-            user: store.getters.user,
         }),
         watch: {
             'register_type': function(newValue) {
@@ -786,9 +820,6 @@
 
 
         },
-        created(){
-            this.getMenuRegisterOpening()
-        },
         mounted(){
             this.fetchProvinces();
             this.fetchSelectList();
@@ -809,473 +840,7 @@
                 // Load data based on this.$route.params.id for editing
             }
         },
-
         methods: {
-
-async checkEmployee (){
-    try {
-        const data = {
-            "username": this.dataFrom.employee_id,
-            "password": this.dataFrom.password,
-        }
-        const adPath = `/active_directory/login`
-        const response = await this.$axios.post(adPath, data);
-
-
-
-
-
-        if(response.data.code === '200'){
-            this.check_employee = false;
-        }else{
-            this.check_employee = true;
-        }
-
-        // if(!this.check_employee){
-        //     await this.$swal.fire({
-        //         icon: 'success',
-        //         title: 'ยืนยันตัวตนสำเร็จ',
-        //         showConfirmButton: false,
-        //         timer: 1500
-        //     })
-        // }
-
-    } catch (error) {
-        console.log('checkEmployee', error);
-    }
-  
-},
-async getCountRegister(){
-    try {
-        const countRegisterPath          = `/api_gcp/Register/CounterRegister`
-        const response                  = await this.$axios.get(`${countRegisterPath}`)
-
-        if(response.data.COUNT >= parseInt(this.limitCourse)){
-            //เต็ม
-            // full = true;
-            this.checkLimitCourse = true;
-            this.checkLimitCourseOther = true;
-
-        }else{
-            //สามารถสมัครได้
-            // full = false;    
-            this.checkLimitCourse = false;           
-            // console.log("onsite ==== >", this.limitCourse)
-
-            if(response.data.sum_check_course_other >= parseInt(this.limitCourseOther)){
-                //เต็ม
-                this.checkLimitCourseOther = true;
-                // console.log("onsite_other ==== <", this.limitCourseOther)
-
-            }else{ 
-                //สามารถสมัครได้
-                this.checkLimitCourseOther = false;
-                // console.log("onsite_other ==== >", this.limitCourseOther)
-                
-            }
-        }
-
-
-        if(this.checkLimitCourse){
-            this.$swal.fire({
-                icon: 'warning',
-                html: 'ขณะนี้ระบบลงทะเบียนหลักสูตร "แนวทางปฏิบัติการวิจัยทางคลินิคที่ดี"2567 แบบ Onsite เต็มจำนวน  <br/>อยู่ในระหว่างตรวจสอบสถานะชำระเงิน <br/> สามารถกดลงทะเบียนอีกครั้งในวันพุธของสัปดาห์ถัดไป',  
-        
-            });
-        }
-
-            
-    } catch (error) {
-        console.log('getCountRegister', error);
-    }
- 
-},
-
-async saveRegister(){
-
-    const { 
-        title_name, title_name_other, 
-        name_th, lastname_th, name_en, lastname_en, education,
-        receipt_name, id_card_number,  company_address, 
-        phone, phone_other, email1, email2, confirm_receipt,
-        employee_id, job_position, job_position_other, work_experience,
-        food_allergy, food_allergy_detail, food, food_other,
-        confirm_register
-    } = this.dataFrom;
-
-    if (!this.register_type) return this.showError('กรุณาระบุประเภทผู้สมัคร', this.$refs.RegisterTypeField);
-    //  if (this.valueCheckboxCourse) return this.showError('กรุณาระบุอัตราค่าสมัครเข้าอบรม', this.$refs.ValueCourseField);
-    //  if (this.valueCheckboxCourse.find(it => it.course_type === 'Onsite') && check_course_other) return this.showError('กรุณาระบุการเข้าร่วมอบรมอบรมเชิงปฏิบัติการ หัวข้อ " Data Analysis in Clinical Research Using R Programming"', this.$refs.CheckCourseOtherField);
-    if (!title_name) return this.showError('กรุณาระบุคำนำหน้า', this.$refs.titleNameField);
-    if (title_name === '10013' && !title_name_other) return this.showError('กรุณาระบุคำนำหน้าอื่น ๆ', this.$refs.titleNameOtherField);
-    if (!name_th) return this.showError('กรุณาระบุชื่อ', this.$refs.NameThField);
-    if (!lastname_th) return this.showError('กรุณาระบุนามสกุล', this.$refs.LastNameThField);
-    if (!name_en) return this.showError('กรุณาระบุชื่อภาษาอังกฤษ', this.$refs.NameEnField);
-    if (!lastname_en) return this.showError('กรุณาระบุนามสกุลภาษาอังกฤษ', this.$refs.LastNameEnField);
-    if (this.register_type === '40002' && !education) return this.showError('กรุณาระบุคุณวุฒิการศึกษาสูงสุด', this.$refs.EducationField);
-    if (this.register_type === '40002' && !receipt_name) return this.showError('กรุณาระบุชื่อที่ใช้สำหรับออกใบเสร็จรับเงิน', this.$refs.ReceiptNameField);
-    if (this.register_type === '40002' && !id_card_number) return this.showError('กรุณาระบุเลขบัตรประชาชน/เลขประจำตัวผู้เสียภาษีอากร ', this.$refs.IdCardNumberField);
-    //  if (!company_name) return this.showError('กรุณาระบุชื่อสถานที่ปฏิบัติงาน', this.$refs.CompanyNameField);
-    if (this.register_type === '40002' && !company_address) return this.showError('กรุณาระบุที่อยู่สถานที่ทำงานเลขที่', this.$refs.CompanyAddressField);
-    if (this.register_type === '40002' && !this.selectedProvince) return this.showError('กรุณาเลือกจังหวัด', this.$refs.ProvinceField);
-    if (this.register_type === '40002' && !this.selectedDistrict) return this.showError('กรุณาเลือกเขต/อำเภอ', this.$refs.DistrictField);
-    if (this.register_type === '40002' && !this.selectedSubdistrict) return this.showError('กรุณาเลือกแขวง/ตำบล', this.$refs.SubdistrictField);
-    if (this.register_type === '40002' && !this.postcode) return this.showError('กรุณาระบุรหัสไปรษณีย์', this.$refs.PostcodeField);
-    if (!phone) return this.showError('กรุณาระบุเบอร์โทรศัพท์มือถือ', this.$refs.PhoneField);
-    if (!phone_other) return this.showError('กรุณาระบุเบอร์โทรศัพท์อื่น (กรณีติดต่อไม่ได้)', this.$refs.PhoneOtherField);
-    if (!email1) return this.showError('กรุณาระบุอีเมล', this.$refs.EmailField);
-    if (!email2) return this.showError('กรุณาระบุยืนยันอีเมล', this.$refs.EmailConfirmField);
-    if (this.register_type === '40002' && !confirm_receipt) return this.showError('กรุณายืนยันว่าข้อมูลในใบเสร็จรับเงินถูกต้อง', this.$refs.ConfirmReceiptField);
-    if (this.register_type === '40001' &&!employee_id) return this.showError('กรุณาระบุรหัสพนักงาน', this.$refs.EmployeeIdField);
-    if (!job_position) return this.showError('กรุณาระบุตำแหน่งงาน', this.$refs.JobPositionField);
-    if (job_position === '20008' && !job_position_other) return this.showError('กรุณาระบุตำแหน่งงานอื่น ๆ', this.$refs.JobPositionOtherField);
-    if (this.register_type === '40002' && !work_experience) return this.showError('กรุณาระบุประสบการณ์ทำงาน', this.$refs.WorkExperienceField);
-    if (!food_allergy) return this.showError('กรุณาระบุอาการการแพ้อาหาร', this.$refs.foodAllergyField);
-    if (food_allergy === '50001' && !food_allergy_detail) return this.showError('กรุณาระบุรายละเอียดอาหารที่มีอาการแพ้', this.$refs.FoodAllergyDetailField);
-    if (!food) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodField);
-    if (food === '70004' && !food_other) return this.showError('กรุณาระบุรายละเอียดประเภทอาหาร', this.$refs.FoodOtherField);
-    //  if (this.register_type === '40002' && !receipt_order) return this.showError('กรุณาระบุประเภทข้อมูลใบเสร็จรับเงิน', this.$refs.SelectReceiptField);
-    if (!confirm_register) return this.showError('กรุณายืนยันว่าข้อมูลการลงทะเบียนถูกต้อง', this.$refs.ConfirmRegisterField);
-
-
-    if(this.isEdit === false){
-        try {
-
-            // รับวันที่ปัจจุบัน
-            let currentDate = this.$moment();
-
-            // เพิ่ม 3 วัน
-        
-
-            // รูปแบบใหม่ (YYYY-MM-DD HH:mm:ss)
-            let start_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
-
-            currentDate.add(3, 'days');
-            let end_date = currentDate.format('YYYY-MM-DD HH:mm:ss');
-
-
-            const fd = {
-            "register_type"             : this.register_type,
-            "course_id"                 : this.valueCheckboxCourse[0].select_code,
-            "course_name"               : this.valueCheckboxCourse[0].name,
-            "course_price"              : this.valueCheckboxCourse[0].course_price,
-            "check_course_other"        : this.dataFrom.check_course_other,
-            "title_name"                : this.dataFrom.title_name,
-            "title_name_other"          : this.dataFrom.title_name_other,
-            "name_th"                   : this.dataFrom.name_th,
-            "lastname_th"               : this.dataFrom.lastname_th,
-            "name_en"                   : this.dataFrom.name_en,
-            "lastname_en"               : this.dataFrom.lastname_en,
-            "education"                 : this.dataFrom.education,
-            "receipt_name"              : this.dataFrom.receipt_name,
-            "id_card_number"            : this.dataFrom.id_card_number,
-            "confirm_receipt"           : this.dataFrom.confirm_receipt,
-            "company_name"              : this.dataFrom.company_name,
-            "company_address"           : this.dataFrom.company_address,
-            "province_id"               : this.selectedProvince === null ? "" : this.selectedProvince.province_code,
-            "district_id"               : this.selectedDistrict === null ? "" : this.selectedDistrict.district_code,
-            "subdistrict_id"            : this.selectedSubdistrict === null ? "" : this.selectedSubdistrict.sub_district_code,
-            "postcode"                  : this.postcode,
-            "email"                     : this.dataFrom.email1,
-            "phone"                     : this.dataFrom.phone,
-            "phone_other"               : this.dataFrom.phone_other,
-            "employee_id"               : this.dataFrom.employee_id,
-            "job_position"              : this.dataFrom.job_position,
-            "job_position_other"        : this.dataFrom.job_position_other,
-            "work_experience"           : this.dataFrom.work_experience,
-            "food_allergy"              : this.dataFrom.food_allergy,
-            "food_allergy_detail"       : this.dataFrom.food_allergy_detail,
-            "food"                      : this.dataFrom.food,
-            "food_other"                : this.dataFrom.food_other,
-            // "receipt_order"             : this.dataFrom.receipt_order, 
-            "confirm_register"          : this.dataFrom.confirm_register,
-            "create_date"               : start_date,
-            "status_register"           : this.register_type === "40001" ? "12002" : "12001",
-            "status_receipt"           : this.register_type === "40002" ? "13001" : null,
-            "end_date"                  : end_date,
-            "cancel_order"              : 11002,
-        }
-
-        // let Action = false;
-        // if(responseEmployee === '' )
-        // {
-        //     Action = true;
-        // }
-        // else if(responseEmployee.data.code === '200')
-        // {
-        //     Action = true;
-        // }
-
-        if (this.register_type === "40001" && this.check_employee) return this.showError('ข้อมูลรหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง', this.$refs.PasswordField);
-
-        if( !this.check_employee ||  this.register_type === "40002"){
-
-            const registerPath = `/api_gcp/Register/addRegister`
-
-            let response =  await this.$axios.post(`${registerPath}`, fd)
-
-            const registerId = { id: response.data.data };
-            
-            // const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
-            const key = 'gCpI2eigt0r041'; // คีย์สำหรับการเข้ารหัส
-
-            // Encrypt the receipt data
-            const encryptedData = this.$cryptoJS.AES.encrypt(JSON.stringify(registerId), key).toString();
-            
-
-            if(response.data.data){
-                
-                this.getDigit(response.data.data)
-
-                const dataEmail = {
-
-                "register_type"         : this.register_type,
-                "course_type"           : this.valueCheckboxCourse[0].course_type,
-                "check_course_other"    : this.dataFrom.check_course_other,
-                "email"                 : this.dataFrom.email1,
-                }
-
-                this.$axios.post('/api_gcp/Register/sendMailRegister', dataEmail)
-
-
-                // console.log(responseEmail);
-            }
-
-        
-        await this.$swal.fire({
-            icon: 'success',
-            title: 'บันทึกสำเร็จ',
-            text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-        }).then( function(){
-
-        });
-
-        await this.$router.push({ name: 'registration-detail', params: { id: encryptedData }})
-        }
-
-
-        } catch (error) {
-            console.error('Error Insert register:', error);
-            this.$router.push({ name: 'mainView'})
-        }
-    }else{
-        try {
-
-            const date = this.$moment();
-            const formattedDate = date.format('YYYY-MM-DD HH:mm:ss'); 
-
-            const fdEdit = {
-                "register_id"               : this.dataFrom.id,
-                "title_name"                : this.dataFrom.title_name,
-                "title_name_other"          : this.dataFrom.title_name_other,
-                "name_th"                   : this.dataFrom.name_th,
-                "lastname_th"               : this.dataFrom.lastname_th,
-                "name_en"                   : this.dataFrom.name_en,
-                "lastname_en"               : this.dataFrom.lastname_en,
-                "education"                 : this.dataFrom.education,
-                "receipt_name"              : this.dataFrom.receipt_name,
-                "id_card_number"            : this.dataFrom.id_card_number,
-                "confirm_receipt"           : this.dataFrom.confirm_receipt,
-                "company_name"              : this.dataFrom.company_name,
-                "company_address"           : this.dataFrom.company_address,
-                "province_id"               : this.selectedProvince.length ? this.selectedProvince : this.selectedProvince.province_code,
-                "district_id"               : this.selectedDistrict.length ? this.selectedDistrict : this.selectedDistrict.district_code,
-                "subdistrict_id"            : this.selectedSubdistrict.length ? this.selectedSubdistrict : this.selectedSubdistrict.sub_district_code,
-                "postcode"                  : this.postcode,
-                "email"                     : this.dataFrom.email1,
-                "phone"                     : this.dataFrom.phone,
-                "phone_other"               : this.dataFrom.phone_other,
-                "employee_id"               : this.dataFrom.employee_id,
-                "job_position"              : this.dataFrom.job_position,
-                "job_position_other"        : this.dataFrom.job_position_other,
-                "work_experience"           : this.dataFrom.work_experience,
-                "food_allergy"              : this.dataFrom.food_allergy,
-                "food_allergy_detail"       : this.dataFrom.food_allergy !== "50001" ?  null : this.dataFrom.food_allergy_detail,
-                "food"                      : this.dataFrom.food,
-                "food_other"                : this.dataFrom.food !== "70004" ? null : this.dataFrom.food_other,
-                // "receipt_order"           : this.dataFrom.receipt_order, 
-                "confirm_register"          : this.dataFrom.confirm_register,
-                "modified_by"               : this.dataFrom.id,
-                "modified_date"             : formattedDate
-            }
-
-            const registerEditPath = `/api_gcp/Register/editRegister`
-            await this.$axios.post(`${registerEditPath}`, fdEdit)
-
-            await this.$swal.fire({
-                icon: 'success',
-                title: 'บันทึกสำเร็จ',
-                text: 'ระบบได้ทำการบันทึกข้อมูลของคุณแล้ว'
-            }).then( function(){
-            
-
-            });
-            this.fechRegisterById(this.dataFrom.id);
-        } catch (error) {
-            console.log('editRegister',error);
-        }
-
-    }
-},
-
-async getDigit(id){
-
-    let idProject           = this.project_code;
-    let formatPaymentDate   = this.$moment().format('DD-MM-YY')
-    let paymentDate         = formatPaymentDate.replace(/-/g, "");
-    var string              = "" + id;
-    var pad1                = "000000";
-    let running_no_1        = pad1.substring(0, pad1.length - string.length) + string;
-    var pad2                = "00000000";
-    let running_no_2        = pad2.substring(0, pad2.length - string.length) + string;
-
-    const reference_no_1    = idProject + paymentDate + running_no_1
-    const reference_no_2    = idProject + running_no_2 + paymentDate
-
-    const fd = {
-        "reference_no_1"    : reference_no_1,
-        "reference_no_2"    : reference_no_2,
-        "cost"              : this.valueCheckboxCourse[0].course_price,
-    }
-
-    const digitPath = `/CRAServices/payment/get_digit`
-    let response =  await this.$axios.post(`${digitPath}`, fd)
-
-
-    if(response.data){
-
-        const lastDigit             = response.data.last_2_digit
-        const FormatReference_no_1  = reference_no_1 + lastDigit
-
-        const fd = {
-            "reference_no_1"    : FormatReference_no_1,
-            "reference_no_2"    : reference_no_2,
-            "id"                : id,
-        }
-
-
-        const updateReferencePath = `/api_gcp/Register/updateReferenceRegister`
-
-        await this.$axios.post(`${updateReferencePath}`, fd)
-
-    }
-
-},
-
-async fechRegisterById(id){
-
-    try {
-
-    const registerByIdPath              = `/api_gcp/Register/getRegisterById`
-    const response                      = await this.$axios.get(`${registerByIdPath}/${id}`)
-
-    const datas                         = response.data.data
-
-    this.dataFrom                       = datas
-
-    this.register_type                  = datas.register_type
-
-    this.dataFrom.check_course_other    = datas.check_course_other === 1 ? true : false
-
-    this.selectedProvince               = datas.province_id
-
-    this.selectedDistrict               = datas.district_id
-
-    this.selectedSubdistrict            = datas.subdistrict_id
-
-    this.postcode                       = datas.postcode
-
-    this.dataFrom.email1                = datas.email
-
-    this.dataFrom.email2                = datas.email
-
-    let course                          = {"select_code": datas.course_id, "course_type": datas.course_type };
-
-    this.valueCheckboxCourse.push(course);
-
-
-    if (this.selectedProvince) {
-        this.fetchDistricts(this.selectedProvince);
-    }
-
-    if (this.selectedDistrict) {
-        this.fetchSubdistricts( this.selectedProvince, this.selectedDistrict);
-    }
-
-
-    } catch (error) {
-        console.log('fechRegisterById', error);
-    }
-
-},
-
-handleInput(field) {
-// Replace non-numeric characters with an empty string
-    this.dataFrom[field] = this.dataFrom[field].replace(/[^0-9]/g, '');
-},
-validateInput(field) {
-    // ใช้ regex เพื่อตรวจสอบว่าข้อความประกอบด้วยตัวอักษรภาษาไทยเท่านั้น
-    const thaiTextPattern = /^[\u0E00-\u0E7F\s]+$/;
-    this.isValidThaiText = thaiTextPattern.test(this.dataFrom[field]);
-  
-    // หากไม่ใช่ภาษาไทยให้ทำการ replace อักษรภาษาอังกฤษด้วย ''
-    if (!this.isValidThaiText) {
-        this.dataFrom[field] = this.dataFrom[field].replace(/[a-zA-Z^0-9*!@#$%^&*()_+{}:;<>,.?~`-]/g, '');
-    }
-
-    // .replace(/[^a-zA-Z0-9*!@#$%^&*()_+{}\[\]:;<>,.?/~`|\\\-]+/g, '')
-},
-
-textMatch() {
-    return this.dataFrom.email1 === this.dataFrom.email2
-},
-
-showError(message, fieldRef) {
-    this.$swal.fire({
-        icon: 'warning',
-        title: message,
-        // text: message
-    }).then(() => {
-        const tableContainer = fieldRef.$el.querySelector('.v-data-table');
-        const input = fieldRef.$el.querySelector('input');
-        const firstRadioButton = fieldRef.$el.querySelector('input[type="radio"]');
-        const firstCheckboxButton = fieldRef.$el.querySelector('input[type="checkbox"]');
-        if(input){
-            input.focus();
-        }
-        if (tableContainer) {
-            tableContainer.focus();
-        }
-        if (firstRadioButton) {
-        firstRadioButton.focus();
-        }
-        if (firstCheckboxButton) {
-            firstCheckboxButton.focus();
-        }
-    });
-},
-
-// Validation functions
-validateRequiredField(field, errorMessage, ref) {
-    if (!field) {
-        return this.showError(errorMessage, ref);
-    }
-},
-
-validateConditionalField(condition, field, errorMessage, ref) {
-    if (condition && !field) {
-        return this.showError(errorMessage, ref);
-    }
-},
-
-clearEditData() {
-    this.dataFrom               = {}; // เคลียร์ข้อมูลการแก้ไข
-    this.isEdit                 = false; // สลับโหมดกลับไปยังโหมดการเพิ่มข้อมูล
-    this.valueCheckboxCourse    = []
-    this.register_type          = null
-}
-
-},        methods: {
 
             async checkEmployee (){
                 try {
@@ -1741,7 +1306,7 @@ clearEditData() {
             }
 
         },
-        
+
         beforeRouteLeave(to, from, next) {
             // ตรวจสอบว่ากำลังออกจากหน้าแก้ไขไปยังหน้าลงทะเบียนหรือไม่
             if (from.name === 'registration-edit' && to.name === 'registration') {
