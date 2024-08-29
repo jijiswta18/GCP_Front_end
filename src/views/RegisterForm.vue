@@ -695,6 +695,7 @@
 </template>
 
 <script>
+    import store from '../store/index.js';
     export default {
         data: () => ({
             register_type : null,
@@ -702,12 +703,12 @@
             isEdit: false,
             valid: true,
             dataFrom: {},
-           
+            checkDate: false,
             options: [],
             // optionsCourses: [],
             valueCheckboxCourse: [],
             selectedItems: [],
-          
+            user: store.getters,
             errorMessage:'',
             headerCourses: [
                 { text: 'name', align: 'left', value: 'name' },
@@ -823,24 +824,51 @@
         mounted(){
             this.fetchProvinces();
             this.fetchSelectList();
-
+           
             
             // this.fetchCourses();
             this.getCountRegister();
             if (this.$route.name === 'registration-edit') {
-            this.isEdit             = true;
-            this.isHidden           = !this.isHidden;
-            const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
-            const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
-            const bytes             = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
-            const decryptedData     = bytes.toString(this.$cryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
-            const registerEditId    = JSON.parse(decryptedData);
-            
-            this.fechRegisterById(registerEditId.id);
-                // Load data based on this.$route.params.id for editing
+                this.isEdit             = true;
+                this.isHidden           = !this.isHidden;
+                const encryptedData     = this.$route.params.id; // รับค่า receiptData จากพารามิเตอร์ใน URL
+                const key               = 'gCpI2eigt0r041'; // คีย์สำหรับถอดรหัส 
+                const bytes             = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
+                const decryptedData     = bytes.toString(this.$cryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
+                const registerEditId    = JSON.parse(decryptedData);
+                
+                this.fechRegisterById(registerEditId.id);
+                    // Load data based on this.$route.params.id for editing
+            }else{
+
+                this.getMenuRegisterOpening()
+                
+
+                if(this.user.user === null && !this.checkDate){
+                 
+                    this.$swal.fire({
+                        icon: "error",
+                        title: "ขออภัย ขณะนี้ไม่อยู่ในช่วงเวลาลงทะเบียน",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                             this.$router.push({ name: 'RegisterListView'})
+
+                        }
+                    });
+
+                  
+                }
+              
             }
         },
         methods: {
+
+            async getMenuRegisterOpening(){
+                const path = '/api_gcp/Register/getMenuRegisterOpening'
+                const response = await this.$axios.get(path);
+                this.checkDate = response.data
+
+            },
 
             async checkEmployee (){
                 try {

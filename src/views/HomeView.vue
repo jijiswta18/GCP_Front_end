@@ -29,7 +29,8 @@
             @click.prevent="handleRegistration"
           >
 
-            <v-list-item link v-if="user.user?.menu_register || checkDate">
+            <!-- <v-list-item link v-if="user.user?.menu_register || checkDate"> -->
+            <v-list-item>
                 <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
             </v-list-item>
           </router-link>
@@ -110,8 +111,8 @@
               active-class="activemenu"
               :to="{ name: 'registration'}"              >
             
-              <v-list-item link v-if="user.user?.menu_register || checkDate">
-              <!-- <v-list-item link > -->
+              <!-- <v-list-item link v-if="user.user?.menu_register || checkDate"> -->
+              <v-list-item link >
                   <v-list-item-title class="menu-text">ลงทะเบียน</v-list-item-title>
               </v-list-item>
             </router-link>
@@ -176,7 +177,8 @@ export default {
     // ...mapGetters(['isAuthenticated'])
   },
   mounted(){
-    this.getMenuRegisterOpening()
+
+    // this.getMenuRegissterOpening()
   },
   methods: {
     toggleMenu() {
@@ -190,16 +192,16 @@ export default {
       window.location.href = item.link;
     },
 
-    async getMenuRegisterOpening(){
-      const path = '/api_gcp/Register/getMenuRegisterOpening'
-      const response = await this.$axios.get(path);
-      this.checkDate = response.data
+    // async getMenuRegisterOpening(){
+    //   const path = '/api_gcp/Register/getMenuRegisterOpening'
+    //   const response = await this.$axios.get(path);
+    //   this.checkDate = response.data
 
-      console.log(this.checkDate );
+    //   console.log(this.checkDate );
 
 
       
-    },
+    // },
     async logout() {
 
       this.$swal.fire({

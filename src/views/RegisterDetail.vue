@@ -407,6 +407,7 @@ export default{
         const bytes             = this.$cryptoJS.AES.decrypt(encryptedData, key); // ใช้ CryptoJS ในการถอดรหัส
         const decryptedData     = bytes.toString(this.$cryptoJS.enc.Utf8); // เก็บข้อมูลที่ถอดรหัสไว้ในตัวแปร decryptedData
         this.registerId        = JSON.parse(decryptedData);
+        
 
         setTimeout(() => {
             this.fechRegisterById();
@@ -422,6 +423,7 @@ export default{
                 const response                  = await this.$axios.get(`${registerByIdPath}/` + this.registerId.id)
 
                 const datas                     = response.data.data
+                
                 const formattedEndDate          = this.$moment(datas.end_date).format('DD-MM-YYYY');
                 this.data                       = datas
                 this.data.name_th               = `${datas.name_th} ` + `${datas.lastname_th}`  

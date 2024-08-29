@@ -85,6 +85,9 @@ const store = new Vuex.Store({
         
         const user = responseCheck.data.result
 
+        console.log(user);
+        
+
         
 
         console.log(user);
